@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendar Annual View</title>
+    <link rel="stylesheet" href="./year-view.css" />
+  </head>
+  <body class="theme-dark">
+    <header>
+      <div class="controls">
+        <button id="toggleCalendars" class="btn" data-size="compact" type="button" aria-expanded="false" aria-controls="calendarFilters">Show options</button>
+        <div class="year-nav">
+          <button class="btn" type="button" data-size="compact" data-year-step="-1">–</button>
+          <input id="yearInput" class="input" type="number" min="1900" max="2999" step="1" />
+          <button class="btn" type="button" data-size="compact" data-year-step="1">+</button>
+        </div>
+        <div id="selectedSummary" class="selected-summary" aria-live="polite"></div>
+        <button id="themeToggle" class="btn" data-size="compact" type="button">Toggle theme</button>
+      </div>
+    </header>
+
+    <div id="yearLayout" class="year-layout">
+      <aside id="calendarFilters" class="calendar-filters collapsed" aria-label="Calendar filters">
+        <div class="cal-actions">
+          <label for="allDayOnly" class="btn cal-chip-toggle" data-size="compact">
+            <input id="allDayOnly" type="checkbox" />
+            <span class="chip-indicator" aria-hidden="true"></span>
+            <span class="chip-text">Show all-day only</span>
+          </label>
+          <label for="minDurationHours" class="cal-chip" aria-label="Minimum event length in hours">
+            <span>Min event length (h)</span>
+            <input id="minDurationHours" class="input" type="number" min="0" step="0.25" value="25" />
+            <div class="min-duration-controls">
+              <button id="minDurationDown" class="btn" data-size="compact" type="button" aria-label="Decrease minimum length by one hour">–</button>
+              <button id="minDurationUp" class="btn" data-size="compact" type="button" aria-label="Increase minimum length by one hour">+</button>
+            </div>
+          </label>
+          <button id="selectAllCals" class="btn" data-size="compact" type="button">Select all</button>
+          <button id="deselectAllCals" class="btn" data-size="compact" type="button">Deselect all</button>
+        </div>
+        <div class="cal-list" id="calendarList" aria-label="Calendars"></div>
+      </aside>
+
+      <main class="main-panel">
+        <div class="calendar-wrap">
+          <section class="calendar" id="calendarGrid" aria-label="Linear year calendar"></section>
+          <div class="events-layer" id="eventsLayer" aria-hidden="true"></div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

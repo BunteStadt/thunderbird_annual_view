@@ -1,0 +1,38 @@
+name: Build Thunderbird XPI
+
+permissions:
+  contents: write  # needed to create releases and upload files
+
+on:
+  push:
+    tags:
+      - 'v*'   # Run on version tags, e.g., v1.0.0
+
+jobs:
+  build-xpi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Build XPI
+        run: |
+          mkdir -p dist
+          zip -r dist/calendar-annual-view-${GITHUB_REF##*/}.xpi \
+          manifest.json src experiments icons
+
+      - name: Upload XPI to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/calendar-annual-view-${{ github.ref_name }}.xpi
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: "Automatic build of XPI"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

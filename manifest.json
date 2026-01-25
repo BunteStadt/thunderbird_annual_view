@@ -7,7 +7,8 @@
     "browser_specific_settings": {
         "gecko": {
             "id": "GlamorousPotato.calendar-annual-view@addons.thunderbird.net",
-            "strict_min_version": "115.0"
+            "strict_min_version": "147.0",
+            "strict_max_version": "148.0"
         }
     },
     "permissions": [

@@ -101,3 +101,31 @@ export async function persistHighlightCurrentDay(enabled) {
         console.error("[storage] save highlight current day failed", err);
     }
 }
+
+export async function loadRefreshSettings() {
+    try {
+        const stored = await browser.storage.local.get("refreshSettings");
+        if (Object.prototype.hasOwnProperty.call(stored, "refreshSettings")) {
+            const settings = stored.refreshSettings;
+            return {
+                autoRefreshEnabled: settings.autoRefreshEnabled !== false,
+                autoRefreshInterval: settings.autoRefreshInterval || 300000 // 5 minutes default
+            };
+        }
+    } catch (err) {
+        console.error("[storage] load refresh settings failed", err);
+    }
+    return {
+        autoRefreshEnabled: true,
+        autoRefreshInterval: 300000 // 5 minutes default
+    };
+}
+
+export async function persistRefreshSettings(settings) {
+    try {
+        await browser.storage.local.set({ refreshSettings: settings });
+    } catch (err) {
+        console.error("[storage] save refresh settings failed", err);
+    }
+}
+

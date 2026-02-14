@@ -28,7 +28,6 @@ This is a Thunderbird WebExtension add-on that provides an annual calendar view 
 - Use `const` and `let`, avoid `var`
 - Prefer async/await over promise chains
 - Use browser.* API namespaces (WebExtension standard)
-- Include descriptive console.log statements for debugging
 - Follow existing naming conventions:
   - camelCase for functions and variables
   - PascalCase for class names
@@ -95,7 +94,7 @@ This project currently has no automated test suite. Manual testing in Thunderbir
 1. Modify relevant files in `src/`
 2. Update manifest.json if new permissions needed
 3. Test manually in Thunderbird
-4. Update README.md if user-facing feature
+4. Always update README.md when user-facing behavior, setup, options, or compatibility details change
 5. Update version in manifest.json
 6. Create git tag for release
 
@@ -109,6 +108,7 @@ This project currently has no automated test suite. Manual testing in Thunderbir
 - Support both light and dark themes
 - Use CSS variables for theme-dependent colors
 - Test in both theme modes
+- If GUI output changes, include at least one updated screenshot in the PR
 
 ## Troubleshooting
 

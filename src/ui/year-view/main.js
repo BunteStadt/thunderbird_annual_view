@@ -22,6 +22,10 @@ import { applyTheme, detectSystemMode } from "./theme.js";
 // Set to true for local development with dummy calendars/events. Real calendars are ignored when enabled.
 globalThis.ENABLE_DUMMY_CALENDARS = true;
 
+// Constants
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const GRID_HEADER_OFFSET = 2; // Accounts for month label column + header row
+
 const months = [
     "January",
     "February",
@@ -804,8 +808,8 @@ function renderDayAlignedEvents(year, events) {
             const gridRow = monthIdx + 2;
             
             // Column span: offset by first day + actual day positions
-            const startCol = 2 + firstDayOfMonth + monthStartDay - 1; // 2 = skip month label + header
-            const endCol = 2 + firstDayOfMonth + monthEndDay; // Exclusive end
+            const startCol = GRID_HEADER_OFFSET + firstDayOfMonth + monthStartDay - 1;
+            const endCol = GRID_HEADER_OFFSET + firstDayOfMonth + monthEndDay; // Exclusive end
             
             const continuesPrev = monthIdx > startMonth;
             const continuesNext = monthIdx < endMonth;
@@ -860,7 +864,7 @@ function renderWeekRowsEvents(year, events) {
     
     while (currentRowStart <= endDate || rowIdx < 14) {
         const rowEnd = new Date(currentRowStart);
-        rowEnd.setDate(rowEnd.getDate() + 27); // 4 weeks = 28 days
+        rowEnd.setDate(rowEnd.getDate() + 27); // Add 27 days to create 28-day period (4 weeks, inclusive)
         
         fourWeekRows.push({
             index: rowIdx,
@@ -931,8 +935,8 @@ function renderWeekRowsEvents(year, events) {
             if (!lanes[laneIndex]) lanes[laneIndex] = [];
             
             // Calculate day positions within the 28-day row
-            const daysSinceRowStart = Math.floor((seg.start - row.start) / (24 * 60 * 60 * 1000));
-            const daysSinceRowEnd = Math.floor((seg.end - row.start) / (24 * 60 * 60 * 1000));
+            const daysSinceRowStart = Math.floor((seg.start - row.start) / MS_PER_DAY);
+            const daysSinceRowEnd = Math.floor((seg.end - row.start) / MS_PER_DAY);
             
             // Mark all days occupied
             for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
@@ -944,8 +948,8 @@ function renderWeekRowsEvents(year, events) {
             const gridRow = seg.rowIndex + 2;
             
             // Columns: 1 for row label, then 28 for days
-            const startCol = 2 + daysSinceRowStart;
-            const endCol = 2 + Math.min(daysSinceRowEnd + 1, 28);
+            const startCol = GRID_HEADER_OFFSET + daysSinceRowStart;
+            const endCol = GRID_HEADER_OFFSET + Math.min(daysSinceRowEnd + 1, 28);
             
             const continuesPrev = segIdx > 0;
             const continuesNext = segIdx < eventSegments.length - 1;
@@ -992,8 +996,8 @@ function findFourWeekLaneForSegments(rowLaneEnds, segments, fourWeekRows) {
             if (!lanes[laneIndex]) lanes[laneIndex] = [];
             
             // Calculate day positions within the 28-day row
-            const daysSinceRowStart = Math.floor((seg.start - row.start) / (24 * 60 * 60 * 1000));
-            const daysSinceRowEnd = Math.floor((seg.end - row.start) / (24 * 60 * 60 * 1000));
+            const daysSinceRowStart = Math.floor((seg.start - row.start) / MS_PER_DAY);
+            const daysSinceRowEnd = Math.floor((seg.end - row.start) / MS_PER_DAY);
             
             // Check if any day in this segment is occupied in this lane
             for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {

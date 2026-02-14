@@ -1,14 +1,12 @@
 # Thunderbird Annual View
-Annual calendar year view in a grid layout.
-Displays all 12 months with rows as months and columns as weekdays. Supports multiple calendars with automatic detection and color matching.
-Read-only.
-Filtering by event duration and "full day event"
+Calendar Annual View is a Thunderbird add-on that shows an entire year in one compact, readable grid.
+It displays all 12 months, supports multiple calendars with automatic color matching, and keeps the view read-only for quick planning and overview use cases.
 
-## Description
+## Marketplace Description
 
-This add-on allows to view all months of a year in a single, linear grid layout. Each row represents a month, and each column represents a weekday. Multiple calendars can be displayed simultaneously, with automatic detection from Thunderbird's standard calendar list. Calendar colors are inherited from the normal calendar settings.
+Calendar Annual View adds a full-year calendar layout to Thunderbird: all 12 months are shown in one linear grid where each row is a month and each column is a weekday. It is designed for fast yearly planning and conflict spotting.
 
-The view is read-only; to edit events, use Thunderbird's standard calendar views.
+The add-on automatically detects your Thunderbird calendars, applies their configured colors, and lets you filter what is shown (per-calendar visibility, minimum event duration, and all-day events only). The annual view is intentionally read-only, so event editing remains in Thunderbird's standard day/week/month views.
 
 ## Features
 
@@ -33,7 +31,7 @@ The view is read-only; to edit events, use Thunderbird's standard calendar views
 
 ## Installation
 
-1. Download the latest `.xpi` file from the [Releases](https://github.com/your-repo/thunderbird_annual_view/releases) page.
+1. Download the latest `.xpi` file from the [Releases](https://github.com/BunteStadt/thunderbird_annual_view/releases) page.
 2. In Thunderbird, go to **Add-ons and Themes** (Tools > Add-ons and Themes).
 3. Click the gear icon and select **Install Add-on From File**.
 4. Select the downloaded `.xpi` file and follow the prompts.
@@ -44,7 +42,7 @@ Alternatively, install directly from the [Thunderbird Add-ons site](https://addo
 
 1. After installation, new buttons (on the left in the spaces toolbar and at the top left) will appear.
 2. Click a button to open the annual calendar view.
-3. Select the year to display using the input field or the 2 bottons.
+3. Select the year to display using the input field or the 2 buttons.
 4. Click on `show options` to open the configuration tab.
 
 ## Configuration

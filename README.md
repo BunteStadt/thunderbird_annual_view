@@ -70,6 +70,14 @@ To create an `.xpi` file manually:
 2. Zip the contents (excluding the `.git` folder).
 3. Rename the zip file extension to `.xpi`.
 
+### Automated Smoke Test
+
+Run the lightweight Node.js smoke tests for the year-view calendar service:
+
+```bash
+node --test
+```
+
 ### Releasing a New Version
 
 1. Create branches and commits as needed during development.

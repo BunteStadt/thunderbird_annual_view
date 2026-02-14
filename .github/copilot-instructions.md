@@ -42,6 +42,7 @@ This is a Thunderbird WebExtension add-on that provides an annual calendar view 
 - Add comments to explain complex logic or Thunderbird-specific behavior
 - Document function purposes when not obvious from name
 - Keep comments concise and relevant
+- When changing code, review nearby comments and update/add them if intent is not obvious
 
 ## Building and Testing
 

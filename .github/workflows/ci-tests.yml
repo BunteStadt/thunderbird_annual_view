@@ -1,0 +1,28 @@
+name: CI Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run unit and integration tests
+        run: node --test
+
+      - name: Build XPI archive
+        run: zip -r /tmp/calendar-annual-view-ci.xpi manifest.json src experiments icons
+
+      - name: Validate archive structure
+        run: unzip -t /tmp/calendar-annual-view-ci.xpi

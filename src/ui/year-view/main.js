@@ -7,7 +7,7 @@ import {
     loadThemePreference,
     persistTheme,
     loadRefreshSettings,
-    persistRefreshSettings
+    persistRefreshSettings,
     loadGrayPastDays,
     persistGrayPastDays,
     loadHighlightCurrentDay,

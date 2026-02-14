@@ -28,6 +28,7 @@ This is a Thunderbird WebExtension add-on that provides an annual calendar view 
 - Use `const` and `let`, avoid `var`
 - Prefer async/await over promise chains
 - Use browser.* API namespaces (WebExtension standard)
+- Include descriptive console.log statements for debugging
 - Follow existing naming conventions:
   - camelCase for functions and variables
   - PascalCase for class names

@@ -62,6 +62,74 @@ export async function persistTheme(theme) {
     }
 }
 
+export async function loadGrayPastDays() {
+    try {
+        const stored = await browser.storage.local.get("grayPastDays");
+        if (Object.prototype.hasOwnProperty.call(stored, "grayPastDays")) {
+            return Boolean(stored.grayPastDays);
+        }
+    } catch (err) {
+        console.error("[storage] load gray past days failed", err);
+    }
+    return false;
+}
+
+export async function persistGrayPastDays(enabled) {
+    try {
+        await browser.storage.local.set({ grayPastDays: !!enabled });
+    } catch (err) {
+        console.error("[storage] save gray past days failed", err);
+    }
+}
+
+export async function loadHighlightCurrentDay() {
+    try {
+        const stored = await browser.storage.local.get("highlightCurrentDay");
+        if (Object.prototype.hasOwnProperty.call(stored, "highlightCurrentDay")) {
+            return Boolean(stored.highlightCurrentDay);
+        }
+    } catch (err) {
+        console.error("[storage] load highlight current day failed", err);
+    }
+    return false;
+}
+
+export async function persistHighlightCurrentDay(enabled) {
+    try {
+        await browser.storage.local.set({ highlightCurrentDay: !!enabled });
+    } catch (err) {
+        console.error("[storage] save highlight current day failed", err);
+    }
+}
+
+export async function loadRefreshSettings() {
+    try {
+        const stored = await browser.storage.local.get("refreshSettings");
+        if (Object.prototype.hasOwnProperty.call(stored, "refreshSettings")) {
+            const settings = stored.refreshSettings;
+            return {
+                autoRefreshEnabled: settings.autoRefreshEnabled !== false,
+                autoRefreshInterval: settings.autoRefreshInterval || 300000 // 5 minutes default
+            };
+        }
+    } catch (err) {
+        console.error("[storage] load refresh settings failed", err);
+    }
+    return {
+        autoRefreshEnabled: true,
+        autoRefreshInterval: 300000 // 5 minutes default
+    };
+}
+
+export async function persistRefreshSettings(settings) {
+    try {
+        await browser.storage.local.set({ refreshSettings: settings });
+    } catch (err) {
+        console.error("[storage] save refresh settings failed", err);
+    }
+}
+
+
 export async function loadWeekNumbersPreference() {
     try {
         const stored = await browser.storage.local.get("showWeekNumbers");

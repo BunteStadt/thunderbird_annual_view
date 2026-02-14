@@ -16,6 +16,7 @@
           <button class="btn" type="button" data-size="compact" data-year-step="1">+</button>
         </div>
         <div id="selectedSummary" class="selected-summary" aria-live="polite"></div>
+        <button id="refreshButton" class="btn" data-size="compact" type="button" title="Refresh calendar data">⟳ Refresh</button>
         <button id="themeToggle" class="btn" data-size="compact" type="button">Toggle theme</button>
       </div>
     </header>
@@ -40,6 +41,16 @@
               <button id="minDurationDown" class="btn" data-size="compact" type="button" aria-label="Decrease minimum length by one hour">–</button>
               <button id="minDurationUp" class="btn" data-size="compact" type="button" aria-label="Increase minimum length by one hour">+</button>
             </div>
+          </label>
+          <label for="grayPastDays" class="btn cal-chip-toggle" data-size="compact">
+            <input id="grayPastDays" type="checkbox" />
+            <span class="chip-indicator" aria-hidden="true"></span>
+            <span class="chip-text">Gray out past days</span>
+          </label>
+          <label for="highlightCurrentDay" class="btn cal-chip-toggle" data-size="compact">
+            <input id="highlightCurrentDay" type="checkbox" />
+            <span class="chip-indicator" aria-hidden="true"></span>
+            <span class="chip-text">Highlight current day</span>
           </label>
           <button id="selectAllCals" class="btn" data-size="compact" type="button">Select all</button>
           <button id="deselectAllCals" class="btn" data-size="compact" type="button">Deselect all</button>

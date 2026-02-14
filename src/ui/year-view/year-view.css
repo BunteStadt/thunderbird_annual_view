@@ -275,7 +275,8 @@ input[type="number"] {
   border-top: 1px dashed var(--grid-line);
 }
 
-.cal-chip {
+.cal-chip,
+.cal-chip-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -287,8 +288,11 @@ input[type="number"] {
   font-size: 0.8rem;
   cursor: pointer;
   transition: background 120ms ease, color 120ms ease;
-  width: 100%;
   justify-content: space-between;
+}
+
+.cal-chip {
+  width: 100%;
 }
 
 .theme-dark .cal-chip {
@@ -303,6 +307,52 @@ input[type="number"] {
 .cal-chip.selected {
   background: var(--chip-selected);
   color: var(--text);
+}
+
+.cal-chip-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.cal-chip-toggle .chip-indicator {
+  width: 36px;
+  height: 20px;
+  background: var(--btn-surface);
+  border-radius: 10px;
+  position: relative;
+  transition: background 200ms ease;
+  border: 1px solid var(--grid-line);
+}
+
+.cal-chip-toggle .chip-indicator::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--text);
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 200ms ease;
+}
+
+.cal-chip-toggle input[type="checkbox"]:checked~.chip-indicator {
+  background: var(--accent);
+}
+
+.cal-chip-toggle input[type="checkbox"]:checked~.chip-indicator::after {
+  transform: translateX(16px);
+  background: var(--panel);
+}
+
+.cal-chip-toggle:hover {
+  background: var(--chip-hover);
+}
+
+.cal-chip-toggle .chip-text {
+  flex: 1;
 }
 
 .selected-summary {
@@ -375,7 +425,28 @@ input[type="number"] {
   color: var(--weekend-text);
 }
 
+.cell.past-day::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
 
+.theme-dark .cell.past-day::after {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.cell.current-day {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+  z-index: 1;
+}
+
+.cell.current-day .day-number {
+  color: var(--accent);
+  font-weight: 700;
+}
 
 
 .month {

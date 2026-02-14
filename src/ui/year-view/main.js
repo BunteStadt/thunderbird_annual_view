@@ -101,6 +101,7 @@ function renderCalendar(year) {
     const todayYear = today.getFullYear();
     const todayMonth = today.getMonth();
     const todayDay = today.getDate();
+    const todayDate = new Date(todayYear, todayMonth, todayDay);
 
     months.forEach((name, monthIndex) => {
         const monthCell = document.createElement("div");
@@ -130,7 +131,6 @@ function renderCalendar(year) {
                 // Apply past day gray overlay
                 if (grayPastDaysEnabled) {
                     const cellDate = new Date(year, monthIndex, day);
-                    const todayDate = new Date(todayYear, todayMonth, todayDay);
                     if (cellDate < todayDate) {
                         cell.classList.add("past-day");
                     }

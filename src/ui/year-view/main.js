@@ -112,8 +112,8 @@ function renderCalendar(year) {
                 label.textContent = day;
                 cell.appendChild(label);
                 if (showWeekNumbersInput?.checked) {
-                    const date = new Date(year, monthIndex, day);
-                    if (date.getDay() === 1) {
+                    const date = new Date(Date.UTC(year, monthIndex, day));
+                    if (date.getUTCDay() === 1) {
                         const weekLabel = document.createElement("span");
                         weekLabel.className = "week-number";
                         weekLabel.textContent = `W${getISOWeekNumber(date)}`;
@@ -128,7 +128,7 @@ function renderCalendar(year) {
 }
 
 function getISOWeekNumber(date) {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
     const dayNum = d.getUTCDay() || 7;
     d.setUTCDate(d.getUTCDate() + 4 - dayNum);
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));

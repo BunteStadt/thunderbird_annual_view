@@ -365,7 +365,7 @@ input[type="number"] {
 
 .cell .week-number {
   position: absolute;
-  top: 4px;
+  top: 18px;
   right: 6px;
   font-size: 0.62rem;
   color: var(--muted);

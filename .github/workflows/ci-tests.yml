@@ -1,5 +1,8 @@
 name: CI Tests
 
+permissions:
+  contents: read
+
 on:
   push:
   pull_request:
@@ -20,9 +23,3 @@ jobs:
 
       - name: Run unit and integration tests
         run: node --test
-
-      - name: Build XPI archive
-        run: zip -r /tmp/calendar-annual-view-ci.xpi manifest.json src experiments icons
-
-      - name: Validate archive structure
-        run: unzip -t /tmp/calendar-annual-view-ci.xpi

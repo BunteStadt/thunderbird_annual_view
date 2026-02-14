@@ -42,9 +42,9 @@ test('background script loads and click handler executes without console errors'
             error(...args) {
                 consoleErrors.push(args);
             }
-        },
-        globalThis: {}
+        }
     });
+    context.globalThis = context;
 
     vm.runInContext(source, context, { filename: 'background.js' });
     assert.equal(typeof clickHandler, 'function');

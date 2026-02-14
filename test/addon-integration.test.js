@@ -40,8 +40,15 @@ test('manifest references existing addon files', () => {
     }
 });
 
-test('addon package can be built and validated as a zip archive', () => {
-    const xpiPath = path.join(os.tmpdir(), `calendar-annual-view-ci-${Date.now()}.xpi`);
+test('addon package can be built and validated as a zip archive', (t) => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'calendar-annual-view-ci-'));
+    const xpiPath = path.join(tempDir, 'addon.xpi');
+    t.after(() => {
+        if (fs.existsSync(xpiPath)) {
+            fs.unlinkSync(xpiPath);
+        }
+        fs.rmSync(tempDir, { recursive: true, force: true });
+    });
 
     const build = spawnSync(
         'zip',

@@ -13,6 +13,9 @@ import {
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./theme.js";
 
+// Set to true for local development with dummy calendars/events. Real calendars are ignored when enabled.
+globalThis.ENABLE_DUMMY_CALENDARS = true;
+
 const months = [
     "January",
     "February",

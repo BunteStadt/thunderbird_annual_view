@@ -1,9 +1,10 @@
 // Minimal ical parsing for DTSTART/DTEND values returned by Thunderbird's calendar API.
-const ENABLE_DUMMY_CALENDARS = false; // Set to true for local development with dummy calendars/events.
+// Dummy calendars are controlled by globalThis.ENABLE_DUMMY_CALENDARS in main.js
 const DUMMY_CALENDARS = [
     { id: "dummy-work", name: "Work", color: "#0ea5e9" },
     { id: "dummy-personal", name: "Personal", color: "#22c55e" },
-    { id: "dummy-project", name: "Project X", color: "#f97316" }
+    { id: "dummy-project", name: "Project X", color: "#f97316" },
+    { id: "dummy-holidays", name: "Holidays", color: "#ef4444" }
 ];
 
 function hasCalendarApi() {
@@ -65,6 +66,146 @@ function getDummyEvents(year, options = {}) {
             start: new Date(year - 1, 11, 29),
             end: new Date(year, 0, 10),
             allDay: true
+        },
+        {
+            id: `dummy-${year}-7`,
+            calendarId: "dummy-work",
+            title: "Team building",
+            start: new Date(year, 2, 15),
+            end: new Date(year, 2, 18),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-8`,
+            calendarId: "dummy-personal",
+            title: "Family reunion",
+            start: new Date(year, 3, 20),
+            end: new Date(year, 3, 23),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-9`,
+            calendarId: "dummy-project",
+            title: "Beta testing",
+            start: new Date(year, 4, 10),
+            end: new Date(year, 4, 16),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-10`,
+            calendarId: "dummy-holidays",
+            title: "Christmas break",
+            start: new Date(year, 11, 24),
+            end: new Date(year, 11, 27),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-11`,
+            calendarId: "dummy-holidays",
+            title: "New Year",
+            start: new Date(year, 11, 31),
+            end: new Date(year + 1, 0, 3),
+            allDay: true
+        },
+        // Multi-week events for Work
+        {
+            id: `dummy-${year}-12`,
+            calendarId: "dummy-work",
+            title: "Quarterly planning",
+            start: new Date(year, 4, 5),
+            end: new Date(year, 4, 20),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-13`,
+            calendarId: "dummy-work",
+            title: "Client workshops",
+            start: new Date(year, 6, 7),
+            end: new Date(year, 6, 22),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-14`,
+            calendarId: "dummy-work",
+            title: "Performance reviews",
+            start: new Date(year, 8, 1),
+            end: new Date(year, 8, 16),
+            allDay: true
+        },
+        // Multi-week events for Personal
+        {
+            id: `dummy-${year}-15`,
+            calendarId: "dummy-personal",
+            title: "Extended family visit",
+            start: new Date(year, 4, 10),
+            end: new Date(year, 4, 25),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-16`,
+            calendarId: "dummy-personal",
+            title: "Home renovation",
+            start: new Date(year, 7, 1),
+            end: new Date(year, 7, 16),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-17`,
+            calendarId: "dummy-personal",
+            title: "Thanksgiving prep",
+            start: new Date(year, 10, 1),
+            end: new Date(year, 10, 16),
+            allDay: true
+        },
+        // Multi-week events for Project
+        {
+            id: `dummy-${year}-18`,
+            calendarId: "dummy-project",
+            title: "Development sprint",
+            start: new Date(year, 5, 1),
+            end: new Date(year, 5, 16),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-19`,
+            calendarId: "dummy-project",
+            title: "User testing phase",
+            start: new Date(year, 4, 15),
+            end: new Date(year, 4, 30),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-20`,
+            calendarId: "dummy-project",
+            title: "Launch preparation",
+            start: new Date(year, 9, 1),
+            end: new Date(year, 9, 16),
+            allDay: true
+        },
+        // Multi-week events for Holidays
+        {
+            id: `dummy-${year}-21`,
+            calendarId: "dummy-holidays",
+            title: "Spring break",
+            start: new Date(year, 3, 1),
+            end: new Date(year, 3, 16),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-22`,
+            calendarId: "dummy-holidays",
+            title: "Memorial Day weekend",
+            start: new Date(year, 4, 20),
+            end: new Date(year, 5, 4),
+            allDay: true
+        },
+        {
+            id: `dummy-${year}-23`,
+            calendarId: "dummy-holidays",
+            title: "Thanksgiving week",
+            start: new Date(year, 10, 20),
+            end: new Date(year, 11, 1),
+            allDay: true
         }
     ];
 
@@ -101,7 +242,7 @@ function formatRangeBound(year, month, day) {
 }
 
 export async function fetchCalendars() {
-    if (ENABLE_DUMMY_CALENDARS) {
+    if (globalThis.ENABLE_DUMMY_CALENDARS) {
         return getDummyCalendars();
     }
     if (!hasCalendarApi()) {
@@ -122,7 +263,7 @@ export async function fetchCalendars() {
 }
 
 export async function fetchCalendarEvents(year, options = {}) {
-    if (ENABLE_DUMMY_CALENDARS) {
+    if (globalThis.ENABLE_DUMMY_CALENDARS) {
         return getDummyEvents(year, options);
     }
     if (!hasCalendarApi()) {

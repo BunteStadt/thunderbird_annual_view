@@ -149,3 +149,26 @@ export async function persistWeekNumbersPreference(showWeekNumbers) {
         console.error("[storage] save week numbers failed", err);
     }
 }
+
+export async function loadViewMode() {
+    try {
+        const stored = await browser.storage.local.get("viewMode");
+        if (Object.prototype.hasOwnProperty.call(stored, "viewMode")) {
+            const mode = stored.viewMode;
+            if (mode === "linear" || mode === "day-aligned" || mode === "week-rows") {
+                return mode;
+            }
+        }
+    } catch (err) {
+        console.error("[storage] load view mode failed", err);
+    }
+    return "linear";
+}
+
+export async function persistViewMode(mode) {
+    try {
+        await browser.storage.local.set({ viewMode: mode });
+    } catch (err) {
+        console.error("[storage] save view mode failed", err);
+    }
+}

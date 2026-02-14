@@ -15,6 +15,14 @@
           <input id="yearInput" class="input" type="number" min="1900" max="2999" step="1" />
           <button class="btn" type="button" data-size="compact" data-year-step="1">+</button>
         </div>
+        <label for="viewMode" class="view-mode-label">
+          <span>View:</span>
+          <select id="viewMode" class="input input-compact">
+            <option value="linear">Linear (31 days)</option>
+            <option value="day-aligned">Day-of-Week Aligned</option>
+            <option value="week-rows">4-Week Rows</option>
+          </select>
+        </label>
         <div id="selectedSummary" class="selected-summary" aria-live="polite"></div>
         <button id="refreshButton" class="btn" data-size="compact" type="button" title="Refresh calendar data">⟳ Refresh</button>
         <button id="themeToggle" class="btn" data-size="compact" type="button">Toggle theme</button>

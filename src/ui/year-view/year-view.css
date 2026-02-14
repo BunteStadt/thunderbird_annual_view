@@ -531,6 +531,7 @@ input[type="number"] {
   justify-content: flex-end;
   color: var(--text);
   box-shadow: inset -1px 0 0 var(--grid-line);
+  grid-column: 1; /* Always place month labels in the first column */
 }
 
 

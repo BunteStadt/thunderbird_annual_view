@@ -191,20 +191,20 @@ function renderDayAlignedCalendar(year) {
     const todayDay = today.getDate();
     const todayDate = new Date(todayYear, todayMonth, todayDay);
     
-    const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const weekdayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
     
     // Add empty cell for month column header
     const emptyHeader = document.createElement("div");
     emptyHeader.className = "cell month";
     grid.appendChild(emptyHeader);
     
-    // Add weekday headers
-    weekdayNames.forEach(name => {
+    // Add weekday headers - repeating pattern for 31 days
+    for (let i = 0; i < 31; i++) {
         const header = document.createElement("div");
         header.className = "weekday-header";
-        header.textContent = name;
+        header.textContent = weekdayNames[i % 7];
         grid.appendChild(header);
-    });
+    }
 
     months.forEach((name, monthIndex) => {
         const monthCell = document.createElement("div");
@@ -215,7 +215,7 @@ function renderDayAlignedCalendar(year) {
         const maxDays = daysInMonth(monthIndex, year);
         const firstDayOfMonth = new Date(year, monthIndex, 1).getDay();
         
-        // Add empty cells before the first day
+        // Add empty cells before the first day to align with weekday
         for (let i = 0; i < firstDayOfMonth; i++) {
             const emptyCell = document.createElement("div");
             emptyCell.className = "cell disabled";
@@ -260,9 +260,9 @@ function renderDayAlignedCalendar(year) {
             grid.appendChild(cell);
         }
         
-        // Add empty cells after the last day to complete the week
-        const lastDayOfMonth = new Date(year, monthIndex, maxDays).getDay();
-        const cellsToAdd = lastDayOfMonth === 6 ? 0 : 6 - lastDayOfMonth;
+        // Add empty cells after the last day to fill the rest of the row (up to 31 total)
+        const totalCells = firstDayOfMonth + maxDays;
+        const cellsToAdd = 31 - totalCells;
         for (let i = 0; i < cellsToAdd; i++) {
             const emptyCell = document.createElement("div");
             emptyCell.className = "cell disabled";
@@ -289,13 +289,15 @@ function renderWeekRowsCalendar(year) {
     emptyHeader.className = "cell month";
     grid.appendChild(emptyHeader);
     
-    // Add weekday headers
-    weekdayNames.forEach(name => {
-        const header = document.createElement("div");
-        header.className = "weekday-header";
-        header.textContent = name;
-        grid.appendChild(header);
-    });
+    // Add weekday headers - repeat 4 times for 4 weeks
+    for (let week = 0; week < 4; week++) {
+        weekdayNames.forEach(name => {
+            const header = document.createElement("div");
+            header.className = "weekday-header";
+            header.textContent = name;
+            grid.appendChild(header);
+        });
+    }
     
     // Find the first Monday of the year (or before)
     let currentDate = new Date(year, 0, 1);
@@ -305,35 +307,40 @@ function renderWeekRowsCalendar(year) {
     currentDate.setDate(currentDate.getDate() - daysToSubtract);
     
     const endDate = new Date(year, 11, 31);
-    let weekNumber = 0;
+    let rowNumber = 0;
     
-    while (currentDate <= endDate || weekNumber * 7 < 365) {
-        weekNumber++;
+    while (currentDate <= endDate || rowNumber * 28 < 365) {
+        rowNumber++;
         
-        // Add week label
-        const weekLabel = document.createElement("div");
-        weekLabel.className = "week-label";
+        // Add row label showing date range
+        const rowLabel = document.createElement("div");
+        rowLabel.className = "week-label";
         
-        // Determine month(s) for this week
-        const weekStart = new Date(currentDate);
-        const weekEnd = new Date(currentDate);
-        weekEnd.setDate(weekEnd.getDate() + 6);
+        const rowStart = new Date(currentDate);
+        const rowEnd = new Date(currentDate);
+        rowEnd.setDate(rowEnd.getDate() + 27); // 4 weeks = 28 days
         
-        if (weekStart.getMonth() === weekEnd.getMonth()) {
-            weekLabel.textContent = months[weekStart.getMonth()].substring(0, 3);
+        // Show month(s) for this 4-week period
+        const startMonth = rowStart.getMonth();
+        const endMonth = rowEnd.getMonth();
+        
+        if (startMonth === endMonth) {
+            rowLabel.textContent = months[startMonth].substring(0, 3);
+        } else if (endMonth === startMonth + 1) {
+            rowLabel.textContent = `${months[startMonth].substring(0, 3)}/${months[endMonth].substring(0, 3)}`;
         } else {
-            weekLabel.textContent = `${months[weekStart.getMonth()].substring(0, 3)}/${months[weekEnd.getMonth()].substring(0, 3)}`;
+            rowLabel.textContent = `${months[startMonth].substring(0, 3)}-${months[endMonth].substring(0, 3)}`;
         }
         
         if (showWeekNumbersInput?.checked) {
-            const isoWeek = getISOWeekNumber(new Date(Date.UTC(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate())));
-            weekLabel.textContent += ` W${isoWeek}`;
+            const isoWeek = getISOWeekNumber(new Date(Date.UTC(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate())));
+            rowLabel.textContent += ` W${isoWeek}`;
         }
         
-        grid.appendChild(weekLabel);
+        grid.appendChild(rowLabel);
         
-        // Add 7 days (Monday to Sunday)
-        for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+        // Add 28 days (4 weeks, Monday to Sunday)
+        for (let dayOffset = 0; dayOffset < 28; dayOffset++) {
             const date = new Date(currentDate);
             date.setDate(date.getDate() + dayOffset);
             
@@ -371,11 +378,11 @@ function renderWeekRowsCalendar(year) {
             grid.appendChild(cell);
         }
         
-        // Move to next week
-        currentDate.setDate(currentDate.getDate() + 7);
+        // Move to next 4-week period
+        currentDate.setDate(currentDate.getDate() + 28);
         
         // Safety check to prevent infinite loop
-        if (weekNumber > 54) break;
+        if (rowNumber > 14) break;
     }
 }
 
@@ -717,9 +724,9 @@ function forEachWeekDay(startDayOfWeek, endDayOfWeek, callback) {
 }
 
 function renderDayAlignedEvents(year, events) {
-    // For day-aligned view, we need to track lanes per month-row
-    // Each month has a variable number of weeks, so we track by month
-    const monthLaneEnds = Array.from({ length: 12 }, () => Array.from({ length: 7 }, () => []));
+    // For day-aligned view, each month is one row with 31 columns
+    // Track lanes per month
+    const monthLaneEnds = Array.from({ length: 12 }, () => []);
     
     const sortedEvents = [...events].sort((a, b) => {
         const startDiff = a.start?.getTime?.() - b.start?.getTime?.();
@@ -765,15 +772,16 @@ function renderDayAlignedEvents(year, events) {
             
             while (!foundLane) {
                 foundLane = true;
+                const lanes = monthLaneEnds[monthIdx];
                 
                 // Check if this lane is free for all days of this event in this month
+                // Calculate the column position for each day
                 for (let day = monthStartDay; day <= monthEndDay; day++) {
-                    const dayOfWeek = new Date(year, monthIdx, day).getDay();
-                    const lanes = monthLaneEnds[monthIdx][dayOfWeek];
+                    const colIndex = firstDayOfMonth + day - 1; // Position in 31-column grid
                     
                     if (!lanes[laneIndex]) lanes[laneIndex] = -Infinity;
                     
-                    if (lanes[laneIndex] >= day) {
+                    if (lanes[laneIndex] >= colIndex) {
                         foundLane = false;
                         break;
                     }
@@ -785,23 +793,19 @@ function renderDayAlignedEvents(year, events) {
             }
             
             // Mark this lane as occupied for all days
+            const lanes = monthLaneEnds[monthIdx];
             for (let day = monthStartDay; day <= monthEndDay; day++) {
-                const dayOfWeek = new Date(year, monthIdx, day).getDay();
-                const lanes = monthLaneEnds[monthIdx][dayOfWeek];
-                lanes[laneIndex] = Math.max(lanes[laneIndex] ?? -Infinity, day);
+                const colIndex = firstDayOfMonth + day - 1;
+                lanes[laneIndex] = Math.max(lanes[laneIndex] ?? -Infinity, colIndex);
             }
             
             // Calculate grid positions for day-aligned view
             // Row = month (add 1 for header row) + 1
             const gridRow = monthIdx + 2;
             
-            // Calculate column span
-            const startDayOfWeek = new Date(year, monthIdx, monthStartDay).getDay();
-            const endDayOfWeek = new Date(year, monthIdx, monthEndDay).getDay();
-            
-            // Start column = 1 (month label) + 1 + day of week
-            const startCol = 2 + startDayOfWeek;
-            const endCol = 2 + endDayOfWeek + 1;
+            // Column span: offset by first day + actual day positions
+            const startCol = 2 + firstDayOfMonth + monthStartDay - 1; // 2 = skip month label + header
+            const endCol = 2 + firstDayOfMonth + monthEndDay; // Exclusive end
             
             const continuesPrev = monthIdx > startMonth;
             const continuesNext = monthIdx < endMonth;
@@ -840,7 +844,7 @@ function renderDayAlignedEvents(year, events) {
 }
 
 function renderWeekRowsEvents(year, events) {
-    // For week-rows view, track lanes per week-row
+    // For week-rows view, track lanes per 4-week row
     // Find the first Monday of the year (or before)
     let startDate = new Date(year, 0, 1);
     const firstDayOfYear = startDate.getDay();
@@ -849,28 +853,28 @@ function renderWeekRowsEvents(year, events) {
     
     const endDate = new Date(year, 11, 31);
     
-    // Build list of week rows
-    const weekRows = [];
-    let currentWeekStart = new Date(startDate);
-    let weekIdx = 0;
+    // Build list of 4-week rows
+    const fourWeekRows = [];
+    let currentRowStart = new Date(startDate);
+    let rowIdx = 0;
     
-    while (currentWeekStart <= endDate || weekIdx < 53) {
-        const weekEnd = new Date(currentWeekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
+    while (currentRowStart <= endDate || rowIdx < 14) {
+        const rowEnd = new Date(currentRowStart);
+        rowEnd.setDate(rowEnd.getDate() + 27); // 4 weeks = 28 days
         
-        weekRows.push({
-            index: weekIdx,
-            start: new Date(currentWeekStart),
-            end: weekEnd
+        fourWeekRows.push({
+            index: rowIdx,
+            start: new Date(currentRowStart),
+            end: rowEnd
         });
         
-        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
-        weekIdx++;
+        currentRowStart.setDate(currentRowStart.getDate() + 28);
+        rowIdx++;
         
-        if (weekIdx > 54) break;
+        if (rowIdx > 14) break;
     }
     
-    const weekLaneEnds = weekRows.map(() => []);
+    const rowLaneEnds = fourWeekRows.map(() => []);
     
     const sortedEvents = [...events].sort((a, b) => {
         const startDiff = a.start?.getTime?.() - b.start?.getTime?.();
@@ -894,19 +898,19 @@ function renderWeekRowsEvents(year, events) {
         
         if (end < start) return;
         
-        // Find which weeks this event spans
+        // Find which 4-week rows this event spans
         const eventSegments = [];
         
-        for (let i = 0; i < weekRows.length; i++) {
-            const week = weekRows[i];
+        for (let i = 0; i < fourWeekRows.length; i++) {
+            const row = fourWeekRows[i];
             
-            // Check if event overlaps with this week
-            if (start <= week.end && end >= week.start) {
-                const segStart = new Date(Math.max(start.getTime(), week.start.getTime()));
-                const segEnd = new Date(Math.min(end.getTime(), week.end.getTime()));
+            // Check if event overlaps with this 4-week row
+            if (start <= row.end && end >= row.start) {
+                const segStart = new Date(Math.max(start.getTime(), row.start.getTime()));
+                const segEnd = new Date(Math.min(end.getTime(), row.end.getTime()));
                 
                 eventSegments.push({
-                    weekIndex: i,
+                    rowIndex: i,
                     start: segStart,
                     end: segEnd
                 });
@@ -916,31 +920,32 @@ function renderWeekRowsEvents(year, events) {
         if (eventSegments.length === 0) return;
         
         // Find a lane that works for all segments
-        const laneIndex = findWeekLaneForSegments(weekLaneEnds, eventSegments, startDate);
+        const laneIndex = findFourWeekLaneForSegments(rowLaneEnds, eventSegments, fourWeekRows);
         
         // Render each segment
         eventSegments.forEach((seg, segIdx) => {
-            const week = weekRows[seg.weekIndex];
+            const row = fourWeekRows[seg.rowIndex];
             
             // Update lane occupancy
-            const lanes = weekLaneEnds[seg.weekIndex];
-            if (!lanes[laneIndex]) lanes[laneIndex] = {};
+            const lanes = rowLaneEnds[seg.rowIndex];
+            if (!lanes[laneIndex]) lanes[laneIndex] = [];
             
-            // Mark all days occupied using helper function
-            forEachWeekDay(seg.start.getDay(), seg.end.getDay(), (dayIndex) => {
-                lanes[laneIndex][dayIndex] = true;
-            });
+            // Calculate day positions within the 28-day row
+            const daysSinceRowStart = Math.floor((seg.start - row.start) / (24 * 60 * 60 * 1000));
+            const daysSinceRowEnd = Math.floor((seg.end - row.start) / (24 * 60 * 60 * 1000));
+            
+            // Mark all days occupied
+            for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
+                lanes[laneIndex][day] = true;
+            }
             
             // Calculate grid position
-            // Row = week index + 1 (for header) + 1
-            const gridRow = seg.weekIndex + 2;
+            // Row = row index + 1 (for header) + 1
+            const gridRow = seg.rowIndex + 2;
             
-            // Columns: 1 for week label, then 7 for days (Mon=2, Sun=8)
-            // Convert Sunday-based (0-6) to Monday-based (0-6) for grid columns
-            const startDayOfWeek = (seg.start.getDay() + 6) % 7; // Monday = 0
-            const endDayOfWeek = (seg.end.getDay() + 6) % 7;
-            const startCol = 2 + startDayOfWeek;
-            const endCol = 2 + endDayOfWeek + 1;
+            // Columns: 1 for row label, then 28 for days
+            const startCol = 2 + daysSinceRowStart;
+            const endCol = 2 + Math.min(daysSinceRowEnd + 1, 28);
             
             const continuesPrev = segIdx > 0;
             const continuesNext = segIdx < eventSegments.length - 1;
@@ -972,25 +977,31 @@ function renderWeekRowsEvents(year, events) {
     });
     
     // Apply dynamic row heights for week-rows view
-    applyWeekRowsRowHeights(weekLaneEnds);
+    applyWeekRowsRowHeights(rowLaneEnds);
 }
 
-function findWeekLaneForSegments(weekLaneEnds, segments, startDate) {
+function findFourWeekLaneForSegments(rowLaneEnds, segments, fourWeekRows) {
     let laneIndex = 0;
     
     while (true) {
         let fitsAll = true;
         
         for (const seg of segments) {
-            const lanes = weekLaneEnds[seg.weekIndex];
-            if (!lanes[laneIndex]) lanes[laneIndex] = {};
+            const row = fourWeekRows[seg.rowIndex];
+            const lanes = rowLaneEnds[seg.rowIndex];
+            if (!lanes[laneIndex]) lanes[laneIndex] = [];
+            
+            // Calculate day positions within the 28-day row
+            const daysSinceRowStart = Math.floor((seg.start - row.start) / (24 * 60 * 60 * 1000));
+            const daysSinceRowEnd = Math.floor((seg.end - row.start) / (24 * 60 * 60 * 1000));
             
             // Check if any day in this segment is occupied in this lane
-            forEachWeekDay(seg.start.getDay(), seg.end.getDay(), (dayIndex) => {
-                if (lanes[laneIndex][dayIndex]) {
+            for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
+                if (lanes[laneIndex][day]) {
                     fitsAll = false;
+                    break;
                 }
-            });
+            }
             
             if (!fitsAll) break;
         }

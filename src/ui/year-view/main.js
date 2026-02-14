@@ -116,7 +116,7 @@ function renderCalendar(year) {
                     if (date.getUTCDay() === 1) {
                         const weekLabel = document.createElement("span");
                         weekLabel.className = "week-number";
-                        weekLabel.textContent = `W${getISOWeekNumber(date)}`;
+                        weekLabel.textContent = `${getISOWeekNumber(date)}`;
                         cell.appendChild(weekLabel);
                     }
                 }

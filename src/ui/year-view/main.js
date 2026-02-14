@@ -6,6 +6,10 @@ import {
     persistPanelState,
     loadThemePreference,
     persistTheme,
+    loadWeekNumbersPreference,
+    persistWeekNumbersPreference,
+    loadRefreshSettings,
+    persistRefreshSettings,
     loadGrayPastDays,
     persistGrayPastDays,
     loadHighlightCurrentDay,
@@ -38,6 +42,7 @@ const calendarList = document.getElementById("calendarList");
 const calendarFilters = document.getElementById("calendarFilters");
 const yearLayout = document.getElementById("yearLayout");
 const allDayOnlyInput = document.getElementById("allDayOnly");
+const showWeekNumbersInput = document.getElementById("showWeekNumbers");
 const minDurationInput = document.getElementById("minDurationHours");
 const minDurationDownBtn = document.getElementById("minDurationDown");
 const minDurationUpBtn = document.getElementById("minDurationUp");
@@ -46,6 +51,7 @@ const deselectAllBtn = document.getElementById("deselectAllCals");
 const toggleCalendarsBtn = document.getElementById("toggleCalendars");
 const selectedSummary = document.getElementById("selectedSummary");
 const themeToggleBtn = document.getElementById("themeToggle");
+const refreshButton = document.getElementById("refreshButton");
 const grayPastDaysInput = document.getElementById("grayPastDays");
 const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
 const yearButtons = document.querySelectorAll("[data-year-step]");
@@ -57,6 +63,9 @@ let currentYear = new Date().getFullYear();
 let lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false };
 let themeMode = "auto";
 let systemThemeWatcher = null;
+let autoRefreshTimer = null;
+let refreshSettings = { autoRefreshEnabled: true, autoRefreshInterval: 300000 };
+let isRefreshing = false;
 let grayPastDaysEnabled = false;
 let highlightCurrentDayEnabled = false;
 
@@ -138,11 +147,28 @@ function renderCalendar(year) {
                         cell.classList.add("past-day");
                     }
                 }
+                if (showWeekNumbersInput?.checked) {
+                    const date = new Date(Date.UTC(year, monthIndex, day));
+                    if (date.getUTCDay() === 1) {
+                        const weekLabel = document.createElement("span");
+                        weekLabel.className = "week-number";
+                        weekLabel.textContent = `${getISOWeekNumber(date)}`;
+                        cell.appendChild(weekLabel);
+                    }
+                }
             }
 
             grid.appendChild(cell);
         }
     });
+}
+
+function getISOWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
 function splitEventByMonth(year, event) {
@@ -492,6 +518,50 @@ async function loadCalendars() {
     await persistSelection(selectedCalendarIds);
 }
 
+async function refreshCalendarData() {
+    if (isRefreshing) {
+        console.log("[refresh] Already refreshing, skipping");
+        return;
+    }
+
+    isRefreshing = true;
+    refreshButton?.classList.add("refreshing");
+
+    try {
+        console.log("[refresh] Refreshing calendar data");
+        await loadCalendars();
+        await setYear(currentYear);
+    } catch (err) {
+        console.error("[refresh] Refresh failed", err);
+    } finally {
+        isRefreshing = false;
+        refreshButton?.classList.remove("refreshing");
+    }
+}
+
+function setupAutoRefresh() {
+    if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
+        autoRefreshTimer = null;
+    }
+
+    if (refreshSettings.autoRefreshEnabled) {
+        console.log(`[refresh] Setting up auto-refresh every ${refreshSettings.autoRefreshInterval}ms`);
+        autoRefreshTimer = setInterval(() => {
+            refreshCalendarData();
+        }, refreshSettings.autoRefreshInterval);
+    }
+}
+
+function setupTabFocusRefresh() {
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            console.log("[refresh] Tab became visible, refreshing");
+            refreshCalendarData();
+        }
+    });
+}
+
 async function initTheme() {
     const preferred = await loadThemePreference();
     setThemeMode(preferred || "auto");
@@ -535,6 +605,10 @@ function updateThemeToggleLabel() {
 
 async function init() {
     await initTheme();
+    refreshSettings = await loadRefreshSettings();
+    if (showWeekNumbersInput) {
+        showWeekNumbersInput.checked = await loadWeekNumbersPreference();
+    }
     await loadCalendars();
 
     // Load day indicator preferences
@@ -545,6 +619,8 @@ async function init() {
 
     await setYear(currentYear);
     updateSelectedSummary();
+    setupAutoRefresh();
+    setupTabFocusRefresh();
 
     onChange(yearInput, () => {
         const nextYear = Number(yearInput.value) || currentYear;
@@ -560,6 +636,10 @@ async function init() {
     });
 
     onChange(allDayOnlyInput, () => setYear(currentYear));
+    onChange(showWeekNumbersInput, () => {
+        persistWeekNumbersPreference(showWeekNumbersInput.checked);
+        setYear(currentYear);
+    });
     onChange(minDurationInput, () => setYear(currentYear));
     onClick(minDurationDownBtn, () => adjustMinDuration(-1));
     onClick(minDurationUpBtn, () => adjustMinDuration(1));
@@ -587,6 +667,8 @@ async function init() {
         const initialExpanded = await loadPanelState();
         setCalendarPanelVisible(initialExpanded);
     }
+
+    onClick(refreshButton, () => refreshCalendarData());
 
     onClick(themeToggleBtn, () => {
         const modes = ["auto", "light", "dark"];

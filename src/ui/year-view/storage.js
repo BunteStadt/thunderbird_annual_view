@@ -61,3 +61,43 @@ export async function persistTheme(theme) {
         console.error("[storage] save theme failed", err);
     }
 }
+
+export async function loadGrayPastDays() {
+    try {
+        const stored = await browser.storage.local.get("grayPastDays");
+        if (Object.prototype.hasOwnProperty.call(stored, "grayPastDays")) {
+            return Boolean(stored.grayPastDays);
+        }
+    } catch (err) {
+        console.error("[storage] load gray past days failed", err);
+    }
+    return false;
+}
+
+export async function persistGrayPastDays(enabled) {
+    try {
+        await browser.storage.local.set({ grayPastDays: !!enabled });
+    } catch (err) {
+        console.error("[storage] save gray past days failed", err);
+    }
+}
+
+export async function loadHighlightCurrentDay() {
+    try {
+        const stored = await browser.storage.local.get("highlightCurrentDay");
+        if (Object.prototype.hasOwnProperty.call(stored, "highlightCurrentDay")) {
+            return Boolean(stored.highlightCurrentDay);
+        }
+    } catch (err) {
+        console.error("[storage] load highlight current day failed", err);
+    }
+    return false;
+}
+
+export async function persistHighlightCurrentDay(enabled) {
+    try {
+        await browser.storage.local.set({ highlightCurrentDay: !!enabled });
+    } catch (err) {
+        console.error("[storage] save highlight current day failed", err);
+    }
+}

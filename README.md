@@ -54,6 +54,7 @@ Access the add-on options through Thunderbird's Add-ons Manager:
 - **Calendars**: Select which calendars to include in the annual view.
 - **Duration Filter**: Set a minimum event duration (in hours) to display.
 - **All-Day Events Only**: Toggle to show only full-day events.
+- **Week Numbers**: Toggle to show/hide ISO week numbers in the grid.
 
 ## Development
 

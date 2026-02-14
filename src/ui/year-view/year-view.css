@@ -363,6 +363,15 @@ input[type="number"] {
   font-weight: 500;
 }
 
+.cell .week-number {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.62rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .disabled {
   background: var(--disabled-day-bg);
 }

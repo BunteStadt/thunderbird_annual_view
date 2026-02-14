@@ -61,3 +61,23 @@ export async function persistTheme(theme) {
         console.error("[storage] save theme failed", err);
     }
 }
+
+export async function loadWeekNumbersPreference() {
+    try {
+        const stored = await browser.storage.local.get("showWeekNumbers");
+        if (Object.prototype.hasOwnProperty.call(stored, "showWeekNumbers")) {
+            return stored.showWeekNumbers !== false;
+        }
+    } catch (err) {
+        console.error("[storage] load week numbers failed", err);
+    }
+    return true;
+}
+
+export async function persistWeekNumbersPreference(showWeekNumbers) {
+    try {
+        await browser.storage.local.set({ showWeekNumbers: showWeekNumbers !== false });
+    } catch (err) {
+        console.error("[storage] save week numbers failed", err);
+    }
+}

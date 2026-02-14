@@ -5,7 +5,9 @@ import {
     loadPanelState,
     persistPanelState,
     loadThemePreference,
-    persistTheme
+    persistTheme,
+    loadRefreshSettings,
+    persistRefreshSettings
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./theme.js";
 
@@ -39,6 +41,7 @@ const deselectAllBtn = document.getElementById("deselectAllCals");
 const toggleCalendarsBtn = document.getElementById("toggleCalendars");
 const selectedSummary = document.getElementById("selectedSummary");
 const themeToggleBtn = document.getElementById("themeToggle");
+const refreshButton = document.getElementById("refreshButton");
 const yearButtons = document.querySelectorAll("[data-year-step]");
 const YEAR_MIN = Number(yearInput.min) || 1900;
 const YEAR_MAX = Number(yearInput.max) || 2999;
@@ -48,6 +51,9 @@ let currentYear = new Date().getFullYear();
 let lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false };
 let themeMode = "auto";
 let systemThemeWatcher = null;
+let autoRefreshTimer = null;
+let refreshSettings = { autoRefreshEnabled: true, autoRefreshInterval: 300000 };
+let isRefreshing = false;
 
 const onClick = (el, handler) => el?.addEventListener("click", handler);
 const onChange = (el, handler) => el?.addEventListener("change", handler);
@@ -462,6 +468,50 @@ async function loadCalendars() {
     await persistSelection(selectedCalendarIds);
 }
 
+async function refreshCalendarData() {
+    if (isRefreshing) {
+        console.log("[refresh] Already refreshing, skipping");
+        return;
+    }
+
+    isRefreshing = true;
+    refreshButton?.classList.add("refreshing");
+
+    try {
+        console.log("[refresh] Refreshing calendar data");
+        await loadCalendars();
+        await setYear(currentYear);
+    } catch (err) {
+        console.error("[refresh] Refresh failed", err);
+    } finally {
+        isRefreshing = false;
+        refreshButton?.classList.remove("refreshing");
+    }
+}
+
+function setupAutoRefresh() {
+    if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
+        autoRefreshTimer = null;
+    }
+
+    if (refreshSettings.autoRefreshEnabled) {
+        console.log(`[refresh] Setting up auto-refresh every ${refreshSettings.autoRefreshInterval}ms`);
+        autoRefreshTimer = setInterval(() => {
+            refreshCalendarData();
+        }, refreshSettings.autoRefreshInterval);
+    }
+}
+
+function setupTabFocusRefresh() {
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            console.log("[refresh] Tab became visible, refreshing");
+            refreshCalendarData();
+        }
+    });
+}
+
 async function initTheme() {
     const preferred = await loadThemePreference();
     setThemeMode(preferred || "auto");
@@ -505,9 +555,12 @@ function updateThemeToggleLabel() {
 
 async function init() {
     await initTheme();
+    refreshSettings = await loadRefreshSettings();
     await loadCalendars();
     await setYear(currentYear);
     updateSelectedSummary();
+    setupAutoRefresh();
+    setupTabFocusRefresh();
 
     onChange(yearInput, () => {
         const nextYear = Number(yearInput.value) || currentYear;
@@ -536,6 +589,8 @@ async function init() {
         const initialExpanded = await loadPanelState();
         setCalendarPanelVisible(initialExpanded);
     }
+
+    onClick(refreshButton, () => refreshCalendarData());
 
     onClick(themeToggleBtn, () => {
         const modes = ["auto", "light", "dark"];

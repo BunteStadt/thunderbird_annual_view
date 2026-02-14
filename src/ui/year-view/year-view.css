@@ -472,3 +472,25 @@ input[type="number"] {
     font-size: 1.2rem;
   }
 }
+
+/* Refresh button loading state */
+#refreshButton.refreshing {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+#refreshButton.refreshing::before {
+  content: "⟳ ";
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+}

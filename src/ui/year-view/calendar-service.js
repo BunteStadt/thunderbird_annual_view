@@ -1,5 +1,5 @@
 // Minimal ical parsing for DTSTART/DTEND values returned by Thunderbird's calendar API.
-const ENABLE_DUMMY_CALENDARS = true;
+const ENABLE_DUMMY_CALENDARS = false; // Set to true for local development with dummy calendars/events.
 const DUMMY_CALENDARS = [
     { id: "dummy-work", name: "Work", color: "#0ea5e9" },
     { id: "dummy-personal", name: "Personal", color: "#22c55e" },

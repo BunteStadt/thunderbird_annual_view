@@ -7,7 +7,7 @@
   --sidebar-bg: #f9fbff;
   --grid-line: rgba(12, 39, 82, 0.14);
   --text: #0f1d35;
-  --muted: #4b5563;
+  --muted: #7b8697;
   --accent: #0a84ff;
   --accent-strong: #075ecb;
   --chip-bg: #ffffff;
@@ -411,6 +411,21 @@ input[type="number"] {
   font-size: 0.76rem;
   color: var(--weekday-text);
   font-weight: 500;
+}
+
+.cell .week-number {
+  position: absolute;
+  bottom: 2px;
+  right: 6px;
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 500;
+  z-index: 3;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+}
+
+.theme-dark .cell .week-number {
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
 }
 
 .disabled {

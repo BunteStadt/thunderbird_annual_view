@@ -6,6 +6,8 @@ import {
     persistPanelState,
     loadThemePreference,
     persistTheme,
+    loadWeekNumbersPreference,
+    persistWeekNumbersPreference,
     loadRefreshSettings,
     persistRefreshSettings,
     loadGrayPastDays,
@@ -37,6 +39,7 @@ const calendarList = document.getElementById("calendarList");
 const calendarFilters = document.getElementById("calendarFilters");
 const yearLayout = document.getElementById("yearLayout");
 const allDayOnlyInput = document.getElementById("allDayOnly");
+const showWeekNumbersInput = document.getElementById("showWeekNumbers");
 const minDurationInput = document.getElementById("minDurationHours");
 const minDurationDownBtn = document.getElementById("minDurationDown");
 const minDurationUpBtn = document.getElementById("minDurationUp");
@@ -141,11 +144,28 @@ function renderCalendar(year) {
                         cell.classList.add("past-day");
                     }
                 }
+                if (showWeekNumbersInput?.checked) {
+                    const date = new Date(Date.UTC(year, monthIndex, day));
+                    if (date.getUTCDay() === 1) {
+                        const weekLabel = document.createElement("span");
+                        weekLabel.className = "week-number";
+                        weekLabel.textContent = `${getISOWeekNumber(date)}`;
+                        cell.appendChild(weekLabel);
+                    }
+                }
             }
 
             grid.appendChild(cell);
         }
     });
+}
+
+function getISOWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
 function splitEventByMonth(year, event) {
@@ -583,6 +603,9 @@ function updateThemeToggleLabel() {
 async function init() {
     await initTheme();
     refreshSettings = await loadRefreshSettings();
+    if (showWeekNumbersInput) {
+        showWeekNumbersInput.checked = await loadWeekNumbersPreference();
+    }
     await loadCalendars();
 
     // Load day indicator preferences
@@ -610,6 +633,10 @@ async function init() {
     });
 
     onChange(allDayOnlyInput, () => setYear(currentYear));
+    onChange(showWeekNumbersInput, () => {
+        persistWeekNumbersPreference(showWeekNumbersInput.checked);
+        setYear(currentYear);
+    });
     onChange(minDurationInput, () => setYear(currentYear));
     onClick(minDurationDownBtn, () => adjustMinDuration(-1));
     onClick(minDurationUpBtn, () => adjustMinDuration(1));

@@ -202,8 +202,8 @@ function renderDayAlignedCalendar(year) {
     emptyHeader.className = "cell month";
     grid.appendChild(emptyHeader);
     
-    // Add weekday headers - repeating pattern for 31 days
-    for (let i = 0; i < 31; i++) {
+    // Add weekday headers - repeating pattern for 37 columns (max: 6 empty + 31 days)
+    for (let i = 0; i < 37; i++) {
         const header = document.createElement("div");
         header.className = "weekday-header";
         header.textContent = weekdayNames[i % 7];
@@ -264,9 +264,9 @@ function renderDayAlignedCalendar(year) {
             grid.appendChild(cell);
         }
         
-        // Add empty cells after the last day to fill the rest of the row (up to 31 total)
+        // Add empty cells after the last day to fill the rest of the row (up to 37 total)
         const totalCells = firstDayOfMonth + maxDays;
-        const cellsToAdd = 31 - totalCells;
+        const cellsToAdd = 37 - totalCells;
         for (let i = 0; i < cellsToAdd; i++) {
             const emptyCell = document.createElement("div");
             emptyCell.className = "cell disabled";

@@ -399,9 +399,9 @@ input[type="number"] {
   /* box-shadow: var(--shadow); */
 }
 
-/* Day-of-week aligned view: 31 columns for days (repeating weekday pattern) */
+/* Day-of-week aligned view: needs up to 37 columns (6 empty + 31 days max) */
 .calendar.day-aligned {
-  grid-template-columns: 120px repeat(31, minmax(0, 1fr));
+  grid-template-columns: 120px repeat(37, minmax(0, 1fr));
 }
 
 /* Week-rows view: 28 columns for 4 weeks */
@@ -447,7 +447,7 @@ input[type="number"] {
 }
 
 .events-layer.day-aligned {
-  grid-template-columns: 120px repeat(31, minmax(0, 1fr));
+  grid-template-columns: 120px repeat(37, minmax(0, 1fr));
 }
 
 .events-layer.week-rows {
@@ -598,7 +598,7 @@ input[type="number"] {
   }
   
   .calendar.day-aligned {
-    grid-template-columns: 100px repeat(31, minmax(0, 1fr));
+    grid-template-columns: 100px repeat(37, minmax(0, 1fr));
   }
   
   .calendar.week-rows {
@@ -622,7 +622,7 @@ input[type="number"] {
   }
   
   .calendar.day-aligned {
-    grid-template-columns: 88px repeat(31, minmax(0, 1fr));
+    grid-template-columns: 88px repeat(37, minmax(0, 1fr));
   }
   
   .calendar.week-rows {

@@ -8,6 +8,10 @@ import {
     persistTheme,
     loadRefreshSettings,
     persistRefreshSettings
+    loadGrayPastDays,
+    persistGrayPastDays,
+    loadHighlightCurrentDay,
+    persistHighlightCurrentDay
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./theme.js";
 
@@ -42,6 +46,8 @@ const toggleCalendarsBtn = document.getElementById("toggleCalendars");
 const selectedSummary = document.getElementById("selectedSummary");
 const themeToggleBtn = document.getElementById("themeToggle");
 const refreshButton = document.getElementById("refreshButton");
+const grayPastDaysInput = document.getElementById("grayPastDays");
+const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
 const yearButtons = document.querySelectorAll("[data-year-step]");
 const YEAR_MIN = Number(yearInput.min) || 1900;
 const YEAR_MAX = Number(yearInput.max) || 2999;
@@ -54,6 +60,8 @@ let systemThemeWatcher = null;
 let autoRefreshTimer = null;
 let refreshSettings = { autoRefreshEnabled: true, autoRefreshInterval: 300000 };
 let isRefreshing = false;
+let grayPastDaysEnabled = false;
+let highlightCurrentDayEnabled = false;
 
 const onClick = (el, handler) => el?.addEventListener("click", handler);
 const onChange = (el, handler) => el?.addEventListener("change", handler);
@@ -95,6 +103,12 @@ function daysInMonth(monthIndex, year) {
 
 function renderCalendar(year) {
     grid.innerHTML = "";
+    const today = new Date();
+    const todayYear = today.getFullYear();
+    const todayMonth = today.getMonth();
+    const todayDay = today.getDate();
+    const todayDate = new Date(todayYear, todayMonth, todayDay);
+
     months.forEach((name, monthIndex) => {
         const monthCell = document.createElement("div");
         monthCell.className = "cell month";
@@ -114,6 +128,19 @@ function renderCalendar(year) {
                 label.className = "day-number";
                 label.textContent = day;
                 cell.appendChild(label);
+
+                // Apply current day highlight
+                if (highlightCurrentDayEnabled && year === todayYear && monthIndex === todayMonth && day === todayDay) {
+                    cell.classList.add("current-day");
+                }
+
+                // Apply past day gray overlay
+                if (grayPastDaysEnabled) {
+                    const cellDate = new Date(year, monthIndex, day);
+                    if (cellDate < todayDate) {
+                        cell.classList.add("past-day");
+                    }
+                }
             }
 
             grid.appendChild(cell);
@@ -557,6 +584,13 @@ async function init() {
     await initTheme();
     refreshSettings = await loadRefreshSettings();
     await loadCalendars();
+
+    // Load day indicator preferences
+    grayPastDaysEnabled = await loadGrayPastDays();
+    highlightCurrentDayEnabled = await loadHighlightCurrentDay();
+    if (grayPastDaysInput) grayPastDaysInput.checked = grayPastDaysEnabled;
+    if (highlightCurrentDayInput) highlightCurrentDayInput.checked = highlightCurrentDayEnabled;
+
     await setYear(currentYear);
     updateSelectedSummary();
     setupAutoRefresh();
@@ -581,6 +615,20 @@ async function init() {
     onClick(minDurationUpBtn, () => adjustMinDuration(1));
     onClick(selectAllBtn, () => setAllCalendars(true));
     onClick(deselectAllBtn, () => setAllCalendars(false));
+
+    // Add event listeners for new day indicator toggles
+    onChange(grayPastDaysInput, async () => {
+        grayPastDaysEnabled = grayPastDaysInput?.checked || false;
+        await persistGrayPastDays(grayPastDaysEnabled);
+        renderCalendar(currentYear);
+    });
+
+    onChange(highlightCurrentDayInput, async () => {
+        highlightCurrentDayEnabled = highlightCurrentDayInput?.checked || false;
+        await persistHighlightCurrentDay(highlightCurrentDayEnabled);
+        renderCalendar(currentYear);
+    });
+
     if (toggleCalendarsBtn) {
         onClick(toggleCalendarsBtn, () => {
             const isExpanded = toggleCalendarsBtn.getAttribute("aria-expanded") === "true";

@@ -300,7 +300,7 @@ function renderWeekRowsCalendar(year) {
     // Find the first Monday of the year (or before)
     let currentDate = new Date(year, 0, 1);
     const firstDayOfYear = currentDate.getDay();
-    // Adjust to previous Monday (day 1)
+    // Adjust to previous Monday: Sunday (0) needs to go back 6 days, other days go back (day - 1)
     const daysToSubtract = firstDayOfYear === 0 ? 6 : firstDayOfYear - 1;
     currentDate.setDate(currentDate.getDate() - daysToSubtract);
     
@@ -694,6 +694,28 @@ function applyDynamicRowHeights(monthLanes) {
     eventsLayer.style.gridTemplateRows = rowHeights.join(" ");
 }
 
+// Helper function to iterate through days of week, handling week wrapping
+// Converts Sunday-based day (0-6) to Monday-based (0=Mon, 6=Sun)
+function forEachWeekDay(startDayOfWeek, endDayOfWeek, callback) {
+    const startDay = (startDayOfWeek + 6) % 7; // Convert to Monday-based (0=Mon)
+    const endDay = (endDayOfWeek + 6) % 7;
+    
+    if (startDay <= endDay) {
+        // Simple case: no week wrapping
+        for (let d = startDay; d <= endDay; d++) {
+            callback(d);
+        }
+    } else {
+        // Week wrapping case (e.g., Saturday to Monday)
+        for (let d = startDay; d < 7; d++) {
+            callback(d);
+        }
+        for (let d = 0; d <= endDay; d++) {
+            callback(d);
+        }
+    }
+}
+
 function renderDayAlignedEvents(year, events) {
     // For day-aligned view, we need to track lanes per month-row
     // Each month has a variable number of weeks, so we track by month
@@ -902,25 +924,21 @@ function renderWeekRowsEvents(year, events) {
             
             // Update lane occupancy
             const lanes = weekLaneEnds[seg.weekIndex];
-            const startDayOfWeek = (seg.start.getDay() + 6) % 7; // Monday = 0
-            const endDayOfWeek = (seg.end.getDay() + 6) % 7;
+            if (!lanes[laneIndex]) lanes[laneIndex] = {};
             
-            for (let d = startDayOfWeek; d <= endDayOfWeek || (endDayOfWeek < startDayOfWeek && d < 7); d++) {
-                if (!lanes[laneIndex]) lanes[laneIndex] = {};
-                lanes[laneIndex][d] = true;
-                if (d === 6 && endDayOfWeek < startDayOfWeek) {
-                    for (let d2 = 0; d2 <= endDayOfWeek; d2++) {
-                        lanes[laneIndex][d2] = true;
-                    }
-                    break;
-                }
-            }
+            // Mark all days occupied using helper function
+            forEachWeekDay(seg.start.getDay(), seg.end.getDay(), (dayIndex) => {
+                lanes[laneIndex][dayIndex] = true;
+            });
             
             // Calculate grid position
             // Row = week index + 1 (for header) + 1
             const gridRow = seg.weekIndex + 2;
             
             // Columns: 1 for week label, then 7 for days (Mon=2, Sun=8)
+            // Convert Sunday-based (0-6) to Monday-based (0-6) for grid columns
+            const startDayOfWeek = (seg.start.getDay() + 6) % 7; // Monday = 0
+            const endDayOfWeek = (seg.end.getDay() + 6) % 7;
             const startCol = 2 + startDayOfWeek;
             const endCol = 2 + endDayOfWeek + 1;
             
@@ -967,25 +985,12 @@ function findWeekLaneForSegments(weekLaneEnds, segments, startDate) {
             const lanes = weekLaneEnds[seg.weekIndex];
             if (!lanes[laneIndex]) lanes[laneIndex] = {};
             
-            const startDayOfWeek = (seg.start.getDay() + 6) % 7; // Monday = 0
-            const endDayOfWeek = (seg.end.getDay() + 6) % 7;
-            
             // Check if any day in this segment is occupied in this lane
-            for (let d = startDayOfWeek; d <= endDayOfWeek || (endDayOfWeek < startDayOfWeek && d < 7); d++) {
-                if (lanes[laneIndex][d]) {
+            forEachWeekDay(seg.start.getDay(), seg.end.getDay(), (dayIndex) => {
+                if (lanes[laneIndex][dayIndex]) {
                     fitsAll = false;
-                    break;
                 }
-                if (d === 6 && endDayOfWeek < startDayOfWeek) {
-                    for (let d2 = 0; d2 <= endDayOfWeek; d2++) {
-                        if (lanes[laneIndex][d2]) {
-                            fitsAll = false;
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
+            });
             
             if (!fitsAll) break;
         }

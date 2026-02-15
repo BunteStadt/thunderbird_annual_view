@@ -198,13 +198,10 @@ input[type="number"] {
 .view-mode-label {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
 }
 
 .view-mode-label select {
-  min-width: 180px;
+  min-width: 90px;
 }
 
 .btn,
@@ -285,6 +282,17 @@ input[type="number"] {
   margin-top: 0.35rem;
   padding-top: 0.35rem;
   border-top: 1px dashed var(--grid-line);
+}
+
+.separator {
+  border-top: 1px dashed var(--grid-line);
+  margin: 0.35rem 0;
+  padding-top: 0.35rem;
+}
+
+.select-buttons {
+  display: flex;
+  gap: 0.45rem;
 }
 
 .cal-chip,

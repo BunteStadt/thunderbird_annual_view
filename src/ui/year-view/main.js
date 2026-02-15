@@ -27,14 +27,14 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const GRID_HEADER_OFFSET = 2; // Accounts for month label column + header row
 const MAX_LANES = 50; // Safety limit to prevent infinite loops in lane finding
 
-// Grid configuration - Calculate column counts dynamically based on actual calendar data
-function getLinearViewCols() {
-    return 31; // Standard linear view always shows 31 days
-}
+// Grid configuration constants
+const LINEAR_VIEW_COLS = 31; // Standard linear view always shows 31 days
+const DAYS_PER_WEEK_ROW = 28; // Continuous weeks: 4 weeks × 7 days
 
+// Dynamic grid calculation - calculates exact columns needed for day-aligned view per year
 function getMaxColsDayAligned(year) {
-    // Calculate max columns needed for day-aligned view dynamically
-    // Find the month requiring most columns (starts latest in week + has most days)
+    // Calculate max columns needed dynamically based on actual month data
+    // Finds the month requiring most columns (starts latest in week + has most days)
     let maxCols = 0;
     for (let month = 0; month < 12; month++) {
         const firstDay = new Date(year, month, 1);
@@ -45,10 +45,6 @@ function getMaxColsDayAligned(year) {
         maxCols = Math.max(maxCols, colsNeeded);
     }
     return maxCols;
-}
-
-function getDaysPerWeekRow() {
-    return 28; // 4 weeks × 7 days
 }
 
 // Row height configuration (used for dynamic row expansion based on event lanes)
@@ -935,7 +931,7 @@ function renderWeekRowsEvents(year, events) {
 
     while (currentRowStart <= endDate || rowIdx < 14) {
         const rowEnd = new Date(currentRowStart);
-        rowEnd.setDate(rowEnd.getDate() + getDaysPerWeekRow() - 1); // 28-day period (4 weeks, inclusive)
+        rowEnd.setDate(rowEnd.getDate() + DAYS_PER_WEEK_ROW - 1); // 28-day period (4 weeks, inclusive)
 
         fourWeekRows.push({
             index: rowIdx,
@@ -943,7 +939,7 @@ function renderWeekRowsEvents(year, events) {
             end: rowEnd
         });
 
-        currentRowStart.setDate(currentRowStart.getDate() + getDaysPerWeekRow());
+        currentRowStart.setDate(currentRowStart.getDate() + DAYS_PER_WEEK_ROW);
         rowIdx++;
 
         if (rowIdx > 14) break; // Safety limit
@@ -1004,7 +1000,7 @@ function renderWeekRowsEvents(year, events) {
                 
                 // Check if this lane is available for all days in this segment
                 let available = true;
-                for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < getDaysPerWeekRow(); day++) {
+                for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < DAYS_PER_WEEK_ROW; day++) {
                     if (lanes[laneIndex][day]) {
                         available = false;
                         break;
@@ -1016,7 +1012,7 @@ function renderWeekRowsEvents(year, events) {
             }
 
             // Mark all days occupied in this lane
-            for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < getDaysPerWeekRow(); day++) {
+            for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < DAYS_PER_WEEK_ROW; day++) {
                 lanes[laneIndex][day] = true;
             }
 
@@ -1026,7 +1022,7 @@ function renderWeekRowsEvents(year, events) {
 
             // Columns: no row label, just day columns (1-indexed)
             const startCol = 1 + daysSinceRowStart;
-            const endCol = 1 + Math.min(daysSinceRowEnd + 1, getDaysPerWeekRow());
+            const endCol = 1 + Math.min(daysSinceRowEnd + 1, DAYS_PER_WEEK_ROW);
 
             const continuesPrev = segIdx > 0;
             const continuesNext = segIdx < eventSegments.length - 1;

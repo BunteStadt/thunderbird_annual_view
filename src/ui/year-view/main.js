@@ -26,6 +26,19 @@ globalThis.ENABLE_DUMMY_CALENDARS = true;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const GRID_HEADER_OFFSET = 2; // Accounts for month label column + header row
 
+// Grid dimension constants
+const MAX_DAYS_IN_MONTH = 31; // Linear view columns
+const MAX_COLS_DAY_ALIGNED = 37; // Day-aligned view: max 6 empty cells + 31 days
+const DAYS_PER_WEEK_ROW = 28; // Continuous weeks view: 4 weeks × 7 days
+
+// Row height configuration (used for dynamic row expansion based on event lanes)
+const ROW_HEIGHT_CONFIG = {
+    baseHeight: 72,       // Minimum row height in pixels
+    laneSpacing: 26,      // Vertical spacing between event lanes
+    firstLaneOffset: 55,  // Space needed for first event lane
+    headerHeight: "auto"  // Header row uses auto height
+};
+
 const months = [
     "January",
     "February",
@@ -109,6 +122,92 @@ async function loadEvents(year) {
         lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false };
         return [];
     }
+}
+
+// ============================================================================
+// Helper Functions for Event Rendering (shared across all view modes)
+// ============================================================================
+
+/**
+ * Returns the year boundaries for clamping event dates
+ */
+function getYearBoundaries(year) {
+    return {
+        start: new Date(year, 0, 1),
+        end: new Date(year, 11, 31, 23, 59, 59, 999)
+    };
+}
+
+/**
+ * Sorts events by start time, then by duration (longest first), then by title
+ */
+function sortEventsByStartAndDuration(events) {
+    return [...events].sort((a, b) => {
+        const startDiff = a.start?.getTime?.() - b.start?.getTime?.();
+        if (Number.isFinite(startDiff) && startDiff !== 0) return startDiff;
+        const lenA = eventDurationMs(a);
+        const lenB = eventDurationMs(b);
+        if (lenA !== lenB) return lenB - lenA;
+        return (a.title || "").localeCompare(b.title || "");
+    });
+}
+
+/**
+ * Creates a tooltip string for an event
+ */
+function createEventTooltip(event, startStr, endStr) {
+    const lines = [];
+    if (event.title) lines.push(event.title);
+    if (event.calendarName) lines.push(`Calendar: ${event.calendarName}`);
+    lines.push(`${startStr} – ${endStr}`);
+    if (event.location) lines.push(`Location: ${event.location}`);
+    if (event.description) lines.push(event.description);
+    return lines.filter(Boolean).join("\n");
+}
+
+/**
+ * Creates an event bar DOM element with common styling
+ */
+function createEventBar(event, laneIndex, gridRow, gridColumn, continuesPrev, continuesNext) {
+    const bar = document.createElement("div");
+    bar.className = "event";
+    if (continuesPrev) bar.classList.add("continues-prev");
+    if (continuesNext) bar.classList.add("continues-next");
+    
+    const color = getEventColor(event);
+    applyEventColor(bar, color);
+    bar.style.setProperty("--lane", laneIndex);
+    bar.style.gridRow = gridRow;
+    bar.style.gridColumn = gridColumn;
+    bar.textContent = event.title;
+    
+    return bar;
+}
+
+/**
+ * Calculates row heights based on the maximum number of event lanes per row
+ * @param {number[]} laneCounts - Array where each element is the max lanes needed for that row
+ * @param {boolean} includeHeader - Whether to include a header row at the start
+ * @returns {string} Space-separated list of row heights for CSS grid-template-rows
+ */
+function calculateRowHeights(laneCounts, includeHeader = false) {
+    const heights = [];
+    
+    if (includeHeader) {
+        heights.push(ROW_HEIGHT_CONFIG.headerHeight);
+    }
+    
+    for (const laneCount of laneCounts) {
+        if (laneCount === 0) {
+            heights.push(`${ROW_HEIGHT_CONFIG.baseHeight}px`);
+        } else {
+            const neededHeight = ROW_HEIGHT_CONFIG.firstLaneOffset + 
+                                Math.max(0, laneCount - 1) * ROW_HEIGHT_CONFIG.laneSpacing;
+            heights.push(`${Math.max(ROW_HEIGHT_CONFIG.baseHeight, neededHeight)}px`);
+        }
+    }
+    
+    return heights.join(" ");
 }
 
 function daysInMonth(monthIndex, year) {
@@ -492,14 +591,7 @@ function renderEvents(year, events) {
 function renderLinearEvents(year, events) {
     const monthLaneEnds = Array.from({ length: 12 }, () => []);
 
-    const sortedEvents = [...events].sort((a, b) => {
-        const startDiff = a.start?.getTime?.() - b.start?.getTime?.();
-        if (Number.isFinite(startDiff) && startDiff !== 0) return startDiff;
-        const lenA = eventDurationMs(a);
-        const lenB = eventDurationMs(b);
-        if (lenA !== lenB) return lenB - lenA; // longer first
-        return (a.title || "").localeCompare(b.title || "");
-    });
+    const sortedEvents = sortEventsByStartAndDuration(events);
 
     sortedEvents.forEach((event) => {
         const segments = splitEventByMonth(year, event);
@@ -517,25 +609,19 @@ function renderLinearEvents(year, events) {
             const continuesPrev = Number.isInteger(eventStartMonth) ? seg.monthIndex > eventStartMonth : false;
             const continuesNext = Number.isInteger(eventEndMonth) ? seg.monthIndex < eventEndMonth : false;
 
-            const bar = document.createElement("div");
-            bar.className = "event";
-            if (continuesPrev) bar.classList.add("continues-prev");
-            if (continuesNext) bar.classList.add("continues-next");
-            const color = getEventColor(event);
-            applyEventColor(bar, color);
-            bar.style.setProperty("--lane", laneIndex);
-            bar.style.gridRow = `${seg.monthIndex + 1} / ${seg.monthIndex + 2}`;
-            bar.style.gridColumn = `${seg.startDay + 1} / ${seg.endDay + 2}`;
-            bar.textContent = event.title;
+            const bar = createEventBar(
+                event,
+                laneIndex,
+                `${seg.monthIndex + 1} / ${seg.monthIndex + 2}`,
+                `${seg.startDay + 1} / ${seg.endDay + 2}`,
+                continuesPrev,
+                continuesNext
+            );
+
             const startStr = event.start?.toLocaleString?.() || "";
             const endStr = event.end?.toLocaleString?.() || "";
-            const lines = [];
-            if (event.title) lines.push(event.title);
-            if (event.calendarName) lines.push(`Calendar: ${event.calendarName}`);
-            lines.push(`${startStr} – ${endStr}`);
-            if (event.location) lines.push(`Location: ${event.location}`);
-            if (event.description) lines.push(event.description);
-            bar.title = lines.filter(Boolean).join("\n");
+            bar.title = createEventTooltip(event, startStr, endStr);
+            
             eventsLayer.appendChild(bar);
         });
     });
@@ -676,19 +762,11 @@ function setAllCalendars(selected) {
 }
 
 function applyDynamicRowHeights(monthLanes) {
-    const baseHeight = 72;
-    const laneSpacing = 26;
-    const firstLaneOffset = 55;
-
-    const rowHeights = monthLanes.map((lanes) => {
-        const laneCount = lanes.length;
-        if (laneCount === 0) return `${baseHeight}px`;
-        const needed = firstLaneOffset + Math.max(0, laneCount - 1) * laneSpacing;
-        return `${Math.max(baseHeight, needed)}px`;
-    });
-
-    grid.style.gridTemplateRows = rowHeights.join(" ");
-    eventsLayer.style.gridTemplateRows = rowHeights.join(" ");
+    const laneCounts = monthLanes.map(lanes => lanes.length);
+    const rowHeights = calculateRowHeights(laneCounts);
+    
+    grid.style.gridTemplateRows = rowHeights;
+    eventsLayer.style.gridTemplateRows = rowHeights;
 }
 
 // Helper function to iterate through days of week, handling week wrapping
@@ -714,21 +792,16 @@ function forEachWeekDay(startDayOfWeek, endDayOfWeek, callback) {
 }
 
 function renderDayAlignedEvents(year, events) {
-    // For day-aligned view, each month is one row with 31 columns
+    // For day-aligned view, each month is one row with MAX_COLS_DAY_ALIGNED columns
     // Track lanes per month
     const monthLaneEnds = Array.from({ length: 12 }, () => []);
 
-    const sortedEvents = [...events].sort((a, b) => {
-        const startDiff = a.start?.getTime?.() - b.start?.getTime?.();
-        if (Number.isFinite(startDiff) && startDiff !== 0) return startDiff;
-        const lenA = eventDurationMs(a);
-        const lenB = eventDurationMs(b);
-        if (lenA !== lenB) return lenB - lenA;
-        return (a.title || "").localeCompare(b.title || "");
-    });
+    const sortedEvents = sortEventsByStartAndDuration(events);
 
     // Build row height data per month
     const monthRowHeights = Array.from({ length: 12 }, () => 0);
+
+    const { start: yearStart, end: yearEnd } = getYearBoundaries(year);
 
     sortedEvents.forEach((event) => {
         if (!event.start || !event.end) return;
@@ -736,8 +809,6 @@ function renderDayAlignedEvents(year, events) {
         const allDay = isAllDayEvent(event);
         const adjustedEnd = allDay ? adjustAllDayEnd(event.end) : event.end;
 
-        const yearStart = new Date(year, 0, 1);
-        const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
         const start = new Date(Math.max(event.start.getTime(), yearStart.getTime()));
         const end = new Date(Math.min(adjustedEnd.getTime(), yearEnd.getTime()));
 
@@ -767,7 +838,7 @@ function renderDayAlignedEvents(year, events) {
                 // Check if this lane is free for all days of this event in this month
                 // Calculate the column position for each day
                 for (let day = monthStartDay; day <= monthEndDay; day++) {
-                    const colIndex = firstDayOfMonth + day - 1; // Position in 31-column grid
+                    const colIndex = firstDayOfMonth + day - 1; // Position in 37-column grid
 
                     if (!lanes[laneIndex]) lanes[laneIndex] = -Infinity;
 
@@ -800,27 +871,18 @@ function renderDayAlignedEvents(year, events) {
             const continuesPrev = monthIdx > startMonth;
             const continuesNext = monthIdx < endMonth;
 
-            const bar = document.createElement("div");
-            bar.className = "event";
-            if (continuesPrev) bar.classList.add("continues-prev");
-            if (continuesNext) bar.classList.add("continues-next");
-
-            const color = getEventColor(event);
-            applyEventColor(bar, color);
-            bar.style.setProperty("--lane", laneIndex);
-            bar.style.gridRow = `${gridRow} / ${gridRow + 1}`;
-            bar.style.gridColumn = `${startCol} / ${endCol}`;
-            bar.textContent = event.title;
+            const bar = createEventBar(
+                event,
+                laneIndex,
+                `${gridRow} / ${gridRow + 1}`,
+                `${startCol} / ${endCol}`,
+                continuesPrev,
+                continuesNext
+            );
 
             const startStr = event.start?.toLocaleString?.() || "";
             const endStr = event.end?.toLocaleString?.() || "";
-            const lines = [];
-            if (event.title) lines.push(event.title);
-            if (event.calendarName) lines.push(`Calendar: ${event.calendarName}`);
-            lines.push(`${startStr} – ${endStr}`);
-            if (event.location) lines.push(`Location: ${event.location}`);
-            if (event.description) lines.push(event.description);
-            bar.title = lines.filter(Boolean).join("\n");
+            bar.title = createEventTooltip(event, startStr, endStr);
 
             eventsLayer.appendChild(bar);
 
@@ -838,6 +900,7 @@ function renderWeekRowsEvents(year, events) {
     // Find the first Monday of the year (or before)
     let startDate = new Date(year, 0, 1);
     const firstDayOfYear = startDate.getDay();
+    // Convert Sunday (0) to Monday-based (0=Mon, 6=Sun)
     const daysToSubtract = firstDayOfYear === 0 ? 6 : firstDayOfYear - 1;
     startDate.setDate(startDate.getDate() - daysToSubtract);
 
@@ -850,7 +913,7 @@ function renderWeekRowsEvents(year, events) {
 
     while (currentRowStart <= endDate || rowIdx < 14) {
         const rowEnd = new Date(currentRowStart);
-        rowEnd.setDate(rowEnd.getDate() + 27); // Add 27 days to create 28-day period (4 weeks, inclusive)
+        rowEnd.setDate(rowEnd.getDate() + DAYS_PER_WEEK_ROW - 1); // 28-day period (4 weeks, inclusive)
 
         fourWeekRows.push({
             index: rowIdx,
@@ -858,22 +921,17 @@ function renderWeekRowsEvents(year, events) {
             end: rowEnd
         });
 
-        currentRowStart.setDate(currentRowStart.getDate() + 28);
+        currentRowStart.setDate(currentRowStart.getDate() + DAYS_PER_WEEK_ROW);
         rowIdx++;
 
-        if (rowIdx > 14) break;
+        if (rowIdx > 14) break; // Safety limit
     }
 
     const rowLaneEnds = fourWeekRows.map(() => []);
 
-    const sortedEvents = [...events].sort((a, b) => {
-        const startDiff = a.start?.getTime?.() - b.start?.getTime?.();
-        if (Number.isFinite(startDiff) && startDiff !== 0) return startDiff;
-        const lenA = eventDurationMs(a);
-        const lenB = eventDurationMs(b);
-        if (lenA !== lenB) return lenB - lenA;
-        return (a.title || "").localeCompare(b.title || "");
-    });
+    const sortedEvents = sortEventsByStartAndDuration(events);
+
+    const { start: yearStart, end: yearEnd } = getYearBoundaries(year);
 
     sortedEvents.forEach((event) => {
         if (!event.start || !event.end) return;
@@ -881,8 +939,6 @@ function renderWeekRowsEvents(year, events) {
         const allDay = isAllDayEvent(event);
         const adjustedEnd = allDay ? adjustAllDayEnd(event.end) : event.end;
 
-        const yearStart = new Date(year, 0, 1);
-        const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
         const start = new Date(Math.max(event.start.getTime(), yearStart.getTime()));
         const end = new Date(Math.min(adjustedEnd.getTime(), yearEnd.getTime()));
 
@@ -926,7 +982,7 @@ function renderWeekRowsEvents(year, events) {
                 
                 // Check if this lane is available for all days in this segment
                 let available = true;
-                for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
+                for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < DAYS_PER_WEEK_ROW; day++) {
                     if (lanes[laneIndex][day]) {
                         available = false;
                         break;
@@ -938,7 +994,7 @@ function renderWeekRowsEvents(year, events) {
             }
 
             // Mark all days occupied in this lane
-            for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
+            for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < DAYS_PER_WEEK_ROW; day++) {
                 lanes[laneIndex][day] = true;
             }
 
@@ -948,32 +1004,23 @@ function renderWeekRowsEvents(year, events) {
 
             // Columns: no row label, just 28 day columns (1-indexed)
             const startCol = 1 + daysSinceRowStart;
-            const endCol = 1 + Math.min(daysSinceRowEnd + 1, 28);
+            const endCol = 1 + Math.min(daysSinceRowEnd + 1, DAYS_PER_WEEK_ROW);
 
             const continuesPrev = segIdx > 0;
             const continuesNext = segIdx < eventSegments.length - 1;
 
-            const bar = document.createElement("div");
-            bar.className = "event";
-            if (continuesPrev) bar.classList.add("continues-prev");
-            if (continuesNext) bar.classList.add("continues-next");
-
-            const color = getEventColor(event);
-            applyEventColor(bar, color);
-            bar.style.setProperty("--lane", laneIndex);
-            bar.style.gridRow = `${gridRow} / ${gridRow + 1}`;
-            bar.style.gridColumn = `${startCol} / ${endCol}`;
-            bar.textContent = event.title;
+            const bar = createEventBar(
+                event,
+                laneIndex,
+                `${gridRow} / ${gridRow + 1}`,
+                `${startCol} / ${endCol}`,
+                continuesPrev,
+                continuesNext
+            );
 
             const startStr = event.start?.toLocaleString?.() || "";
             const endStr = event.end?.toLocaleString?.() || "";
-            const lines = [];
-            if (event.title) lines.push(event.title);
-            if (event.calendarName) lines.push(`Calendar: ${event.calendarName}`);
-            lines.push(`${startStr} – ${endStr}`);
-            if (event.location) lines.push(`Location: ${event.location}`);
-            if (event.description) lines.push(event.description);
-            bar.title = lines.filter(Boolean).join("\n");
+            bar.title = createEventTooltip(event, startStr, endStr);
 
             eventsLayer.appendChild(bar);
         });
@@ -984,36 +1031,21 @@ function renderWeekRowsEvents(year, events) {
 }
 
 function applyDayAlignedRowHeights(monthRowHeights) {
-    const baseHeight = 72;
-    const laneSpacing = 26;
-    const firstLaneOffset = 55;
-    const headerHeight = "auto";
-
-    const rowHeights = [headerHeight].concat(monthRowHeights.map((laneCount) => {
-        if (laneCount === 0) return `${baseHeight}px`;
-        const needed = firstLaneOffset + Math.max(0, laneCount - 1) * laneSpacing;
-        return `${Math.max(baseHeight, needed)}px`;
-    }));
-
-    grid.style.gridTemplateRows = rowHeights.join(" ");
-    eventsLayer.style.gridTemplateRows = rowHeights.join(" ");
+    const rowHeights = calculateRowHeights(monthRowHeights, true);
+    
+    grid.style.gridTemplateRows = rowHeights;
+    eventsLayer.style.gridTemplateRows = rowHeights;
 }
 
 function applyWeekRowsRowHeights(weekLaneEnds) {
-    const baseHeight = 72;
-    const laneSpacing = 26;
-    const firstLaneOffset = 55;
-    const headerHeight = "auto";
-
-    const rowHeights = [headerHeight].concat(weekLaneEnds.map((lanes) => {
-        const laneCount = Object.keys(lanes).length;
-        if (laneCount === 0) return `${baseHeight}px`;
-        const needed = firstLaneOffset + Math.max(0, laneCount - 1) * laneSpacing;
-        return `${Math.max(baseHeight, needed)}px`;
-    }));
-
-    grid.style.gridTemplateRows = rowHeights.join(" ");
-    eventsLayer.style.gridTemplateRows = rowHeights.join(" ");
+    const laneCounts = weekLaneEnds.map((lanes) => {
+        // Find max lane index used in this row
+        return Math.max(0, ...lanes.map((lane, idx) => lane && lane.length > 0 ? idx + 1 : 0));
+    });
+    const rowHeights = calculateRowHeights(laneCounts, true);
+    
+    grid.style.gridTemplateRows = rowHeights;
+    eventsLayer.style.gridTemplateRows = rowHeights;
 }
 
 function updateSelectedSummary() {

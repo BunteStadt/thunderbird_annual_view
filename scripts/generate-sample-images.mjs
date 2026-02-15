@@ -117,10 +117,13 @@ async function captureScenario(browser, scenario) {
         return !!grid && grid.children.length > 0;
     });
     await applyOptions(page, scenario.options);
-    await page.waitForTimeout(700);
 
-    const name = scenario.suffix || `${scenario.mode}-${scenario.theme}`;
-    const fileName = `${name}.png`;
+    await page.waitForFunction(() => {
+        const layer = document.getElementById("eventsLayer");
+        return !!layer && layer.childElementCount > 0;
+    });
+
+    const fileName = `${scenario.suffix}.png`;
     const filePath = path.join(outputDir, fileName);
     await page.screenshot({ path: filePath, fullPage: true });
     await context.close();
@@ -130,10 +133,7 @@ async function main() {
     await fs.mkdir(outputDir, { recursive: true });
     const browser = await chromium.launch({ headless: true });
     try {
-        const scenarios = [
-            ...baseScenarios.map((scenario) => ({ ...scenario, suffix: `${scenario.mode}-${scenario.theme}` })),
-            ...optionScenarios
-        ];
+        const scenarios = [...baseScenarios.map((scenario) => ({ ...scenario, suffix: `${scenario.mode}-${scenario.theme}` })), ...optionScenarios];
         for (const scenario of scenarios) {
             console.log(`[screenshots] Capturing ${scenario.suffix}`);
             await captureScenario(browser, scenario);

@@ -288,12 +288,7 @@ function renderWeekRowsCalendar(year) {
     
     const weekdayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     
-    // Add empty cell for week column header
-    const emptyHeader = document.createElement("div");
-    emptyHeader.className = "cell month";
-    grid.appendChild(emptyHeader);
-    
-    // Add weekday headers - repeat 4 times for 4 weeks
+    // Add weekday headers - repeat 4 times for 4 weeks (no month column)
     for (let week = 0; week < 4; week++) {
         weekdayNames.forEach(name => {
             const header = document.createElement("div");
@@ -316,32 +311,7 @@ function renderWeekRowsCalendar(year) {
     while (currentDate <= endDate || rowNumber * 28 < 365) {
         rowNumber++;
         
-        // Add row label showing date range
-        const rowLabel = document.createElement("div");
-        rowLabel.className = "week-label";
-        
         const rowStart = new Date(currentDate);
-        const rowEnd = new Date(currentDate);
-        rowEnd.setDate(rowEnd.getDate() + 27); // 4 weeks = 28 days
-        
-        // Show month(s) for this 4-week period
-        const startMonth = rowStart.getMonth();
-        const endMonth = rowEnd.getMonth();
-        
-        if (startMonth === endMonth) {
-            rowLabel.textContent = months[startMonth].substring(0, 3);
-        } else if (endMonth === startMonth + 1) {
-            rowLabel.textContent = `${months[startMonth].substring(0, 3)}/${months[endMonth].substring(0, 3)}`;
-        } else {
-            rowLabel.textContent = `${months[startMonth].substring(0, 3)}-${months[endMonth].substring(0, 3)}`;
-        }
-        
-        if (showWeekNumbersInput?.checked) {
-            const isoWeek = getISOWeekNumber(new Date(Date.UTC(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate())));
-            rowLabel.textContent += ` W${isoWeek}`;
-        }
-        
-        grid.appendChild(rowLabel);
         
         // Add 28 days (4 weeks, Monday to Sunday)
         for (let dayOffset = 0; dayOffset < 28; dayOffset++) {
@@ -365,8 +335,23 @@ function renderWeekRowsCalendar(year) {
                 
                 const label = document.createElement("span");
                 label.className = "day-number";
-                label.textContent = day;
+                
+                // If it's the first day of the month, show month name instead of "1"
+                if (day === 1) {
+                    label.textContent = months[monthIndex].substring(0, 3);
+                } else {
+                    label.textContent = day;
+                }
+                
                 cell.appendChild(label);
+
+                // Add week number on Mondays (dayOffset % 7 === 0 means Monday in our grid)
+                if (dayOffset % 7 === 0 && showWeekNumbersInput?.checked) {
+                    const weekLabel = document.createElement("span");
+                    weekLabel.className = "week-number";
+                    weekLabel.textContent = `${getISOWeekNumber(new Date(Date.UTC(dateYear, monthIndex, day)))}`;
+                    cell.appendChild(weekLabel);
+                }
 
                 // Apply current day highlight
                 if (highlightCurrentDayEnabled && dateYear === todayYear && monthIndex === todayMonth && day === todayDay) {
@@ -944,12 +929,12 @@ function renderWeekRowsEvents(year, events) {
             }
             
             // Calculate grid position
-            // Row = row index + 1 (for header) + 1
+            // Row = row index + 1 (for header)
             const gridRow = seg.rowIndex + 2;
             
-            // Columns: 1 for row label, then 28 for days
-            const startCol = GRID_HEADER_OFFSET + daysSinceRowStart;
-            const endCol = GRID_HEADER_OFFSET + Math.min(daysSinceRowEnd + 1, 28);
+            // Columns: no row label, just 28 day columns (1-indexed)
+            const startCol = 1 + daysSinceRowStart;
+            const endCol = 1 + Math.min(daysSinceRowEnd + 1, 28);
             
             const continuesPrev = segIdx > 0;
             const continuesNext = segIdx < eventSegments.length - 1;

@@ -404,9 +404,9 @@ input[type="number"] {
   grid-template-columns: 120px repeat(37, minmax(0, 1fr));
 }
 
-/* Week-rows view: 28 columns for 4 weeks */
+/* Week-rows view: 28 columns for 4 weeks (no separate month column) */
 .calendar.week-rows {
-  grid-template-columns: 120px repeat(28, minmax(0, 1fr));
+  grid-template-columns: repeat(28, minmax(0, 1fr));
   grid-template-rows: auto;
   grid-auto-rows: minmax(72px, auto);
 }
@@ -451,7 +451,7 @@ input[type="number"] {
 }
 
 .events-layer.week-rows {
-  grid-template-columns: 120px repeat(28, minmax(0, 1fr));
+  grid-template-columns: repeat(28, minmax(0, 1fr));
   grid-template-rows: auto;
   grid-auto-rows: minmax(72px, auto);
 }
@@ -602,7 +602,7 @@ input[type="number"] {
   }
   
   .calendar.week-rows {
-    grid-template-columns: 100px repeat(28, minmax(0, 1fr));
+    grid-template-columns: repeat(28, minmax(0, 1fr));
   }
 }
 
@@ -626,7 +626,7 @@ input[type="number"] {
   }
   
   .calendar.week-rows {
-    grid-template-columns: 88px repeat(28, minmax(0, 1fr));
+    grid-template-columns: repeat(28, minmax(0, 1fr));
   }
 
   .title h1 {

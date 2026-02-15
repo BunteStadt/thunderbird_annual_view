@@ -909,22 +909,34 @@ function renderWeekRowsEvents(year, events) {
 
         if (eventSegments.length === 0) return;
 
-        // Find a lane that works for all segments
-        const laneIndex = findFourWeekLaneForSegments(rowLaneEnds, eventSegments, fourWeekRows);
-
-        // Render each segment
+        // Render each segment with independent lane assignment per row
         eventSegments.forEach((seg, segIdx) => {
             const row = fourWeekRows[seg.rowIndex];
-
-            // Update lane occupancy
             const lanes = rowLaneEnds[seg.rowIndex];
-            if (!lanes[laneIndex]) lanes[laneIndex] = [];
 
             // Calculate day positions within the 28-day row
             const daysSinceRowStart = Math.floor((seg.start - row.start) / MS_PER_DAY);
             const daysSinceRowEnd = Math.floor((seg.end - row.start) / MS_PER_DAY);
 
-            // Mark all days occupied
+            // Find the first available lane for this segment in this row
+            let laneIndex = 0;
+            while (true) {
+                if (!lanes[laneIndex]) lanes[laneIndex] = [];
+                
+                // Check if this lane is available for all days in this segment
+                let available = true;
+                for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
+                    if (lanes[laneIndex][day]) {
+                        available = false;
+                        break;
+                    }
+                }
+                
+                if (available) break;
+                laneIndex++;
+            }
+
+            // Mark all days occupied in this lane
             for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
                 lanes[laneIndex][day] = true;
             }
@@ -968,37 +980,6 @@ function renderWeekRowsEvents(year, events) {
 
     // Apply dynamic row heights for week-rows view
     applyWeekRowsRowHeights(rowLaneEnds);
-}
-
-function findFourWeekLaneForSegments(rowLaneEnds, segments, fourWeekRows) {
-    let laneIndex = 0;
-
-    while (true) {
-        let fitsAll = true;
-
-        for (const seg of segments) {
-            const row = fourWeekRows[seg.rowIndex];
-            const lanes = rowLaneEnds[seg.rowIndex];
-            if (!lanes[laneIndex]) lanes[laneIndex] = [];
-
-            // Calculate day positions within the 28-day row
-            const daysSinceRowStart = Math.floor((seg.start - row.start) / MS_PER_DAY);
-            const daysSinceRowEnd = Math.floor((seg.end - row.start) / MS_PER_DAY);
-
-            // Check if any day in this segment is occupied in this lane
-            for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
-                if (lanes[laneIndex][day]) {
-                    fitsAll = false;
-                    break;
-                }
-            }
-
-            if (!fitsAll) break;
-        }
-
-        if (fitsAll) return laneIndex;
-        laneIndex++;
-    }
 }
 
 function applyDayAlignedRowHeights(monthRowHeights) {

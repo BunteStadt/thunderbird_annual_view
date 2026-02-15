@@ -27,7 +27,7 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const GRID_HEADER_OFFSET = 2; // Accounts for month label column + header row
 
 // Grid dimension constants
-const MAX_DAYS_IN_MONTH = 31; // Linear view columns
+const LINEAR_VIEW_COLS = 31; // Linear view: 31 day columns
 const MAX_COLS_DAY_ALIGNED = 37; // Day-aligned view: max 6 empty cells + 31 days
 const DAYS_PER_WEEK_ROW = 28; // Continuous weeks view: 4 weeks × 7 days
 
@@ -1038,9 +1038,11 @@ function applyDayAlignedRowHeights(monthRowHeights) {
 }
 
 function applyWeekRowsRowHeights(weekLaneEnds) {
+    // Count the number of lanes used in each row
     const laneCounts = weekLaneEnds.map((lanes) => {
-        // Find max lane index used in this row
-        return Math.max(0, ...lanes.map((lane, idx) => lane && lane.length > 0 ? idx + 1 : 0));
+        // lanes is an array where each index represents a lane
+        // Count non-empty lanes (lanes that have day occupancy data)
+        return lanes.filter(lane => lane && lane.length > 0).length;
     });
     const rowHeights = calculateRowHeights(laneCounts, true);
     

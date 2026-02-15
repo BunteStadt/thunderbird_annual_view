@@ -19,8 +19,10 @@ import {
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./theme.js";
 
-// Set to true for local development with dummy calendars/events. Real calendars are ignored when enabled.
-globalThis.ENABLE_DUMMY_CALENDARS = true;
+// Enable dummy data only when explicitly requested by the runtime (e.g. screenshot pipeline).
+if (typeof globalThis.ENABLE_DUMMY_CALENDARS !== "boolean") {
+    globalThis.ENABLE_DUMMY_CALENDARS = false;
+}
 
 // Constants
 const MS_PER_DAY = 24 * 60 * 60 * 1000;

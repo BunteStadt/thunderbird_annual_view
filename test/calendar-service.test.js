@@ -42,3 +42,19 @@ test('fetchCalendarEvents applies calendar and all-day filters in dummy mode', a
     assert.ok(events.every((event) => event.calendarId === 'dummy-work'));
     assert.ok(events.every((event) => event.allDay === true));
 });
+
+test('calendar service returns empty arrays when calendar API is unavailable', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    globalThis.ENABLE_DUMMY_CALENDARS = false;
+    globalThis.browser = {};
+    t.after(() => {
+        delete globalThis.browser;
+        delete globalThis.ENABLE_DUMMY_CALENDARS;
+    });
+
+    const calendars = await calendarService.fetchCalendars();
+    const events = await calendarService.fetchCalendarEvents(2026, { calendarIds: [], allDayOnly: false });
+
+    assert.deepEqual(calendars, []);
+    assert.deepEqual(events, []);
+});

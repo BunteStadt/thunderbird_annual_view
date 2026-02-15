@@ -920,7 +920,8 @@ function renderWeekRowsEvents(year, events) {
 
             // Find the first available lane for this segment in this row
             let laneIndex = 0;
-            while (true) {
+            const MAX_LANES = 50; // Safety limit to prevent infinite loops
+            while (laneIndex < MAX_LANES) {
                 if (!lanes[laneIndex]) lanes[laneIndex] = [];
                 
                 // Check if this lane is available for all days in this segment

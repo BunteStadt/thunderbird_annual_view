@@ -129,7 +129,7 @@ function renderLinearCalendar(year) {
     grid.innerHTML = "";
     grid.className = "calendar";
     eventsLayer.className = "events-layer";
-    
+
     const today = new Date();
     const todayYear = today.getFullYear();
     const todayMonth = today.getMonth();
@@ -188,20 +188,20 @@ function renderDayAlignedCalendar(year) {
     grid.innerHTML = "";
     grid.className = "calendar day-aligned";
     eventsLayer.className = "events-layer day-aligned";
-    
+
     const today = new Date();
     const todayYear = today.getFullYear();
     const todayMonth = today.getMonth();
     const todayDay = today.getDate();
     const todayDate = new Date(todayYear, todayMonth, todayDay);
-    
+
     const weekdayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-    
+
     // Add empty cell for month column header
     const emptyHeader = document.createElement("div");
     emptyHeader.className = "cell month";
     grid.appendChild(emptyHeader);
-    
+
     // Add weekday headers - repeating pattern for 37 columns (max: 6 empty + 31 days)
     for (let i = 0; i < 37; i++) {
         const header = document.createElement("div");
@@ -218,14 +218,14 @@ function renderDayAlignedCalendar(year) {
 
         const maxDays = daysInMonth(monthIndex, year);
         const firstDayOfMonth = new Date(year, monthIndex, 1).getDay();
-        
+
         // Add empty cells before the first day to align with weekday
         for (let i = 0; i < firstDayOfMonth; i++) {
             const emptyCell = document.createElement("div");
             emptyCell.className = "cell disabled";
             grid.appendChild(emptyCell);
         }
-        
+
         // Add actual days
         for (let day = 1; day <= maxDays; day++) {
             const date = new Date(year, monthIndex, day);
@@ -235,7 +235,7 @@ function renderDayAlignedCalendar(year) {
             cell.className = isWeekend ? "cell weekend" : "cell";
             cell.dataset.monthIndex = monthIndex;
             cell.dataset.day = day;
-            
+
             const label = document.createElement("span");
             label.className = "day-number";
             label.textContent = day;
@@ -253,17 +253,17 @@ function renderDayAlignedCalendar(year) {
                     cell.classList.add("past-day");
                 }
             }
-            
+
             if (showWeekNumbersInput?.checked && weekday === 1) {
                 const weekLabel = document.createElement("span");
                 weekLabel.className = "week-number";
                 weekLabel.textContent = `${getISOWeekNumber(new Date(Date.UTC(year, monthIndex, day)))}`;
                 cell.appendChild(weekLabel);
             }
-            
+
             grid.appendChild(cell);
         }
-        
+
         // Add empty cells after the last day to fill the rest of the row (up to 37 total)
         const totalCells = firstDayOfMonth + maxDays;
         const cellsToAdd = 37 - totalCells;
@@ -279,15 +279,15 @@ function renderWeekRowsCalendar(year) {
     grid.innerHTML = "";
     grid.className = "calendar week-rows";
     eventsLayer.className = "events-layer week-rows";
-    
+
     const today = new Date();
     const todayYear = today.getFullYear();
     const todayMonth = today.getMonth();
     const todayDay = today.getDate();
     const todayDate = new Date(todayYear, todayMonth, todayDay);
-    
+
     const weekdayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    
+
     // Add weekday headers - repeat 4 times for 4 weeks (no month column)
     for (let week = 0; week < 4; week++) {
         weekdayNames.forEach(name => {
@@ -297,32 +297,32 @@ function renderWeekRowsCalendar(year) {
             grid.appendChild(header);
         });
     }
-    
+
     // Find the first Monday of the year (or before)
     let currentDate = new Date(year, 0, 1);
     const firstDayOfYear = currentDate.getDay();
     // Adjust to previous Monday: Sunday (0) needs to go back 6 days, other days go back (day - 1)
     const daysToSubtract = firstDayOfYear === 0 ? 6 : firstDayOfYear - 1;
     currentDate.setDate(currentDate.getDate() - daysToSubtract);
-    
+
     const endDate = new Date(year, 11, 31);
     let rowNumber = 0;
-    
+
     while (currentDate <= endDate || rowNumber * 28 < 365) {
         rowNumber++;
-        
+
         const rowStart = new Date(currentDate);
-        
+
         // Add 28 days (4 weeks, Monday to Sunday)
         for (let dayOffset = 0; dayOffset < 28; dayOffset++) {
             const date = new Date(currentDate);
             date.setDate(date.getDate() + dayOffset);
-            
+
             const cell = document.createElement("div");
             const monthIndex = date.getMonth();
             const day = date.getDate();
             const dateYear = date.getFullYear();
-            
+
             // Check if date is within the target year
             if (dateYear !== year) {
                 cell.className = "cell disabled";
@@ -332,17 +332,18 @@ function renderWeekRowsCalendar(year) {
                 cell.className = isWeekend ? "cell weekend" : "cell";
                 cell.dataset.monthIndex = monthIndex;
                 cell.dataset.day = day;
-                
+
                 const label = document.createElement("span");
                 label.className = "day-number";
-                
+
                 // If it's the first day of the month, show month name instead of "1"
                 if (day === 1) {
                     label.textContent = months[monthIndex].substring(0, 3);
+                    label.classList.add("month-label");
                 } else {
                     label.textContent = day;
                 }
-                
+
                 cell.appendChild(label);
 
                 // Add week number on Mondays (dayOffset % 7 === 0 means Monday in our grid)
@@ -363,13 +364,13 @@ function renderWeekRowsCalendar(year) {
                     cell.classList.add("past-day");
                 }
             }
-            
+
             grid.appendChild(cell);
         }
-        
+
         // Move to next 4-week period
         currentDate.setDate(currentDate.getDate() + 28);
-        
+
         // Safety check to prevent infinite loop
         if (rowNumber > 14) break;
     }
@@ -478,7 +479,7 @@ function formatFilterSummary() {
 
 function renderEvents(year, events) {
     eventsLayer.querySelectorAll(".event").forEach((el) => el.remove());
-    
+
     if (viewMode === "linear") {
         renderLinearEvents(year, events);
     } else if (viewMode === "day-aligned") {
@@ -695,7 +696,7 @@ function applyDynamicRowHeights(monthLanes) {
 function forEachWeekDay(startDayOfWeek, endDayOfWeek, callback) {
     const startDay = (startDayOfWeek + 6) % 7; // Convert to Monday-based (0=Mon)
     const endDay = (endDayOfWeek + 6) % 7;
-    
+
     if (startDay <= endDay) {
         // Simple case: no week wrapping
         for (let d = startDay; d <= endDay; d++) {
@@ -716,7 +717,7 @@ function renderDayAlignedEvents(year, events) {
     // For day-aligned view, each month is one row with 31 columns
     // Track lanes per month
     const monthLaneEnds = Array.from({ length: 12 }, () => []);
-    
+
     const sortedEvents = [...events].sort((a, b) => {
         const startDiff = a.start?.getTime?.() - b.start?.getTime?.();
         if (Number.isFinite(startDiff) && startDiff !== 0) return startDiff;
@@ -728,89 +729,89 @@ function renderDayAlignedEvents(year, events) {
 
     // Build row height data per month
     const monthRowHeights = Array.from({ length: 12 }, () => 0);
-    
+
     sortedEvents.forEach((event) => {
         if (!event.start || !event.end) return;
-        
+
         const allDay = isAllDayEvent(event);
         const adjustedEnd = allDay ? adjustAllDayEnd(event.end) : event.end;
-        
+
         const yearStart = new Date(year, 0, 1);
         const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
         const start = new Date(Math.max(event.start.getTime(), yearStart.getTime()));
         const end = new Date(Math.min(adjustedEnd.getTime(), yearEnd.getTime()));
-        
+
         if (end < start) return;
-        
+
         const startMonth = start.getMonth();
         const startDay = start.getDate();
         const endMonth = end.getMonth();
         const endDay = end.getDate();
-        
+
         // For each month this event spans
         for (let monthIdx = startMonth; monthIdx <= endMonth; monthIdx++) {
             const firstDayOfMonth = new Date(year, monthIdx, 1).getDay();
             const daysInThisMonth = daysInMonth(monthIdx, year);
-            
+
             const monthStartDay = monthIdx === startMonth ? startDay : 1;
             const monthEndDay = monthIdx === endMonth ? endDay : daysInThisMonth;
-            
+
             // Find a lane for this segment within this month
             let laneIndex = 0;
             let foundLane = false;
-            
+
             while (!foundLane) {
                 foundLane = true;
                 const lanes = monthLaneEnds[monthIdx];
-                
+
                 // Check if this lane is free for all days of this event in this month
                 // Calculate the column position for each day
                 for (let day = monthStartDay; day <= monthEndDay; day++) {
                     const colIndex = firstDayOfMonth + day - 1; // Position in 31-column grid
-                    
+
                     if (!lanes[laneIndex]) lanes[laneIndex] = -Infinity;
-                    
+
                     if (lanes[laneIndex] >= colIndex) {
                         foundLane = false;
                         break;
                     }
                 }
-                
+
                 if (!foundLane) {
                     laneIndex++;
                 }
             }
-            
+
             // Mark this lane as occupied for all days
             const lanes = monthLaneEnds[monthIdx];
             for (let day = monthStartDay; day <= monthEndDay; day++) {
                 const colIndex = firstDayOfMonth + day - 1;
                 lanes[laneIndex] = Math.max(lanes[laneIndex] ?? -Infinity, colIndex);
             }
-            
+
             // Calculate grid positions for day-aligned view
             // Row = month (add 1 for header row) + 1
             const gridRow = monthIdx + 2;
-            
+
             // Column span: offset by first day + actual day positions
             const startCol = GRID_HEADER_OFFSET + firstDayOfMonth + monthStartDay - 1;
             const endCol = GRID_HEADER_OFFSET + firstDayOfMonth + monthEndDay; // Exclusive end
-            
+
             const continuesPrev = monthIdx > startMonth;
             const continuesNext = monthIdx < endMonth;
-            
+
             const bar = document.createElement("div");
             bar.className = "event";
             if (continuesPrev) bar.classList.add("continues-prev");
             if (continuesNext) bar.classList.add("continues-next");
-            
+
             const color = getEventColor(event);
             applyEventColor(bar, color);
             bar.style.setProperty("--lane", laneIndex);
             bar.style.gridRow = `${gridRow} / ${gridRow + 1}`;
             bar.style.gridColumn = `${startCol} / ${endCol}`;
             bar.textContent = event.title;
-            
+
             const startStr = event.start?.toLocaleString?.() || "";
             const endStr = event.end?.toLocaleString?.() || "";
             const lines = [];
@@ -820,14 +821,14 @@ function renderDayAlignedEvents(year, events) {
             if (event.location) lines.push(`Location: ${event.location}`);
             if (event.description) lines.push(event.description);
             bar.title = lines.filter(Boolean).join("\n");
-            
+
             eventsLayer.appendChild(bar);
-            
+
             // Track max lane for this month
             monthRowHeights[monthIdx] = Math.max(monthRowHeights[monthIdx], laneIndex + 1);
         }
     });
-    
+
     // Apply dynamic row heights for day-aligned view
     applyDayAlignedRowHeights(monthRowHeights);
 }
@@ -839,32 +840,32 @@ function renderWeekRowsEvents(year, events) {
     const firstDayOfYear = startDate.getDay();
     const daysToSubtract = firstDayOfYear === 0 ? 6 : firstDayOfYear - 1;
     startDate.setDate(startDate.getDate() - daysToSubtract);
-    
+
     const endDate = new Date(year, 11, 31);
-    
+
     // Build list of 4-week rows
     const fourWeekRows = [];
     let currentRowStart = new Date(startDate);
     let rowIdx = 0;
-    
+
     while (currentRowStart <= endDate || rowIdx < 14) {
         const rowEnd = new Date(currentRowStart);
         rowEnd.setDate(rowEnd.getDate() + 27); // Add 27 days to create 28-day period (4 weeks, inclusive)
-        
+
         fourWeekRows.push({
             index: rowIdx,
             start: new Date(currentRowStart),
             end: rowEnd
         });
-        
+
         currentRowStart.setDate(currentRowStart.getDate() + 28);
         rowIdx++;
-        
+
         if (rowIdx > 14) break;
     }
-    
+
     const rowLaneEnds = fourWeekRows.map(() => []);
-    
+
     const sortedEvents = [...events].sort((a, b) => {
         const startDiff = a.start?.getTime?.() - b.start?.getTime?.();
         if (Number.isFinite(startDiff) && startDiff !== 0) return startDiff;
@@ -873,31 +874,31 @@ function renderWeekRowsEvents(year, events) {
         if (lenA !== lenB) return lenB - lenA;
         return (a.title || "").localeCompare(b.title || "");
     });
-    
+
     sortedEvents.forEach((event) => {
         if (!event.start || !event.end) return;
-        
+
         const allDay = isAllDayEvent(event);
         const adjustedEnd = allDay ? adjustAllDayEnd(event.end) : event.end;
-        
+
         const yearStart = new Date(year, 0, 1);
         const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
         const start = new Date(Math.max(event.start.getTime(), yearStart.getTime()));
         const end = new Date(Math.min(adjustedEnd.getTime(), yearEnd.getTime()));
-        
+
         if (end < start) return;
-        
+
         // Find which 4-week rows this event spans
         const eventSegments = [];
-        
+
         for (let i = 0; i < fourWeekRows.length; i++) {
             const row = fourWeekRows[i];
-            
+
             // Check if event overlaps with this 4-week row
             if (start <= row.end && end >= row.start) {
                 const segStart = new Date(Math.max(start.getTime(), row.start.getTime()));
                 const segEnd = new Date(Math.min(end.getTime(), row.end.getTime()));
-                
+
                 eventSegments.push({
                     rowIndex: i,
                     start: segStart,
@@ -905,52 +906,52 @@ function renderWeekRowsEvents(year, events) {
                 });
             }
         }
-        
+
         if (eventSegments.length === 0) return;
-        
+
         // Find a lane that works for all segments
         const laneIndex = findFourWeekLaneForSegments(rowLaneEnds, eventSegments, fourWeekRows);
-        
+
         // Render each segment
         eventSegments.forEach((seg, segIdx) => {
             const row = fourWeekRows[seg.rowIndex];
-            
+
             // Update lane occupancy
             const lanes = rowLaneEnds[seg.rowIndex];
             if (!lanes[laneIndex]) lanes[laneIndex] = [];
-            
+
             // Calculate day positions within the 28-day row
             const daysSinceRowStart = Math.floor((seg.start - row.start) / MS_PER_DAY);
             const daysSinceRowEnd = Math.floor((seg.end - row.start) / MS_PER_DAY);
-            
+
             // Mark all days occupied
             for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
                 lanes[laneIndex][day] = true;
             }
-            
+
             // Calculate grid position
             // Row = row index + 1 (for header) + 1 (1-based grid indexing)
             const gridRow = seg.rowIndex + 2;
-            
+
             // Columns: no row label, just 28 day columns (1-indexed)
             const startCol = 1 + daysSinceRowStart;
             const endCol = 1 + Math.min(daysSinceRowEnd + 1, 28);
-            
+
             const continuesPrev = segIdx > 0;
             const continuesNext = segIdx < eventSegments.length - 1;
-            
+
             const bar = document.createElement("div");
             bar.className = "event";
             if (continuesPrev) bar.classList.add("continues-prev");
             if (continuesNext) bar.classList.add("continues-next");
-            
+
             const color = getEventColor(event);
             applyEventColor(bar, color);
             bar.style.setProperty("--lane", laneIndex);
             bar.style.gridRow = `${gridRow} / ${gridRow + 1}`;
             bar.style.gridColumn = `${startCol} / ${endCol}`;
             bar.textContent = event.title;
-            
+
             const startStr = event.start?.toLocaleString?.() || "";
             const endStr = event.end?.toLocaleString?.() || "";
             const lines = [];
@@ -960,30 +961,30 @@ function renderWeekRowsEvents(year, events) {
             if (event.location) lines.push(`Location: ${event.location}`);
             if (event.description) lines.push(event.description);
             bar.title = lines.filter(Boolean).join("\n");
-            
+
             eventsLayer.appendChild(bar);
         });
     });
-    
+
     // Apply dynamic row heights for week-rows view
     applyWeekRowsRowHeights(rowLaneEnds);
 }
 
 function findFourWeekLaneForSegments(rowLaneEnds, segments, fourWeekRows) {
     let laneIndex = 0;
-    
+
     while (true) {
         let fitsAll = true;
-        
+
         for (const seg of segments) {
             const row = fourWeekRows[seg.rowIndex];
             const lanes = rowLaneEnds[seg.rowIndex];
             if (!lanes[laneIndex]) lanes[laneIndex] = [];
-            
+
             // Calculate day positions within the 28-day row
             const daysSinceRowStart = Math.floor((seg.start - row.start) / MS_PER_DAY);
             const daysSinceRowEnd = Math.floor((seg.end - row.start) / MS_PER_DAY);
-            
+
             // Check if any day in this segment is occupied in this lane
             for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < 28; day++) {
                 if (lanes[laneIndex][day]) {
@@ -991,10 +992,10 @@ function findFourWeekLaneForSegments(rowLaneEnds, segments, fourWeekRows) {
                     break;
                 }
             }
-            
+
             if (!fitsAll) break;
         }
-        
+
         if (fitsAll) return laneIndex;
         laneIndex++;
     }
@@ -1005,13 +1006,13 @@ function applyDayAlignedRowHeights(monthRowHeights) {
     const laneSpacing = 26;
     const firstLaneOffset = 55;
     const headerHeight = "auto";
-    
+
     const rowHeights = [headerHeight].concat(monthRowHeights.map((laneCount) => {
         if (laneCount === 0) return `${baseHeight}px`;
         const needed = firstLaneOffset + Math.max(0, laneCount - 1) * laneSpacing;
         return `${Math.max(baseHeight, needed)}px`;
     }));
-    
+
     grid.style.gridTemplateRows = rowHeights.join(" ");
     eventsLayer.style.gridTemplateRows = rowHeights.join(" ");
 }
@@ -1021,14 +1022,14 @@ function applyWeekRowsRowHeights(weekLaneEnds) {
     const laneSpacing = 26;
     const firstLaneOffset = 55;
     const headerHeight = "auto";
-    
+
     const rowHeights = [headerHeight].concat(weekLaneEnds.map((lanes) => {
         const laneCount = Object.keys(lanes).length;
         if (laneCount === 0) return `${baseHeight}px`;
         const needed = firstLaneOffset + Math.max(0, laneCount - 1) * laneSpacing;
         return `${Math.max(baseHeight, needed)}px`;
     }));
-    
+
     grid.style.gridTemplateRows = rowHeights.join(" ");
     eventsLayer.style.gridTemplateRows = rowHeights.join(" ");
 }
@@ -1175,13 +1176,13 @@ async function init() {
     if (showWeekNumbersInput) {
         showWeekNumbersInput.checked = await loadWeekNumbersPreference();
     }
-    
+
     // Load view mode preference
     viewMode = await loadViewMode();
     if (viewModeSelect) {
         viewModeSelect.value = viewMode;
     }
-    
+
     await loadCalendars();
 
     // Load day indicator preferences
@@ -1218,7 +1219,7 @@ async function init() {
     onClick(minDurationUpBtn, () => adjustMinDuration(1));
     onClick(selectAllBtn, () => setAllCalendars(true));
     onClick(deselectAllBtn, () => setAllCalendars(false));
-    
+
     // Add event listener for view mode selector
     onChange(viewModeSelect, async () => {
         viewMode = viewModeSelect?.value || "linear";

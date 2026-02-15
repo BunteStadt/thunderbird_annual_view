@@ -471,6 +471,11 @@ input[type="number"] {
   font-weight: 500;
 }
 
+.cell .month-label {
+  font-weight: 900;
+  color: var(--text);
+}
+
 .cell .week-number {
   position: absolute;
   bottom: 2px;
@@ -531,7 +536,8 @@ input[type="number"] {
   justify-content: flex-end;
   color: var(--text);
   box-shadow: inset -1px 0 0 var(--grid-line);
-  grid-column: 1; /* Always place month labels in the first column */
+  grid-column: 1;
+  /* Always place month labels in the first column */
 }
 
 
@@ -596,11 +602,11 @@ input[type="number"] {
   .calendar {
     grid-template-columns: 100px repeat(31, minmax(0, 1fr));
   }
-  
+
   .calendar.day-aligned {
     grid-template-columns: 100px repeat(37, minmax(0, 1fr));
   }
-  
+
   .calendar.week-rows {
     grid-template-columns: repeat(28, minmax(0, 1fr));
   }
@@ -620,11 +626,11 @@ input[type="number"] {
   .calendar {
     grid-template-columns: 88px repeat(31, minmax(0, 1fr));
   }
-  
+
   .calendar.day-aligned {
     grid-template-columns: 88px repeat(37, minmax(0, 1fr));
   }
-  
+
   .calendar.week-rows {
     grid-template-columns: repeat(28, minmax(0, 1fr));
   }
@@ -650,6 +656,7 @@ input[type="number"] {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

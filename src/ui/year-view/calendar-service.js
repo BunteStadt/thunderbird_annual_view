@@ -3,7 +3,8 @@
 const DUMMY_CALENDARS = [
     { id: "dummy-work", name: "Work", color: "#0ea5e9" },
     { id: "dummy-personal", name: "Personal", color: "#22c55e" },
-
+    { id: "dummy-project", name: "Project X", color: "#f97316" },
+    { id: "dummy-holidays", name: "Holidays", color: "#ef4444" }
 ];
 
 function hasCalendarApi() {

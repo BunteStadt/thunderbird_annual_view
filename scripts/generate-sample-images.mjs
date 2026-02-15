@@ -81,6 +81,7 @@ async function captureScenario(browser, scenario) {
 
     await context.addInitScript(({ storageState }) => {
         const state = { ...storageState };
+        globalThis.ENABLE_DUMMY_CALENDARS = true;
         globalThis.browser = {
             storage: {
                 local: {

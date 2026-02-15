@@ -320,7 +320,46 @@ function renderEvents(year, events) {
 }
 
 function findLaneForSegments(monthLaneEnds, segments) {
-    l
+    let laneIndex = 0;
+    while (true) {
+        let fitsAll = true;
+        for (let i = 0; i < segments.length; i += 1) {
+            const { monthIndex, startDay } = segments[i];
+            const endForLane = monthLaneEnds[monthIndex][laneIndex] ?? -Infinity;
+            if (endForLane >= startDay) {
+                fitsAll = false;
+                break;
+            }
+        }
+        if (fitsAll) return laneIndex;
+        laneIndex += 1;
+    }
+}
+
+function getEventColor(event) {
+    return event.calendarColor || event.color || "#38bdf8";
+}
+
+function applyEventColor(el, color) {
+    const bg = alphaFromHex(color, 0.25) || color;
+    const border = alphaFromHex(color, 0.6) || color;
+    el.style.background = `linear-gradient(135deg, ${bg}, ${bg})`;
+    el.style.borderColor = border;
+}
+
+function alphaFromHex(color, alpha) {
+    if (typeof color !== "string") return null;
+    const m = color.match(/^#([0-9a-fA-F]{6})$/);
+    if (!m) return null;
+    const hex = m[1];
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function parseCalendarDate(value, isAllDay) {
+    if (value instanceof Date) return value;
     if (typeof value !== "string") return null;
     const s = value.trim();
 

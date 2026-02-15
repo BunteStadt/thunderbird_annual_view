@@ -3,133 +3,152 @@
     "name": "Calendar Annual View",
     "author": "GlamorousPotato",
     "description": "A Thunderbird add-on that renders a linear annual calendar grid with calendar filters and theming.",
-    "default_title": "Open Annual View",
-    "default_icon": {
-        "16": "icons/annual_view.svg",
-        "32": "icons/annual_view.svg"
+    "version": "1.0.0",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "GlamorousPotato.calendar-annual-view@addons.thunderbird.net",
+            "strict_min_version": "147.0",
+            "strict_max_version": "148.0"
+        }
     },
-    "theme_icons": [
-        {
-            "light": "icons/annual_view_inverted.svg",
-            "dark": "icons/annual_view.svg",
-            "size": 16
+    "permissions": [
+        "tabs",
+        "storage"
+    ],
+    "background": {
+        "scripts": [
+            "src/background/background.js"
+        ]
+    },
+    "action": {
+        "allowed_spaces": [],
+        "default_title": "Open Annual View",
+        "default_icon": {
+            "16": "icons/annual_view.svg",
+            "32": "icons/annual_view.svg"
         },
-        {
-            "light": "icons/annual_view_inverted.svg",
-            "dark": "icons/annual_view.svg",
-            "size": 32
-        }
-    ]
-},
-"experiment_apis": {
-    "calendar_calendars": {
-        "schema": "experiments/calendar/schema/calendar-calendars.json",
-        "parent": {
-            "scopes": [
-                "addon_parent"
-            ],
-            "script": "experiments/calendar/parent/ext-calendar-calendars.js",
-            "paths": [
-                [
-                    "calendar",
-                    "calendars"
-                ]
-            ]
-        }
+        "theme_icons": [
+            {
+                "light": "icons/annual_view_inverted.svg",
+                "dark": "icons/annual_view.svg",
+                "size": 16
+            },
+            {
+                "light": "icons/annual_view_inverted.svg",
+                "dark": "icons/annual_view.svg",
+                "size": 32
+            }
+        ]
     },
-    "calendar_items": {
-        "schema": "experiments/calendar/schema/calendar-items.json",
-        "parent": {
-            "scopes": [
-                "addon_parent"
-            ],
-            "script": "experiments/calendar/parent/ext-calendar-items.js",
-            "paths": [
-                [
-                    "calendar",
-                    "items"
+    "experiment_apis": {
+        "calendar_calendars": {
+            "schema": "experiments/calendar/schema/calendar-calendars.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "experiments/calendar/parent/ext-calendar-calendars.js",
+                "paths": [
+                    [
+                        "calendar",
+                        "calendars"
+                    ]
                 ]
-            ]
-        }
-    },
-    "calendar_provider": {
-        "schema": "experiments/calendar/schema/calendar-provider.json",
-        "parent": {
-            "scopes": [
-                "addon_parent"
-            ],
-            "script": "experiments/calendar/parent/ext-calendar-provider.js",
-            "events": [
-                "startup"
-            ],
-            "paths": [
-                [
-                    "calendar",
-                    "provider"
-                ]
-            ]
-        }
-    },
-    "calendar_timezones": {
-        "schema": "experiments/calendar/schema/calendar-timezones.json",
-        "parent": {
-            "scopes": [
-                "addon_parent"
-            ],
-            "script": "experiments/calendar/parent/ext-calendar-timezones.js",
-            "paths": [
-                [
-                    "calendar",
-                    "timezones"
-                ]
-            ]
+            }
         },
-        "child": {
-            "scopes": [
-                "addon_child"
-            ],
-            "script": "experiments/calendar/child/ext-calendar-timezones.js",
-            "paths": [
-                [
-                    "calendar",
-                    "timezones"
+        "calendar_items": {
+            "schema": "experiments/calendar/schema/calendar-items.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "experiments/calendar/parent/ext-calendar-items.js",
+                "paths": [
+                    [
+                        "calendar",
+                        "items"
+                    ]
                 ]
-            ]
-        }
-    },
-    "calendarItemAction": {
-        "schema": "experiments/calendar/schema/calendarItemAction.json",
-        "parent": {
-            "scopes": [
-                "addon_parent"
-            ],
-            "script": "experiments/calendar/parent/ext-calendarItemAction.js",
-            "events": [
-                "startup"
-            ],
-            "paths": [
-                [
-                    "calendarItemAction"
+            }
+        },
+        "calendar_provider": {
+            "schema": "experiments/calendar/schema/calendar-provider.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "experiments/calendar/parent/ext-calendar-provider.js",
+                "events": [
+                    "startup"
+                ],
+                "paths": [
+                    [
+                        "calendar",
+                        "provider"
+                    ]
                 ]
-            ]
-        }
-    },
-    "calendarItemDetails": {
-        "schema": "experiments/calendar/schema/calendarItemDetails.json",
-        "parent": {
-            "scopes": [
-                "addon_parent"
-            ],
-            "script": "experiments/calendar/parent/ext-calendarItemDetails.js",
-            "events": [
-                "startup"
-            ],
-            "paths": [
-                [
-                    "calendarItemDetails"
+            }
+        },
+        "calendar_timezones": {
+            "schema": "experiments/calendar/schema/calendar-timezones.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "experiments/calendar/parent/ext-calendar-timezones.js",
+                "paths": [
+                    [
+                        "calendar",
+                        "timezones"
+                    ]
                 ]
-            ]
+            },
+            "child": {
+                "scopes": [
+                    "addon_child"
+                ],
+                "script": "experiments/calendar/child/ext-calendar-timezones.js",
+                "paths": [
+                    [
+                        "calendar",
+                        "timezones"
+                    ]
+                ]
+            }
+        },
+        "calendarItemAction": {
+            "schema": "experiments/calendar/schema/calendarItemAction.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "experiments/calendar/parent/ext-calendarItemAction.js",
+                "events": [
+                    "startup"
+                ],
+                "paths": [
+                    [
+                        "calendarItemAction"
+                    ]
+                ]
+            }
+        },
+        "calendarItemDetails": {
+            "schema": "experiments/calendar/schema/calendarItemDetails.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "experiments/calendar/parent/ext-calendarItemDetails.js",
+                "events": [
+                    "startup"
+                ],
+                "paths": [
+                    [
+                        "calendarItemDetails"
+                    ]
+                ]
+            }
         }
     }
-}
 }

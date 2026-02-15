@@ -440,12 +440,39 @@ input[type="number"] {
   color: var(--weekend-text);
 }
 
-.cell.past-da padding-right: 0.75rem;
-display: flex;
-align-items: center;
-justify-content: flex-end;
-color: var(--text);
-box-shadow: inset -1px 0 0 var(--grid-line);
+.cell.past-day::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+.theme-dark .cell.past-day::after {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.cell.current-day {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+  z-index: 1;
+}
+
+.cell.current-day .day-number {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+
+.month {
+  background: var(--month-col);
+  font-weight: 700;
+  padding-right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--text);
+  box-shadow: inset -1px 0 0 var(--grid-line);
 }
 
 
@@ -548,7 +575,6 @@ box-shadow: inset -1px 0 0 var(--grid-line);
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }

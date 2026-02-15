@@ -16,8 +16,34 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Install zip
         run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Generate sample images
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          YEAR_VIEW_URL: http://127.0.0.1:8000/src/ui/year-view/year-view.html
+        run: |
+          python3 -m http.server 8000 >/tmp/calendar-screenshots-http.log 2>&1 &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID" EXIT
+          node scripts/generate-sample-images.mjs
+
+      - name: Archive sample images
+        run: |
+          mkdir -p dist
+          zip -r dist/calendar-annual-view-media-${GITHUB_REF##*/}.zip media/generated/${GITHUB_REF##*/}
 
       - name: Build XPI
         run: |
@@ -28,7 +54,9 @@ jobs:
       - name: Upload XPI to release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/calendar-annual-view-${{ github.ref_name }}.xpi
+          files: |
+            dist/calendar-annual-view-${{ github.ref_name }}.xpi
+            dist/calendar-annual-view-media-${{ github.ref_name }}.zip
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: "Automatic build of XPI"

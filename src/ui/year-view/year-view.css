@@ -195,6 +195,15 @@ input[type="number"] {
   gap: 0.4rem;
 }
 
+.view-mode-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.view-mode-label select {
+  min-width: 90px;
+}
+
 .btn,
 .year-btn,
 .cal-action-btn {
@@ -273,6 +282,17 @@ input[type="number"] {
   margin-top: 0.35rem;
   padding-top: 0.35rem;
   border-top: 1px dashed var(--grid-line);
+}
+
+.separator {
+  border-top: 1px dashed var(--grid-line);
+  margin: 0.35rem 0;
+  padding-top: 0.35rem;
+}
+
+.select-buttons {
+  display: flex;
+  gap: 0.45rem;
 }
 
 .cal-chip,
@@ -387,6 +407,42 @@ input[type="number"] {
   /* box-shadow: var(--shadow); */
 }
 
+/* Day-of-week aligned view: needs up to 37 columns (6 empty + 31 days max) */
+.calendar.day-aligned {
+  grid-template-columns: 120px repeat(37, minmax(0, 1fr));
+}
+
+/* Week-rows view: 28 columns for 4 weeks (no separate month column) */
+.calendar.week-rows {
+  grid-template-columns: repeat(28, minmax(0, 1fr));
+  grid-template-rows: auto;
+  grid-auto-rows: minmax(72px, auto);
+}
+
+.weekday-header {
+  background: var(--panel-strong);
+  font-weight: 700;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  padding: 8px 4px;
+  text-align: center;
+}
+
+.week-label {
+  background: var(--month-col);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--text);
+  box-shadow: inset -1px 0 0 var(--grid-line);
+}
+
 .events-layer {
   pointer-events: none;
   position: absolute;
@@ -396,6 +452,16 @@ input[type="number"] {
   grid-template-rows: repeat(12, minmax(72px, 1fr));
   grid-auto-rows: minmax(72px, 1fr);
   gap: 1px;
+}
+
+.events-layer.day-aligned {
+  grid-template-columns: 120px repeat(37, minmax(0, 1fr));
+}
+
+.events-layer.week-rows {
+  grid-template-columns: repeat(28, minmax(0, 1fr));
+  grid-template-rows: auto;
+  grid-auto-rows: minmax(72px, auto);
 }
 
 .cell {
@@ -411,6 +477,11 @@ input[type="number"] {
   font-size: 0.76rem;
   color: var(--weekday-text);
   font-weight: 500;
+}
+
+.cell .month-label {
+  font-weight: 900;
+  color: var(--text);
 }
 
 .cell .week-number {
@@ -473,6 +544,8 @@ input[type="number"] {
   justify-content: flex-end;
   color: var(--text);
   box-shadow: inset -1px 0 0 var(--grid-line);
+  grid-column: 1;
+  /* Always place month labels in the first column */
 }
 
 
@@ -537,6 +610,14 @@ input[type="number"] {
   .calendar {
     grid-template-columns: 100px repeat(31, minmax(0, 1fr));
   }
+
+  .calendar.day-aligned {
+    grid-template-columns: 100px repeat(37, minmax(0, 1fr));
+  }
+
+  .calendar.week-rows {
+    grid-template-columns: repeat(28, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -552,6 +633,14 @@ input[type="number"] {
 
   .calendar {
     grid-template-columns: 88px repeat(31, minmax(0, 1fr));
+  }
+
+  .calendar.day-aligned {
+    grid-template-columns: 88px repeat(37, minmax(0, 1fr));
+  }
+
+  .calendar.week-rows {
+    grid-template-columns: repeat(28, minmax(0, 1fr));
   }
 
   .title h1 {
@@ -575,6 +664,7 @@ input[type="number"] {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

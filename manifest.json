@@ -3,7 +3,7 @@
     "name": "Calendar Annual View",
     "author": "GlamorousPotato",
     "description": "A Thunderbird add-on that renders a linear annual calendar grid with calendar filters and theming.",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "browser_specific_settings": {
         "gecko": {
             "id": "GlamorousPotato.calendar-annual-view@addons.thunderbird.net",

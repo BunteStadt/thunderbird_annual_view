@@ -929,7 +929,7 @@ function renderWeekRowsEvents(year, events) {
             }
             
             // Calculate grid position
-            // Row = row index + 1 (for header)
+            // Row = row index + 1 (for header) + 1 (1-based grid indexing)
             const gridRow = seg.rowIndex + 2;
             
             // Columns: no row label, just 28 day columns (1-indexed)

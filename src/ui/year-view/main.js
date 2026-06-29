@@ -19,9 +19,17 @@ import {
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./theme.js";
 
-// Enable dummy data only when explicitly requested by the runtime (e.g. screenshot pipeline).
+function shouldEnableDummyCalendarsFromUrl() {
+    const search = globalThis.location?.search || "";
+    if (!search) return false;
+
+    const dummyParam = new URLSearchParams(search).get("dummy");
+    return dummyParam === "" || dummyParam === "1" || dummyParam === "true";
+}
+
+// Enable dummy data only when explicitly requested by the runtime or via ?dummy=1.
 if (typeof globalThis.ENABLE_DUMMY_CALENDARS !== "boolean") {
-    globalThis.ENABLE_DUMMY_CALENDARS = false;
+    globalThis.ENABLE_DUMMY_CALENDARS = shouldEnableDummyCalendarsFromUrl();
 }
 
 // Constants

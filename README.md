@@ -67,12 +67,16 @@ The view mode can be changed directly in the annual view header: select between 
 Note to dev: Use private repo for copilot sessions and pull requests.
 Then create a pull request in the public repo once everything is ready.
 
+### Dummy Data
+Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
+
 ### Build standalone html
 
 Work wihtout Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
 
 1. Install `Live Server (Five Server)` extension in Visual Studio Code.
 2. Right click `/src/ui/year-view/year-view.html` and select `Open with Live Server`.
+3. Add `?dummy=1` to the URL to load the built-in sample calendars and events.
 
 ### Run in Thunderbird
 
@@ -81,8 +85,6 @@ Work wihtout Thunderbird - see the thunderbird tab in the browser - faster for d
 ## Deployments
 
 ### Prerequisites
-
-- Thunderbird 147.0 or later (up to 148.0).
 
 ### Building
 

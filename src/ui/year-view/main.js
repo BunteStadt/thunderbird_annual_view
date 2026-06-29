@@ -767,9 +767,12 @@ async function renderCalendarList(calendars) {
     calendars.forEach((cal) => {
         const chip = document.createElement("button");
         chip.type = "button";
+        const calendarName = cal.name || "(unnamed)";
         const isSelected = selectedCalendarIds.has(cal.id);
         chip.className = isSelected ? "cal-chip selected" : "cal-chip";
-        chip.textContent = cal.name || "(unnamed)";
+        chip.textContent = calendarName;
+        chip.title = calendarName;
+        chip.setAttribute("aria-label", calendarName);
         chip.dataset.id = cal.id;
         chip.addEventListener("click", () => {
             const selected = selectedCalendarIds.has(cal.id);

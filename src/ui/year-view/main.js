@@ -181,8 +181,18 @@ function sortEventsByStartAndDuration(events) {
 /**
  * Creates a tooltip string for an event
  */
-function createEventTooltip(event, startStr, endStr) {
+function formatTooltipDate(date, allDay) {
+    if (!(date instanceof Date)) return "";
+    return allDay ? date.toLocaleDateString() : date.toLocaleString();
+}
+
+function createEventTooltip(event) {
     const lines = [];
+    const allDay = isAllDayEvent(event);
+    const startStr = formatTooltipDate(event.start, allDay);
+    const endDate = allDay && event.end ? adjustAllDayEnd(event.end) : event.end;
+    const endStr = formatTooltipDate(endDate, allDay);
+
     if (event.title) lines.push(event.title);
     if (event.calendarName) lines.push(`Calendar: ${event.calendarName}`);
     lines.push(`${startStr} – ${endStr}`);
@@ -644,9 +654,7 @@ function renderLinearEvents(year, events) {
                 continuesNext
             );
 
-            const startStr = event.start?.toLocaleString?.() || "";
-            const endStr = event.end?.toLocaleString?.() || "";
-            bar.title = createEventTooltip(event, startStr, endStr);
+            bar.title = createEventTooltip(event);
             
             eventsLayer.appendChild(bar);
         });
@@ -908,9 +916,7 @@ function renderDayAlignedEvents(year, events) {
                 continuesNext
             );
 
-            const startStr = event.start?.toLocaleString?.() || "";
-            const endStr = event.end?.toLocaleString?.() || "";
-            bar.title = createEventTooltip(event, startStr, endStr);
+            bar.title = createEventTooltip(event);
 
             eventsLayer.appendChild(bar);
 
@@ -1046,9 +1052,7 @@ function renderWeekRowsEvents(year, events) {
                 continuesNext
             );
 
-            const startStr = event.start?.toLocaleString?.() || "";
-            const endStr = event.end?.toLocaleString?.() || "";
-            bar.title = createEventTooltip(event, startStr, endStr);
+            bar.title = createEventTooltip(event);
 
             eventsLayer.appendChild(bar);
         });

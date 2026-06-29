@@ -6,7 +6,7 @@ It displays all 12 months in various formats (compact linear, day-aligned, or 4-
 
 Calendar Annual View adds a full-year calendar layout to Thunderbird with multiple view modes: compact linear grid (each row is a month), day-aligned layout, or 4-week row format. It is designed for fast yearly planning and conflict spotting.
 
-The add-on automatically detects your Thunderbird calendars, applies their configured colors, and lets you filter what is shown (per-calendar visibility, minimum event duration, all-day events only, week numbers, past day graying, and current day highlighting). The annual view is intentionally read-only, so event editing remains in Thunderbird's standard day/week/month views.
+The add-on automatically detects your Thunderbird calendars, applies their configured colors, and lets you filter what is shown (per-calendar visibility, per-calendar all-day overrides, minimum event duration, all-day events only, week numbers, past day graying, and current day highlighting). The annual view is intentionally read-only, so event editing remains in Thunderbird's standard day/week/month views.
 
 ## Features
 
@@ -15,6 +15,7 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 - **Automatic Calendar Detection**: Pulls calendars and colors from Thunderbird's settings.
 - **Configurable Filters**:
   - Enable/disable specific calendars.
+  - Set each calendar's all-day-only mode to on, off, or follow the global setting.
   - Filter events by duration (longer than X hours).
   - Filter to show only all-day events.
   - Show/hide ISO week numbers.
@@ -56,6 +57,8 @@ Access the add-on options through Thunderbird's Add-ons Manager:
 - **Calendars**: Select which calendars to include in the annual view.
 - **Duration Filter**: Set a minimum event duration (in hours) to display.
 - **All-Day Events Only**: Toggle to show only full-day events.
+- **Per-Calendar All-Day Mode**: Use the per-calendar symbol to force all-day-only on, off, or follow the global setting.
+- **Per-Calendar Duration Override**: Set a calendar-specific minimum duration, or `-1` to follow the global duration filter.
 - **Week Numbers**: Toggle to show/hide ISO week numbers in the grid.
 - **Gray Past Days**: Toggle to gray out days before today for better focus.
 - **Highlight Current Day**: Toggle to highlight today's date.
@@ -63,9 +66,6 @@ Access the add-on options through Thunderbird's Add-ons Manager:
 The view mode can be changed directly in the annual view header: select between compact (linear), aligned, or 4-week layouts.
 
 ## Development
-
-Note to dev: Use private repo for copilot sessions and pull requests.
-Then create a pull request in the public repo once everything is ready.
 
 ### Dummy Data
 Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.

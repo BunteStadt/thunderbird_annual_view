@@ -44,6 +44,53 @@ test('storage module load/persist helpers use browser.storage.local correctly', 
     assert.equal(persistedSelection.found, true);
     assert.deepEqual([...persistedSelection.ids].sort(), ['calendar-a', 'calendar-b']);
 
+    const initialAllDayOnly = await storage.loadAllDayOnlyPreference();
+    assert.equal(initialAllDayOnly, false);
+
+    await storage.persistAllDayOnlyPreference(true);
+    const persistedAllDayOnly = await storage.loadAllDayOnlyPreference();
+    assert.equal(persistedAllDayOnly, true);
+
+    const initialMinDuration = await storage.loadMinDurationPreference();
+    assert.equal(initialMinDuration, 25);
+
+    await storage.persistMinDurationPreference(12.5);
+    const persistedMinDuration = await storage.loadMinDurationPreference();
+    assert.equal(persistedMinDuration, 12.5);
+
+    const initialModes = await storage.loadCalendarAllDayModes();
+    assert.equal(initialModes.found, false);
+    assert.deepEqual(initialModes.modes, {});
+
+    await storage.persistCalendarAllDayModes({
+        'calendar-a': 'yes',
+        'calendar-b': 'no',
+        'calendar-c': 'follow'
+    });
+    const persistedModes = await storage.loadCalendarAllDayModes();
+    assert.equal(persistedModes.found, true);
+    assert.deepEqual(persistedModes.modes, {
+        'calendar-a': 'yes',
+        'calendar-b': 'no',
+        'calendar-c': 'follow'
+    });
+
+    const initialCalendarDurations = await storage.loadCalendarMinDurationHours();
+    assert.equal(initialCalendarDurations.found, false);
+    assert.deepEqual(initialCalendarDurations.hours, {});
+
+    await storage.persistCalendarMinDurationHours({
+        'calendar-a': -1,
+        'calendar-b': 6.5,
+        'calendar-c': 'invalid'
+    });
+    const persistedCalendarDurations = await storage.loadCalendarMinDurationHours();
+    assert.equal(persistedCalendarDurations.found, true);
+    assert.deepEqual(persistedCalendarDurations.hours, {
+        'calendar-a': -1,
+        'calendar-b': 6.5
+    });
+
     const initialWeekNumbers = await storage.loadWeekNumbersPreference();
     assert.equal(initialWeekNumbers, true);
 

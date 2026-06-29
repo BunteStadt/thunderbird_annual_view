@@ -2,6 +2,14 @@ import { fetchCalendars, fetchCalendarEvents } from "./calendar-service.js";
 import {
     loadPersistedSelection,
     persistSelection,
+    loadAllDayOnlyPreference,
+    persistAllDayOnlyPreference,
+    loadMinDurationPreference,
+    persistMinDurationPreference,
+    loadCalendarAllDayModes,
+    persistCalendarAllDayModes,
+    loadCalendarMinDurationHours,
+    persistCalendarMinDurationHours,
     loadPanelState,
     persistPanelState,
     loadThemePreference,
@@ -105,8 +113,11 @@ const YEAR_MIN = Number(yearInput.min) || 1900;
 const YEAR_MAX = Number(yearInput.max) || 2999;
 let availableCalendars = [];
 let selectedCalendarIds = new Set();
+let calendarAllDayModes = {};
+let calendarMinDurationHours = {};
+let allDayOnlyEnabled = false;
 let currentYear = new Date().getFullYear();
-let lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false };
+let lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false, mixed: false };
 let themeMode = "auto";
 let systemThemeWatcher = null;
 let autoRefreshTimer = null;
@@ -119,33 +130,134 @@ let viewMode = "linear";
 const onClick = (el, handler) => el?.addEventListener("click", handler);
 const onChange = (el, handler) => el?.addEventListener("change", handler);
 
+const CALENDAR_ALL_DAY_MODE_SYMBOLS = {
+    yes: "✓",
+    no: "x",
+    follow: "-"
+};
+
+function getCalendarAllDayMode(calendarId) {
+    return calendarAllDayModes[calendarId] === "yes" || calendarAllDayModes[calendarId] === "no" || calendarAllDayModes[calendarId] === "follow"
+        ? calendarAllDayModes[calendarId]
+        : "follow";
+}
+
+function setCalendarAllDayMode(calendarId, mode) {
+    calendarAllDayModes = {
+        ...calendarAllDayModes,
+        [calendarId]: mode
+    };
+}
+
+function cycleCalendarAllDayMode(mode) {
+    if (mode === "yes") return "no";
+    if (mode === "no") return "follow";
+    return "yes";
+}
+
+function getCalendarAllDayModeLabel(mode) {
+    if (mode === "yes") return "all-day only yes";
+    if (mode === "no") return "all-day only no";
+    return "follow global all-day setting";
+}
+
+function getCalendarMinDurationHours(calendarId) {
+    const hours = Number(calendarMinDurationHours[calendarId]);
+    if (!Number.isFinite(hours) || hours < -1) {
+        return -1;
+    }
+    return hours;
+}
+
+function setCalendarMinDurationHours(calendarId, hours) {
+    const duration = Number(hours);
+    if (!Number.isFinite(duration) || duration < 0) {
+        const { [calendarId]: omitted, ...rest } = calendarMinDurationHours;
+        calendarMinDurationHours = rest;
+        return -1;
+    }
+
+    const nextHours = Math.round(duration * 100) / 100;
+    calendarMinDurationHours = {
+        ...calendarMinDurationHours,
+        [calendarId]: nextHours
+    };
+    return nextHours;
+}
+
+function getGlobalMinDurationHours() {
+    const val = Number(minDurationInput?.value);
+    if (Number.isNaN(val) || val < 0) return 0;
+    return val;
+}
+
+function hasSelectedCalendarDurationOverrides() {
+    for (const calendarId of selectedCalendarIds) {
+        if (getCalendarMinDurationHours(calendarId) >= 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getEffectiveMinDurationMs(calendarId) {
+    const overrideHours = getCalendarMinDurationHours(calendarId);
+    const effectiveHours = overrideHours >= 0 ? overrideHours : getGlobalMinDurationHours();
+    return effectiveHours > 0 ? effectiveHours * 60 * 60 * 1000 : 0;
+}
+
+function shouldShowAllDayOnlyForCalendar(calendarId) {
+    const mode = getCalendarAllDayMode(calendarId);
+    if (mode === "yes") return true;
+    if (mode === "no") return false;
+    return allDayOnlyEnabled;
+}
+
 async function loadEvents(year) {
     if (!selectedCalendarIds.size) {
-        lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false };
+        lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false, mixed: false };
         return [];
     }
 
     const options = {
         calendarIds: Array.from(selectedCalendarIds),
-        allDayOnly: allDayOnlyInput?.checked || false
+        allDayOnly: allDayOnlyEnabled,
+        calendarAllDayModes
     };
 
     try {
-        const events = await fetchCalendarEvents(year, options);
-        const normalized = normalizeEvents(events || []);
-        const minDurationMs = getMinDurationMs();
-        const minDurationHours = minDurationMs / (60 * 60 * 1000);
-        const filtered = minDurationMs > 0 ? normalized.filter((ev) => eventDurationMs(ev) >= minDurationMs) : normalized;
+        const minDurationHours = getGlobalMinDurationHours();
+        const hasDurationOverrides = hasSelectedCalendarDurationOverrides();
+        const trackDurationFilters = minDurationHours > 0 || hasDurationOverrides;
+        const events = normalizeEvents((await fetchCalendarEvents(year, options)) || []);
+
+        if (!trackDurationFilters) {
+            lastFilterStats = {
+                filteredOut: 0,
+                total: events.length,
+                thresholdHours: minDurationHours,
+                active: false,
+                mixed: hasDurationOverrides
+            };
+            return events;
+        }
+
+        const allEvents = normalizeEvents((await fetchCalendarEvents(year, {
+            calendarIds: Array.from(selectedCalendarIds),
+            allDayOnly: false
+        })) || []);
+        const filtered = events.filter((ev) => eventDurationMs(ev) >= getEffectiveMinDurationMs(ev.calendarId));
         lastFilterStats = {
-            filteredOut: Math.max(0, normalized.length - filtered.length),
-            total: normalized.length,
+            filteredOut: Math.max(0, allEvents.length - filtered.length),
+            total: allEvents.length,
             thresholdHours: minDurationHours,
-            active: minDurationMs > 0 && normalized.length > 0
+            active: allEvents.length > 0,
+            mixed: hasDurationOverrides
         };
         return filtered;
     } catch (err) {
         console.error("[loadEvents] failed", err);
-        lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false };
+        lastFilterStats = { filteredOut: 0, total: 0, thresholdHours: 0, active: false, mixed: false };
         return [];
     }
 }
@@ -594,30 +706,24 @@ function eventDurationMs(ev) {
 }
 
 function getMinDurationMs() {
-    const val = Number(minDurationInput?.value);
-    if (Number.isNaN(val) || val < 0) return 0;
-    return val * 60 * 60 * 1000;
+    return getGlobalMinDurationHours() * 60 * 60 * 1000;
 }
 
-function adjustMinDuration(deltaHours) {
+async function adjustMinDuration(deltaHours) {
     if (!minDurationInput) return;
     const current = Number(minDurationInput.value);
     const safeCurrent = Number.isNaN(current) ? 0 : current;
     const next = Math.max(0, safeCurrent + deltaHours);
     minDurationInput.value = String(Math.round(next * 100) / 100);
+    await persistMinDurationPreference(next);
     setYear(currentYear);
 }
 
 function formatFilterSummary() {
     if (!lastFilterStats || !lastFilterStats.active) return "";
-    const { filteredOut, total, thresholdHours } = lastFilterStats;
+    const { filteredOut, total } = lastFilterStats;
     if (!total) return "";
-    const hours = Number.isFinite(thresholdHours) ? thresholdHours : 0;
-    const displayHours = hours % 1 === 0 ? hours.toFixed(0) : hours.toFixed(2).replace(/\.0+$/, "").replace(/0+$/, "");
-    if (filteredOut > 0) {
-        return `Filtered out ${filteredOut} of ${total} events under ${displayHours}h`;
-    }
-    return `No events under ${displayHours}h`;
+    return `Filtered out ${filteredOut} of ${total}`;
 }
 
 function renderEvents(year, events) {
@@ -765,31 +871,105 @@ async function setYear(newYear) {
 async function renderCalendarList(calendars) {
     calendarList.innerHTML = "";
     calendars.forEach((cal) => {
+        const row = document.createElement("div");
+        row.className = "calendar-row";
+
         const chip = document.createElement("button");
         chip.type = "button";
         const calendarName = cal.name || "(unnamed)";
         const isSelected = selectedCalendarIds.has(cal.id);
-        chip.className = isSelected ? "cal-chip selected" : "cal-chip";
+        chip.className = isSelected ? "cal-chip selected calendar-select-chip" : "cal-chip calendar-select-chip";
         chip.textContent = calendarName;
         chip.title = calendarName;
         chip.setAttribute("aria-label", calendarName);
         chip.dataset.id = cal.id;
         chip.addEventListener("click", () => {
-            const selected = selectedCalendarIds.has(cal.id);
-            if (selected) {
+            if (selectedCalendarIds.has(cal.id)) {
                 selectedCalendarIds.delete(cal.id);
-                chip.classList.remove("selected");
             } else {
                 selectedCalendarIds.add(cal.id);
-                chip.classList.add("selected");
             }
-            chip.setAttribute("aria-pressed", String(selectedCalendarIds.has(cal.id)));
-            updateSelectedSummary();
             persistSelection(selectedCalendarIds);
+            renderCalendarList(availableCalendars);
             setYear(currentYear);
         });
         chip.setAttribute("aria-pressed", String(isSelected));
-        calendarList.appendChild(chip);
+
+        const modeButton = document.createElement("button");
+        modeButton.type = "button";
+        const mode = getCalendarAllDayMode(cal.id);
+        modeButton.className = "btn calendar-mode-toggle";
+        modeButton.dataset.mode = mode;
+        modeButton.textContent = CALENDAR_ALL_DAY_MODE_SYMBOLS[mode] || "x";
+        modeButton.title = `${calendarName}: ${getCalendarAllDayModeLabel(mode)}`;
+        modeButton.setAttribute("aria-label", `${calendarName}: ${getCalendarAllDayModeLabel(mode)}`);
+        modeButton.addEventListener("click", () => {
+            const nextMode = cycleCalendarAllDayMode(getCalendarAllDayMode(cal.id));
+            setCalendarAllDayMode(cal.id, nextMode);
+            persistCalendarAllDayModes(calendarAllDayModes);
+            renderCalendarList(availableCalendars);
+            setYear(currentYear);
+        });
+
+        const durationControl = document.createElement("label");
+        durationControl.className = "calendar-duration-control";
+        durationControl.title = `${calendarName}: minimum event length in hours. Set to -1 to follow the global duration filter.`;
+
+        const durationInput = document.createElement("input");
+        durationInput.type = "number";
+        durationInput.min = "-1";
+        durationInput.step = "0.25";
+        durationInput.className = "input calendar-duration-input";
+        durationInput.value = String(getCalendarMinDurationHours(cal.id));
+        durationInput.title = `${calendarName}: minimum event length in hours. Set to -1 to follow the global duration filter.`;
+        durationInput.setAttribute("aria-label", `${calendarName}: minimum event length in hours. Use -1 to follow the global duration filter.`);
+        const applyCalendarDuration = async () => {
+            const nextHours = setCalendarMinDurationHours(cal.id, durationInput.value);
+            durationInput.value = String(nextHours);
+            await persistCalendarMinDurationHours(calendarMinDurationHours);
+            setYear(currentYear);
+        };
+
+        const durationDownBtn = document.createElement("button");
+        durationDownBtn.type = "button";
+        durationDownBtn.className = "btn calendar-duration-step";
+        durationDownBtn.dataset.size = "compact";
+        durationDownBtn.textContent = "–";
+        durationDownBtn.title = `${calendarName}: decrease minimum event length by one hour`;
+        durationDownBtn.setAttribute("aria-label", `${calendarName}: decrease minimum event length by one hour`);
+        durationDownBtn.addEventListener("click", async () => {
+            const current = Number(durationInput.value);
+            const safeCurrent = Number.isNaN(current) ? -1 : current;
+            const next = Math.max(-1, safeCurrent - 1);
+            durationInput.value = String(Math.round(next * 100) / 100);
+            await applyCalendarDuration();
+        });
+
+        const durationUpBtn = document.createElement("button");
+        durationUpBtn.type = "button";
+        durationUpBtn.className = "btn calendar-duration-step";
+        durationUpBtn.dataset.size = "compact";
+        durationUpBtn.textContent = "+";
+        durationUpBtn.title = `${calendarName}: increase minimum event length by one hour`;
+        durationUpBtn.setAttribute("aria-label", `${calendarName}: increase minimum event length by one hour`);
+        durationUpBtn.addEventListener("click", async () => {
+            const current = Number(durationInput.value);
+            const safeCurrent = Number.isNaN(current) ? -1 : current;
+            const next = Math.max(-1, safeCurrent + 1);
+            durationInput.value = String(Math.round(next * 100) / 100);
+            await applyCalendarDuration();
+        });
+
+        durationInput.addEventListener("change", applyCalendarDuration);
+
+        durationControl.appendChild(durationInput);
+        durationControl.appendChild(durationDownBtn);
+        durationControl.appendChild(durationUpBtn);
+
+        row.appendChild(chip);
+        row.appendChild(modeButton);
+        row.appendChild(durationControl);
+        calendarList.appendChild(row);
     });
     updateSelectedSummary();
 }
@@ -1133,12 +1313,16 @@ function setCalendarPanelVisible(expanded) {
 async function loadCalendars() {
     availableCalendars = await fetchCalendars();
     const { ids: persistedIds, found } = await loadPersistedSelection();
+    const { modes } = await loadCalendarAllDayModes();
+    const { hours } = await loadCalendarMinDurationHours();
     const filtered = availableCalendars.filter((c) => persistedIds.has(c.id));
     if (found) {
         selectedCalendarIds = new Set(filtered.map((c) => c.id));
     } else {
         selectedCalendarIds = new Set(availableCalendars.map((c) => c.id));
     }
+    calendarAllDayModes = modes;
+    calendarMinDurationHours = hours;
     await renderCalendarList(availableCalendars);
     updateSelectedSummary();
     await persistSelection(selectedCalendarIds);
@@ -1232,6 +1416,14 @@ function updateThemeToggleLabel() {
 async function init() {
     await initTheme();
     refreshSettings = await loadRefreshSettings();
+    const savedMinDuration = await loadMinDurationPreference();
+    if (minDurationInput) {
+        minDurationInput.value = String(savedMinDuration);
+    }
+    allDayOnlyEnabled = await loadAllDayOnlyPreference();
+    if (allDayOnlyInput) {
+        allDayOnlyInput.checked = allDayOnlyEnabled;
+    }
     if (showWeekNumbersInput) {
         showWeekNumbersInput.checked = await loadWeekNumbersPreference();
     }
@@ -1268,12 +1460,19 @@ async function init() {
         });
     });
 
-    onChange(allDayOnlyInput, () => setYear(currentYear));
+    onChange(allDayOnlyInput, async () => {
+        allDayOnlyEnabled = allDayOnlyInput?.checked || false;
+        await persistAllDayOnlyPreference(allDayOnlyEnabled);
+        setYear(currentYear);
+    });
     onChange(showWeekNumbersInput, () => {
         persistWeekNumbersPreference(showWeekNumbersInput.checked);
         setYear(currentYear);
     });
-    onChange(minDurationInput, () => setYear(currentYear));
+    onChange(minDurationInput, async () => {
+        await persistMinDurationPreference(getGlobalMinDurationHours());
+        setYear(currentYear);
+    });
     onClick(minDurationDownBtn, () => adjustMinDuration(-1));
     onClick(minDurationUpBtn, () => adjustMinDuration(1));
     onClick(selectAllBtn, () => setAllCalendars(true));

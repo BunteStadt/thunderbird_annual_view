@@ -15,8 +15,16 @@ function getDummyCalendars() {
     return DUMMY_CALENDARS.map((calendar) => ({ ...calendar }));
 }
 
+function resolveCalendarAllDayOnly(calendarId, options = {}) {
+    const { allDayOnly = false, calendarAllDayModes = {} } = options;
+    const mode = calendarAllDayModes?.[calendarId];
+    if (mode === "yes") return true;
+    if (mode === "no") return false;
+    return allDayOnly;
+}
+
 function getDummyEvents(year, options = {}) {
-    const { calendarIds = [], allDayOnly = false } = options;
+    const { calendarIds = [] } = options;
     const calendars = getDummyCalendars().filter((calendar) => !calendarIds.length || calendarIds.includes(calendar.id));
     const events = [
         {
@@ -211,7 +219,7 @@ function getDummyEvents(year, options = {}) {
 
     return events
         .filter((event) => calendars.some((calendar) => calendar.id === event.calendarId))
-        .filter((event) => !allDayOnly || event.allDay)
+        .filter((event) => !resolveCalendarAllDayOnly(event.calendarId, options) || event.allDay)
         .map((event) => {
             const calendar = calendars.find((item) => item.id === event.calendarId);
             return {
@@ -270,7 +278,7 @@ export async function fetchCalendarEvents(year, options = {}) {
         console.log("[fetchCalendarEvents] browser.calendar API unavailable; returning no events");
         return [];
     }
-    const { calendarIds = [], allDayOnly = false } = options;
+    const { calendarIds = [] } = options;
     const started = Date.now();
     const events = [];
     const rangeStart = formatRangeBound(year, 1, 1);
@@ -337,7 +345,7 @@ export async function fetchCalendarEvents(year, options = {}) {
             const startsInYear = evt.start.getFullYear() === year;
             const endsInYear = evt.end.getFullYear() === year;
             const spansYear = evt.start.getFullYear() < year && evt.end.getFullYear() > year;
-            if (allDayOnly && !evt.allDay) {
+            if (resolveCalendarAllDayOnly(cal.id, options) && !evt.allDay) {
                 return;
             }
             if (startsInYear || endsInYear || spansYear) {

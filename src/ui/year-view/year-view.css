@@ -284,6 +284,68 @@ input[type="number"] {
   border-top: 1px dashed var(--grid-line);
 }
 
+.cal-list-head {
+  display: grid;
+  grid-template-columns: auto 2.8rem 4.3rem;
+  align-items: center;
+  margin-top: 0.35rem;
+  padding: 0rem 0.55rem 0rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cal-list-head span:nth-child(2) {
+  padding-left: 0.4rem;
+}
+
+.calendar-row {
+  display: grid;
+  grid-template-columns: auto 2.8rem 4.3rem;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.calendar-duration-control {
+  display: inline-grid;
+  grid-template-columns: 2rem 1.3rem 1rem;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.14rem 0.2rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: var(--text);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  justify-self: end;
+}
+
+.calendar-duration-control:hover {
+  background: var(--chip-hover);
+}
+
+.calendar-duration-input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.22rem 0.18rem;
+  min-inline-size: 4ch;
+  border-radius: 9px;
+  box-shadow: var(--input-shadow-compact);
+}
+
+.calendar-duration-step.btn {
+  --btn-padding-y: 0.12rem;
+  --btn-padding-x: 0.28rem;
+  --btn-radius: 8px;
+  --btn-font-size: 0.7rem;
+  min-width: 1.45rem;
+  width: 1.45rem;
+  padding-inline: 0;
+  justify-content: center;
+}
+
 .separator {
   border-top: 1px dashed var(--grid-line);
   margin: 0.35rem 0;
@@ -313,6 +375,49 @@ input[type="number"] {
 
 .cal-chip {
   width: 100%;
+}
+
+.calendar-select-chip {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+
+.calendar-mode-toggle {
+  width: 2rem;
+  min-width: 2rem;
+  padding: 0.26rem 0.2rem;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Consolas", "SFMono-Regular", monospace;
+  font-size: 0.95rem;
+  line-height: 1;
+  font-weight: 600;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--muted);
+}
+
+.calendar-mode-toggle[data-mode="yes"] {
+  color: var(--muted);
+}
+
+.calendar-mode-toggle[data-mode="no"],
+.calendar-mode-toggle[data-mode="follow"] {
+  color: var(--muted);
+}
+
+.calendar-mode-toggle:hover {
+  background: var(--chip-hover);
+  color: var(--muted);
+}
+
+.calendar-mode-toggle:focus-visible {
+  outline: 2px solid var(--muted);
+  outline-offset: 2px;
 }
 
 .theme-dark .cal-chip {

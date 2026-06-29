@@ -84,6 +84,13 @@ Work wihtout Thunderbird - see the thunderbird tab in the browser - faster for d
 
 ## Deployments
 
+When development is finished, merge to main. Make sure the ci-test is successful.
+In a new commit, update the version number in `manifest.json`.
+In vscode: select the last commit, right click and select `Create Tag`. Follow the versioning scheme.
+The tag needs to be pushed to the remote repo seperatly. The GitHub Actions workflow will automatically create a new release and upload the `.xpi` file.
+
+Might add message to the tag to be included in release notes. (Not tested yet).
+
 ### Prerequisites
 
 ### Building

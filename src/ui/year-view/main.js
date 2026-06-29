@@ -209,14 +209,14 @@ function createEventBar(event, laneIndex, gridRow, gridColumn, continuesPrev, co
     bar.className = "event";
     if (continuesPrev) bar.classList.add("continues-prev");
     if (continuesNext) bar.classList.add("continues-next");
-    
+
     const color = getEventColor(event);
     applyEventColor(bar, color);
     bar.style.setProperty("--lane", laneIndex);
     bar.style.gridRow = gridRow;
     bar.style.gridColumn = gridColumn;
     bar.textContent = event.title;
-    
+
     return bar;
 }
 
@@ -228,21 +228,21 @@ function createEventBar(event, laneIndex, gridRow, gridColumn, continuesPrev, co
  */
 function calculateRowHeights(laneCounts, includeHeader = false) {
     const heights = [];
-    
+
     if (includeHeader) {
         heights.push(ROW_HEIGHT_CONFIG.headerHeight);
     }
-    
+
     for (const laneCount of laneCounts) {
         if (laneCount === 0) {
             heights.push(`${ROW_HEIGHT_CONFIG.baseHeight}px`);
         } else {
-            const neededHeight = ROW_HEIGHT_CONFIG.firstLaneOffset + 
-                                Math.max(0, laneCount - 1) * ROW_HEIGHT_CONFIG.laneSpacing;
+            const neededHeight = ROW_HEIGHT_CONFIG.firstLaneOffset +
+                Math.max(0, laneCount - 1) * ROW_HEIGHT_CONFIG.laneSpacing;
             heights.push(`${Math.max(ROW_HEIGHT_CONFIG.baseHeight, neededHeight)}px`);
         }
     }
-    
+
     return heights.join(" ");
 }
 
@@ -576,6 +576,14 @@ function adjustAllDayEnd(end) {
     return dt;
 }
 
+function getUtcDayNumber(date) {
+    return Math.trunc(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+}
+
+function getCalendarDayOffset(laterDate, earlierDate) {
+    return getUtcDayNumber(laterDate) - getUtcDayNumber(earlierDate);
+}
+
 function eventDurationMs(ev) {
     if (!ev || !ev.start || !ev.end) return 0;
     if (isAllDayEvent(ev)) {
@@ -655,7 +663,7 @@ function renderLinearEvents(year, events) {
             );
 
             bar.title = createEventTooltip(event);
-            
+
             eventsLayer.appendChild(bar);
         });
     });
@@ -798,7 +806,7 @@ function setAllCalendars(selected) {
 function applyDynamicRowHeights(monthLanes) {
     const laneCounts = monthLanes.map(lanes => lanes.length);
     const rowHeights = calculateRowHeights(laneCounts);
-    
+
     grid.style.gridTemplateRows = rowHeights;
     eventsLayer.style.gridTemplateRows = rowHeights;
 }
@@ -1005,15 +1013,15 @@ function renderWeekRowsEvents(year, events) {
             const lanes = rowLaneEnds[seg.rowIndex];
 
             // Calculate day positions within the 28-day row
-            const daysSinceRowStart = Math.floor((seg.start - row.start) / MS_PER_DAY);
-            const daysSinceRowEnd = Math.floor((seg.end - row.start) / MS_PER_DAY);
+            const daysSinceRowStart = getCalendarDayOffset(seg.start, row.start);
+            const daysSinceRowEnd = getCalendarDayOffset(seg.end, row.start);
 
             // Find the first available lane for this segment in this row
             let laneIndex = 0;
             // Find the first available lane for this segment's duration
             while (laneIndex < MAX_LANES) {
                 if (!lanes[laneIndex]) lanes[laneIndex] = [];
-                
+
                 // Check if this lane is available for all days in this segment
                 let available = true;
                 for (let day = daysSinceRowStart; day <= daysSinceRowEnd && day < DAYS_PER_WEEK_ROW; day++) {
@@ -1022,7 +1030,7 @@ function renderWeekRowsEvents(year, events) {
                         break;
                     }
                 }
-                
+
                 if (available) break;
                 laneIndex++;
             }
@@ -1064,7 +1072,7 @@ function renderWeekRowsEvents(year, events) {
 
 function applyDayAlignedRowHeights(monthRowHeights) {
     const rowHeights = calculateRowHeights(monthRowHeights, true);
-    
+
     grid.style.gridTemplateRows = rowHeights;
     eventsLayer.style.gridTemplateRows = rowHeights;
 }
@@ -1077,7 +1085,7 @@ function applyWeekRowsRowHeights(weekLaneEnds) {
         return lanes.filter(lane => lane && lane.length > 0).length;
     });
     const rowHeights = calculateRowHeights(laneCounts, true);
-    
+
     grid.style.gridTemplateRows = rowHeights;
     eventsLayer.style.gridTemplateRows = rowHeights;
 }

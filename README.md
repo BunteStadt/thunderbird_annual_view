@@ -67,6 +67,15 @@ The view mode can be changed directly in the annual view header: select between 
 
 ## Development
 
+Use a seperate Thunderbird profile.
+
+1. Close Thunderbird.
+2. Start the profile selecter and use a test profile.
+
+``` cmd
+"C:\Program Files\Mozilla Thunderbird\thunderbird.exe" -P
+```
+
 ### Dummy Data
 Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
 

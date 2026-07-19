@@ -18,21 +18,9 @@ async function createCustomSpace() {
         {
 
             "defaultIcons": {
-                "16": "icons/annual_view.svg",
-                "32": "icons/annual_view.svg"
-            },
-            "themeIcons": [
-                {
-                    "light": "icons/annual_view_inverted.svg",
-                    "dark": "icons/annual_view.svg",
-                    "size": 16
-                },
-                {
-                    "light": "icons/annual_view_inverted.svg",
-                    "dark": "icons/annual_view.svg",
-                    "size": 32
-                }
-            ]
+                "16": "icons/annual_view_prefers-color.svg",
+                "32": "icons/annual_view_prefers-color.svg"
+            }
         }
 
     );

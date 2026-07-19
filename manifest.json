@@ -19,25 +19,17 @@
             "src/background/background.js"
         ]
     },
+    "icons": {
+        "16": "icons/annual_view_prefers-color.svg",
+        "32": "icons/annual_view_prefers-color.svg"
+    },
     "action": {
         "allowed_spaces": [],
         "default_title": "Open Annual View",
         "default_icon": {
-            "16": "icons/annual_view.svg",
-            "32": "icons/annual_view.svg"
-        },
-        "theme_icons": [
-            {
-                "light": "icons/annual_view_inverted.svg",
-                "dark": "icons/annual_view.svg",
-                "size": 16
-            },
-            {
-                "light": "icons/annual_view_inverted.svg",
-                "dark": "icons/annual_view.svg",
-                "size": 32
-            }
-        ]
+            "16": "icons/annual_view_prefers-color.svg",
+            "32": "icons/annual_view_prefers-color.svg"
+        }
     },
     "experiment_apis": {
         "calendar_calendars": {

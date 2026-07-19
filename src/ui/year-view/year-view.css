@@ -93,6 +93,9 @@ header {
   background: var(--header-bg);
   /* border-bottom: 8px solid var(--grid-line); */
   margin-bottom: 6px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .year-layout {

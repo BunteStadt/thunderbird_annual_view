@@ -56,6 +56,7 @@ jobs:
           files: |
             dist/calendar-annual-view-${{ github.ref_name }}.xpi
             dist/calendar-annual-view-media-${{ github.ref_name }}.zip
+            media/generated/${{ github.ref_name }}/*.png
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: "Automatic build of XPI"

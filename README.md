@@ -26,12 +26,12 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 ## Screenshots
 
 ### Light Theme
-![Light Theme Screenshot 1](media/Light_1.jpg)
-![Light Theme Screenshot 2](media/Light_2.jpg)
+![Light Theme Screenshot 1](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png)
+![Light Theme Screenshot 2](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png)
 
 ### Dark Theme
-![Dark Theme Screenshot 2](media/Dark_2.jpg)
-![Dark Theme Screenshot 1](media/Dark_1.jpg)
+![Dark Theme Screenshot 2](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-dark.png)
+![Dark Theme Screenshot 1](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-dark.png)
 
 ## Installation
 

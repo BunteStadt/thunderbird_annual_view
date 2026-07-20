@@ -61,6 +61,85 @@
                     ]
                 ]
             }
+        },
+        "calendar_provider": {
+            "schema": "submodules/calendar/experiments/calendar/schema/calendar-provider.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "submodules/calendar/experiments/calendar/parent/ext-calendar-provider.js",
+                "events": [
+                    "startup"
+                ],
+                "paths": [
+                    [
+                        "calendar",
+                        "provider"
+                    ]
+                ]
+            }
+        },
+        "calendar_timezones": {
+            "schema": "submodules/calendar/experiments/calendar/schema/calendar-timezones.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "submodules/calendar/experiments/calendar/parent/ext-calendar-timezones.js",
+                "paths": [
+                    [
+                        "calendar",
+                        "timezones"
+                    ]
+                ]
+            },
+            "child": {
+                "scopes": [
+                    "addon_child"
+                ],
+                "script": "submodules/calendar/experiments/calendar/child/ext-calendar-timezones.js",
+                "paths": [
+                    [
+                        "calendar",
+                        "timezones"
+                    ]
+                ]
+            }
+        },
+        "calendarItemAction": {
+            "schema": "submodules/calendar/experiments/calendar/schema/calendarItemAction.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "submodules/calendar/experiments/calendar/parent/ext-calendarItemAction.js",
+                "events": [
+                    "startup"
+                ],
+                "paths": [
+                    [
+                        "calendarItemAction"
+                    ]
+                ]
+            }
+        },
+        "calendarItemDetails": {
+            "schema": "submodules/calendar/experiments/calendar/schema/calendarItemDetails.json",
+            "parent": {
+                "scopes": [
+                    "addon_parent"
+                ],
+                "script": "submodules/calendar/experiments/calendar/parent/ext-calendarItemDetails.js",
+                "events": [
+                    "startup"
+                ],
+                "paths": [
+                    [
+                        "calendarItemDetails"
+                    ]
+                ]
+            }
         }
     }
 }

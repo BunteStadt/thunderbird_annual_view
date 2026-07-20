@@ -344,6 +344,7 @@ export async function fetchCalendarEvents(year, options = {}) {
                 const allDay = !!startRaw && !startRaw.includes("T");
                 return {
                     id,
+                    calendarId: cal.id,
                     title: summary || "(untitled)",
                     start,
                     end,

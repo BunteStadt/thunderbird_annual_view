@@ -33,7 +33,7 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 ![Day-Aligned View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png)
 
 ### 4-Week View
-![4-Week View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/4-week-light.png)
+![4-Week View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png)
 
 ### Collapsable Options Sidebar
 ![Options Sidebar Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/options-disabled.png)
@@ -41,7 +41,7 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 ### Dark Theme Screenshots
 ![Compact Linear Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-dark.png)
 ![Day-Aligned Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-dark.png)
-![4-Week Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/4-week-dark.png)
+![4-Week Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-dark.png)
 
 ## Installation
 

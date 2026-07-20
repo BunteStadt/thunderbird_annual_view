@@ -1,6 +1,6 @@
 # Thunderbird Annual View
 Calendar Annual View is a Thunderbird add-on that shows an entire year in one compact, readable grid with multiple layout options.
-It displays all 12 months in various formats (compact linear, day-aligned, or 4-week rows), supports multiple calendars with automatic color matching, and keeps the view read-only for quick planning and overview use cases.
+It displays all 12 months in various formats (compact linear, day-aligned, or 4-week rows), scrolls continuously across year boundaries, supports multiple calendars with automatic color matching, and keeps the view read-only for quick planning and overview use cases.
 
 ## Marketplace Description
 
@@ -11,6 +11,7 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 ## Features
 
 - **Multiple View Modes**: Choose from compact linear (each row is a month), day-aligned, or 4-week row layouts for flexible annual viewing.
+- **Infinite Scrolling**: Scroll seamlessly up and down across year boundaries. In the month-based views, December is directly followed by January of the next year; in the 4-week view, years change within a row. Events for neighboring years are prefetched in the background, so scrolling stays smooth.
 - **Multi-Calendar Support**: Show events from multiple calendars at once.
 - **Automatic Calendar Detection**: Pulls calendars and colors from Thunderbird's settings.
 - **Configurable Filters**:
@@ -46,7 +47,7 @@ Alternatively, install directly from the [Thunderbird Add-ons site](https://addo
 
 1. After installation, new buttons (on the left in the spaces toolbar and at the top left) will appear.
 2. Click a button to open the annual calendar view.
-3. Select the year to display using the input field or the 2 buttons.
+3. Scroll the grid to move through time — the view continues endlessly into past and future years. The year input always shows the year at the center of the view; type a year or use the +/- buttons to jump directly.
 4. Choose the view mode (compact, aligned, or 4-week) from the dropdown in the header.
 5. Click on `show options` to open the configuration sidebar for filters and calendar selection.
 

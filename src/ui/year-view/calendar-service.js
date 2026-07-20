@@ -23,10 +23,10 @@ function resolveCalendarAllDayOnly(calendarId, options = {}) {
     return allDayOnly;
 }
 
-function getDummyEvents(year, options = {}) {
-    const { calendarIds = [] } = options;
-    const calendars = getDummyCalendars().filter((calendar) => !calendarIds.length || calendarIds.includes(calendar.id));
-    const events = [
+// Sample events anchored to a given year. Some intentionally span the year
+// boundary ("Year handover", "New Year") to exercise cross-year rendering.
+function getDummyEventsForAnchorYear(year) {
+    return [
         {
             id: `dummy-${year}-1`,
             calendarId: "dummy-work",
@@ -216,6 +216,21 @@ function getDummyEvents(year, options = {}) {
             allDay: true
         }
     ];
+}
+
+function getDummyEvents(year, options = {}) {
+    const { calendarIds = [] } = options;
+    const calendars = getDummyCalendars().filter((calendar) => !calendarIds.length || calendarIds.includes(calendar.id));
+
+    // Like the real calendar API, return every event overlapping the queried
+    // year. Events anchored to neighboring years can spill into this one
+    // (e.g. "New Year" anchored to year-1 ends in January of `year`), so
+    // generate for all three anchors and keep only the overlapping ones.
+    const yearStart = new Date(year, 0, 1);
+    const yearEnd = new Date(year + 1, 0, 1);
+    const events = [year - 1, year, year + 1]
+        .flatMap((anchorYear) => getDummyEventsForAnchorYear(anchorYear))
+        .filter((event) => event.start < yearEnd && event.end >= yearStart);
 
     return events
         .filter((event) => calendars.some((calendar) => calendar.id === event.calendarId))

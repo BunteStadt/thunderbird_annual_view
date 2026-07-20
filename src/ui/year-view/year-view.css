@@ -29,7 +29,6 @@
   --input-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   --input-shadow-compact: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   --event-shadow: 0 8px 16px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  --event-pill-shadow: 0 8px 14px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .theme-dark {
@@ -66,7 +65,6 @@
   --input-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
   --input-shadow-compact: inset 0 1px 0 rgba(255, 255, 255, 0.16);
   --event-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --event-pill-shadow: 0 8px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 * {
@@ -75,7 +73,8 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -100,11 +99,12 @@ header {
 
 .year-layout {
   flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 0.75rem;
   padding: 0;
-  align-items: start;
+  align-items: stretch;
 }
 
 .year-layout.sidebar-collapsed {
@@ -113,6 +113,8 @@ header {
 
 .main-panel {
   min-width: 0;
+  height: 100%;
+  min-height: 0;
   display: flex;
 }
 
@@ -158,13 +160,12 @@ header {
   width: 100%;
   max-width: 360px;
   min-width: 260px;
+  max-height: 100%;
+  overflow-y: auto;
   padding: 0.85rem;
   background: var(--sidebar-bg);
   border: 1px solid var(--grid-line);
   border-radius: 14px;
-  /* box-shadow: var(--shadow); */
-  position: sticky;
-  top: 12px;
 }
 
 .calendar-filters.collapsed {
@@ -259,10 +260,25 @@ input[type="number"] {
 .calendar-wrap {
   position: relative;
   flex: 1;
+  min-height: 0;
   display: flex;
   background: var(--panel);
   border: 2px solid var(--grid-line);
   box-shadow: var(--shadow);
+}
+
+/* Scroll container for the infinite grid */
+.grid-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* GridView compensates scrollTop manually when prepending rows; native
+     scroll anchoring would double-compensate and cause drift. */
+  overflow-anchor: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--grid-line);
 }
 
 .filter-row {
@@ -501,30 +517,58 @@ input[type="number"] {
   color: var(--grid-line);
 }
 
-.calendar {
-  flex: 1;
+/* Rows stack vertically; each row is its own CSS grid. */
+.calendar-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  /* Gap value must match ROW_GAP in grid-view.js */
+}
+
+.grid-row {
   display: grid;
-  grid-template-columns: 120px repeat(31, minmax(0, 1fr));
-  grid-template-rows: repeat(12, minmax(72px, 1fr));
-  grid-auto-rows: minmax(72px, 1fr);
   gap: 1px;
   background: var(--grid-line);
-  padding: 0;
-  margin: 0;
   position: relative;
-  /* box-shadow: var(--shadow); */
+  flex: none;
+}
+
+.grid-row.linear {
+  grid-template-columns: 120px repeat(31, minmax(0, 1fr));
 }
 
 /* Day-of-week aligned view: needs up to 37 columns (6 empty + 31 days max) */
-.calendar.day-aligned {
+.grid-row.day-aligned {
   grid-template-columns: 120px repeat(37, minmax(0, 1fr));
 }
 
 /* Week-rows view: 28 columns for 4 weeks (no separate month column) */
-.calendar.week-rows {
+.grid-row.week-rows {
   grid-template-columns: repeat(28, minmax(0, 1fr));
-  grid-template-rows: auto;
-  grid-auto-rows: minmax(72px, auto);
+}
+
+/* Sticky weekday header shared by all rows */
+.grid-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  gap: 1px;
+  background: var(--grid-line);
+  flex: none;
+  margin-bottom: 1px;
+}
+
+.grid-header.hidden {
+  display: none;
+}
+
+.grid-header.day-aligned {
+  grid-template-columns: 120px repeat(37, minmax(0, 1fr));
+}
+
+.grid-header.week-rows {
+  grid-template-columns: repeat(28, minmax(0, 1fr));
 }
 
 .weekday-header {
@@ -539,37 +583,27 @@ input[type="number"] {
   text-align: center;
 }
 
-.week-label {
-  background: var(--month-col);
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 0 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  color: var(--text);
-  box-shadow: inset -1px 0 0 var(--grid-line);
-}
-
-.events-layer {
+/* Per-row event overlay; spans the same grid as the row's day cells. */
+.row-events {
   pointer-events: none;
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-columns: 120px repeat(31, minmax(0, 1fr));
-  grid-template-rows: repeat(12, minmax(72px, 1fr));
-  grid-auto-rows: minmax(72px, 1fr);
   gap: 1px;
+  grid-template-rows: 1fr;
+  background: transparent;
 }
 
-.events-layer.day-aligned {
+.row-events.linear {
+  grid-template-columns: 120px repeat(31, minmax(0, 1fr));
+}
+
+.row-events.day-aligned {
   grid-template-columns: 120px repeat(37, minmax(0, 1fr));
 }
 
-.events-layer.week-rows {
+.row-events.week-rows {
   grid-template-columns: repeat(28, minmax(0, 1fr));
-  grid-template-rows: auto;
-  grid-auto-rows: minmax(72px, auto);
 }
 
 .cell {
@@ -648,12 +682,30 @@ input[type="number"] {
   font-weight: 700;
   padding-right: 0.75rem;
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
   color: var(--text);
   box-shadow: inset -1px 0 0 var(--grid-line);
   grid-column: 1;
   /* Always place month labels in the first column */
+}
+
+.month .month-year {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Year marker shown on January 1st in the week-rows view */
+.cell .year-label {
+  position: absolute;
+  top: 20px;
+  left: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--accent);
 }
 
 
@@ -687,44 +739,17 @@ input[type="number"] {
   border-bottom-right-radius: 0;
 }
 
-.event-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--event-bg1), var(--event-bg2));
-  border: 1px solid var(--event-border);
-  color: var(--event-text);
-  font-size: 0.74rem;
-  margin-top: 18px;
-  max-width: calc(100% - 12px);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  pointer-events: none;
-  box-shadow: var(--event-pill-shadow);
-}
-
-.event-pill::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--accent);
-}
-
 @media (max-width: 960px) {
-  .calendar {
+
+  .grid-row.linear,
+  .row-events.linear {
     grid-template-columns: 100px repeat(31, minmax(0, 1fr));
   }
 
-  .calendar.day-aligned {
+  .grid-row.day-aligned,
+  .row-events.day-aligned,
+  .grid-header.day-aligned {
     grid-template-columns: 100px repeat(37, minmax(0, 1fr));
-  }
-
-  .calendar.week-rows {
-    grid-template-columns: repeat(28, minmax(0, 1fr));
   }
 }
 
@@ -739,20 +764,15 @@ input[type="number"] {
     position: static;
   }
 
-  .calendar {
+  .grid-row.linear,
+  .row-events.linear {
     grid-template-columns: 88px repeat(31, minmax(0, 1fr));
   }
 
-  .calendar.day-aligned {
+  .grid-row.day-aligned,
+  .row-events.day-aligned,
+  .grid-header.day-aligned {
     grid-template-columns: 88px repeat(37, minmax(0, 1fr));
-  }
-
-  .calendar.week-rows {
-    grid-template-columns: repeat(28, minmax(0, 1fr));
-  }
-
-  .title h1 {
-    font-size: 1.2rem;
   }
 }
 

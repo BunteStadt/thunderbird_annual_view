@@ -114,14 +114,14 @@ async function captureScenario(browser, scenario) {
     const page = await context.newPage();
     await page.goto(yearViewUrl);
     await page.waitForFunction(() => {
-        const grid = document.getElementById("calendarGrid");
-        return !!grid && grid.children.length > 0;
+        const rows = document.getElementById("gridRows");
+        return !!rows && rows.children.length > 0;
     });
     await applyOptions(page, scenario.options);
 
     await page.waitForFunction(() => {
-        const layer = document.getElementById("eventsLayer");
-        return !!layer && layer.childElementCount > 0;
+        const rows = document.getElementById("gridRows");
+        return !!rows && rows.querySelectorAll(".event").length > 0;
     });
 
     const fileName = `${scenario.suffix}.png`;

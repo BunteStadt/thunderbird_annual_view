@@ -14,6 +14,7 @@
           <button class="btn" type="button" data-size="compact" data-year-step="-1">–</button>
           <input id="yearInput" class="input" type="number" min="1900" max="2999" step="1" />
           <button class="btn" type="button" data-size="compact" data-year-step="1">+</button>
+          <button id="todayButton" class="btn" data-size="compact" type="button" title="Jump to the current day">Today</button>
         </div>
         <label for="viewMode" class="view-mode-label">
           <span>View:</span>
@@ -78,8 +79,10 @@
 
       <main class="main-panel">
         <div class="calendar-wrap">
-          <section class="calendar" id="calendarGrid" aria-label="Linear year calendar"></section>
-          <div class="events-layer" id="eventsLayer" aria-hidden="true"></div>
+          <div id="gridViewport" class="grid-viewport" aria-label="Scrollable annual calendar">
+            <div id="gridHeader" class="grid-header hidden" aria-hidden="true"></div>
+            <section id="gridRows" class="calendar-rows" aria-label="Calendar months"></section>
+          </div>
         </div>
       </main>
     </div>

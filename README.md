@@ -118,15 +118,17 @@ Might add message to the tag to be included in release notes. (Not tested yet).
 To create an `.xpi` file manually:
 
 1. Clone or download the repository.
-2. Zip the contents (excluding the `.git` folder).
-3. Rename the zip file extension to `.xpi`.
+2. Stage the package layout so `submodules/calendar/experiments/calendar/` is also available as `experiments/calendar/` at the archive root.
+3. Zip the staged contents (excluding the `.git` folder).
+4. Rename the zip file extension to `.xpi`.
 
 ### Releasing a New Version
 
 1. Create branches and commits as needed during development.
 2. When ready for release, create a Git tag on the desired commit.
 3. Push the tag to the repository (separate from pushing commits).
-4. The GitHub Actions workflow will automatically create a new release and upload the `.xpi` file.
+4. The GitHub Actions workflow will automatically create a new *draft* release and upload the `.xpi` file.
+5. Check the release, test the `.xpi` file, and publish the release when ready.
 
 ## License
 

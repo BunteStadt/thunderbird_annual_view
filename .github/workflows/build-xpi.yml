@@ -48,9 +48,12 @@ jobs:
 
       - name: Build XPI
         run: |
-          mkdir -p dist
-          zip -r dist/calendar-annual-view-${GITHUB_REF##*/}.xpi \
-          manifest.json src submodules icons
+          mkdir -p dist/package/experiments/calendar
+          cp -R manifest.json src submodules icons dist/package/
+          cp -R submodules/calendar/experiments/calendar/. dist/package/experiments/calendar/
+          cd dist/package
+          zip -r ../calendar-annual-view-${GITHUB_REF##*/}.xpi \
+          manifest.json src submodules icons experiments
 
       - name: Upload XPI to release
         uses: softprops/action-gh-release@v1
@@ -62,7 +65,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: "Automatic build of XPI"
-          draft: false
+          draft: true
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

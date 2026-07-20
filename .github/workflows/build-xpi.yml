@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -48,7 +50,7 @@ jobs:
         run: |
           mkdir -p dist
           zip -r dist/calendar-annual-view-${GITHUB_REF##*/}.xpi \
-          manifest.json src experiments icons
+          manifest.json src submodules icons
 
       - name: Upload XPI to release
         uses: softprops/action-gh-release@v1

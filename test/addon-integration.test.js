@@ -52,7 +52,7 @@ test('addon package can be built and validated as a zip archive', (t) => {
 
     const build = spawnSync(
         'zip',
-        ['-r', xpiPath, 'manifest.json', 'src', 'experiments', 'icons'],
+        ['-r', xpiPath, 'manifest.json', 'src', 'submodules', 'icons'],
         { cwd: repoRoot, encoding: 'utf8' }
     );
     assert.equal(build.status, 0, `zip command failed: ${build.stderr || build.stdout}`);

@@ -79,6 +79,7 @@ Use a seperate Thunderbird profile.
 
 ### Dummy Data
 Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
+Or use the commented out code in main.js.
 
 ### Build standalone html
 

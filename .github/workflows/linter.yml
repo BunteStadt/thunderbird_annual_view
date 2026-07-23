@@ -1,0 +1,57 @@
+name: Lint with webext-linter
+
+permissions:
+  contents: read
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Reuse the shared build workflow
+  build:
+    uses: ./.github/workflows/build.yml
+
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download XPI artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: calendar-annual-view-xpi
+          path: dist/
+
+      - name: Install webext-linter
+        run: npm install --no-save @thunderbirdops/webext-linter
+
+      - name: Run webext-linter
+        id: linter
+        continue-on-error: true
+        run: |
+          npx webext-linter dist/calendar-annual-view.xpi --allow-experiments --eslint --report-format text 2>&1 | tee /tmp/linter-report.txt
+
+      - name: Upload linter report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linter-report
+          path: /tmp/linter-report.txt
+
+      - name: Check linter exit code
+        if: steps.linter.outcome == 'failure'
+        run: |
+          echo "::warning::webext-linter reported issues. See the uploaded linter report for details."
+          exit 1

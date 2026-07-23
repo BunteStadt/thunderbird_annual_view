@@ -1,0 +1,41 @@
+{
+  "name": "flast",
+  "version": "3.0.0",
+  "description": "Flatten JS AST",
+  "main": "src/index.js",
+  "types": "src/types.d.ts",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "prepare": "husky",
+    "test": "node --test",
+    "test:coverage": "node --test --experimental-test-coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ctrl-escp/flast.git"
+  },
+  "keywords": [
+    "js",
+    "javascript",
+    "AST"
+  ],
+  "author": "Ben Baryo (ben.baryo@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ctrl-escp/flast/issues"
+  },
+  "homepage": "https://github.com/ctrl-escp/flast#readme",
+  "dependencies": {
+    "escodegen": "npm:@javascript-obfuscator/escodegen",
+    "eslint-scope": "^9.1.2",
+    "espree": "^11.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^10.0.3",
+    "@eslint/js": "^10.0.1",
+    "@eslint/eslintrc": "^3.3.5",
+    "globals": "^17.4.0",
+    "husky": "^9.1.7"
+  }
+}

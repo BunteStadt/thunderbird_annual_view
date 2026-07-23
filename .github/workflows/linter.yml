@@ -35,7 +35,7 @@ jobs:
           path: dist/
 
       - name: Install webext-linter
-        run: npm install --no-save @thunderbirdops/webext-linter
+        run: npm install --no-save github:thunderbird/webext-linter
 
       - name: Run webext-linter
         id: linter

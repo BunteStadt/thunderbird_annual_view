@@ -1,0 +1,58 @@
+[
+  {
+    "namespace": "manifest",
+    "types": [
+      {
+        "id": "OptionalPermission",
+        "enums": {
+          "clipboardRead": {
+            "annotations": [
+              {
+                "additional_properties": {
+                  "web_api": [
+                    {
+                      "receiver": "navigator.clipboard",
+                      "methods": ["read", "readText"]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "clipboardWrite": {
+            "annotations": [
+              {
+                "additional_properties": {
+                  "web_api": [
+                    {
+                      "receiver": "navigator.clipboard",
+                      "methods": ["write", "writeText"]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "geolocation": {
+            "annotations": [
+              {
+                "additional_properties": {
+                  "web_api": [
+                    {
+                      "receiver": "navigator.geolocation",
+                      "methods": [
+                        "getCurrentPosition",
+                        "watchPosition",
+                        "clearWatch"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+]

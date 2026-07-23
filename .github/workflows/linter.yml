@@ -41,14 +41,67 @@ jobs:
         id: linter
         continue-on-error: true
         run: |
-          npx webext-linter dist/calendar-annual-view.xpi --allow-experiments --eslint --report-format text 2>&1 | tee /tmp/linter-report.txt
+          set +e
+          npx webext-linter dist/calendar-annual-view.xpi --allow-experiments --eslint --report-format text --report-out /tmp/linter-report.txt
+          text_exit_code=$?
+          npx webext-linter dist/calendar-annual-view.xpi --allow-experiments --eslint --report-format json --report-out /tmp/linter-report.json
+          json_exit_code=$?
+          if [ "$text_exit_code" -ne 0 ]; then
+            exit "$text_exit_code"
+          fi
+          if [ "$json_exit_code" -ne 0 ]; then
+            exit "$json_exit_code"
+          fi
+
+      - name: Publish lint feedback summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          json_report = Path("/tmp/linter-report.json")
+          markdown_lines = ["## webext-linter feedback", ""]
+
+          if not json_report.exists():
+            markdown_lines.append("- No JSON lint report was generated.")
+          else:
+            report = json.loads(json_report.read_text(encoding="utf-8"))
+            summary = report.get("summary", {})
+            markdown_lines.append(
+              f"- Errors: {summary.get('error', 0)} | Warnings: {summary.get('warning', 0)} | Info: {summary.get('info', 0)}"
+            )
+            findings = report.get("findings", [])
+            if findings:
+              markdown_lines.append("")
+              markdown_lines.append("### Findings")
+              for finding in findings:
+                severity = str(finding.get("severity", "unknown")).upper()
+                rule = finding.get("ruleId") or "unknown-rule"
+                file_name = finding.get("file") or "unknown-file"
+                loc = finding.get("loc") or {}
+                line = loc.get("line", "?")
+                message = finding.get("message") or finding.get("item") or "No message provided."
+                markdown_lines.append(f"- **[{severity}]** `{rule}` in `{file_name}:{line}` — {message}")
+            else:
+              markdown_lines.append("- No findings reported.")
+
+          summary_text = "\n".join(markdown_lines) + "\n"
+          Path("/tmp/linter-feedback-summary.md").write_text(summary_text, encoding="utf-8")
+          with Path("/tmp/linter-feedback-summary.md").open("r", encoding="utf-8") as fh:
+            print(fh.read())
+          PY
+          cat /tmp/linter-feedback-summary.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload linter report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: linter-report
-          path: /tmp/linter-report.txt
+          path: |
+            /tmp/linter-report.txt
+            /tmp/linter-report.json
+            /tmp/linter-feedback-summary.md
 
       - name: Check linter exit code
         if: steps.linter.outcome == 'failure'

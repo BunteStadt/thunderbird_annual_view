@@ -176,6 +176,91 @@
         font-size: 0.95rem;
       }
 
+      .section-title {
+        position: relative;
+        z-index: 2;
+        margin: clamp(30px, 4.5vw, 52px) 0 12px;
+        font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+      }
+
+      .gallery {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .shot {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .shot:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+      }
+
+      .shot img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+      }
+
+      .shot span {
+        display: block;
+        padding: 10px 12px;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      .demo-shell {
+        position: relative;
+        z-index: 2;
+        margin-top: 14px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: clamp(10px, 1.8vw, 14px);
+        box-shadow: var(--shadow);
+      }
+
+      .demo-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .demo-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .demo-frame-wrap {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        min-height: 420px;
+        background: #0e1328;
+      }
+
+      .demo-frame {
+        width: 100%;
+        height: clamp(420px, 72vh, 860px);
+        border: 0;
+        background: transparent;
+      }
+
       .bg-orb {
         position: absolute;
         border-radius: 999px;
@@ -274,6 +359,14 @@
         .bg-orb {
           opacity: 0.35;
         }
+
+        .demo-frame-wrap {
+          min-height: 360px;
+        }
+
+        .demo-frame {
+          height: 70vh;
+        }
       }
 
       @media (min-width: 1700px) {
@@ -349,6 +442,44 @@
           <h2>Theme-Aware UI</h2>
           <p>Works cleanly in light and dark mode while keeping calendar colors easy to read.</p>
         </article>
+      </section>
+
+      <h2 class="section-title">More views</h2>
+      <section class="gallery" aria-label="Screenshot gallery">
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Compact linear view screenshot" />
+          <span>Compact linear layout</span>
+        </a>
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png" alt="Day-aligned view screenshot" />
+          <span>Day-aligned layout</span>
+        </a>
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png" alt="4-week view screenshot" />
+          <span>4-week layout</span>
+        </a>
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/options-disabled.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/options-disabled.png" alt="Options sidebar screenshot" />
+          <span>Filter and options sidebar</span>
+        </a>
+      </section>
+
+      <h2 class="section-title">Try it right here</h2>
+      <section class="demo-shell" aria-label="Embedded dummy demo">
+        <div class="demo-header">
+          <p>Interactive embedded demo using dummy data. Scroll, change year, and switch modes directly in this page.</p>
+          <a class="btn btn-primary" href="./src/ui/year-view/year-view.html?dummy=1" target="_blank" rel="noopener noreferrer">Open Full Screen Demo</a>
+        </div>
+        <div class="demo-frame-wrap">
+          <iframe
+            class="demo-frame"
+            src="./src/ui/year-view/year-view.html?dummy=1"
+            title="Embedded Calendar Annual View demo"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+            allowfullscreen
+          ></iframe>
+        </div>
       </section>
     </main>
   </body>

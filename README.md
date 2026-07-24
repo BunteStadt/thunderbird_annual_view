@@ -55,10 +55,11 @@ Alternatively, install directly from the [Thunderbird Add-ons site](https://addo
 ## GitHub Pages Demo
 
 The repository root contains a landing page (`index.html`) designed for GitHub Pages.
-It is responsive from mobile to wide desktop layouts and includes animated visual accents.
+It is responsive from mobile to wide desktop layouts, includes animated visual accents, and now embeds an interactive dummy demo directly on the page.
 
 - Landing page: `https://buntestadt.github.io/thunderbird_annual_view/`
 - Dummy demo button target (opens in a new tab): `src/ui/year-view/year-view.html?dummy=1`
+- Embedded demo target (inside an iframe): `src/ui/year-view/year-view.html?dummy=1`
 
 ## Usage
 

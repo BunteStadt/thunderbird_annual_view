@@ -102,14 +102,44 @@ Work wihtout Thunderbird - see the thunderbird tab in the browser - faster for d
 
 1. Install extension in Thunderbird as debugg mode.
 
+### Development Tooling
+
+#### Git Hooks
+
+The repository ships with custom Git hooks in `.githooks/`. To enable them, run once:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+- **`pre-commit`** — Checks that the submodule has no unpulled commits and that `experiments/` is in sync with `submodules/calendar/experiments/calendar/`. If they differ, run `just sync-experiments` to sync them before committing.
+
+#### Just Commands
+
+[`just`](https://github.com/casey/just) is a command runner. Available recipes:
+
+| Command | Description |
+|---------|-------------|
+| `just sync-experiments` | Copies experiment APIs from `submodules/calendar/experiments/calendar/` to `experiments/` for development |
+| `just build-xpi` | Builds the `.xpi` release package into `dist/` |
+| `just tag` | Creates a Git tag from the version in `manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |
+
+#### Syncing the Experiment Submodule
+
+The experimental calendar APIs live in `submodules/calendar/experiments/calendar/` (a Git submodule). For the add-on to work, they must also be present at `experiments/calendar/`. To sync manually:
+
+```bash
+just sync-experiments
+```
+
+This copies all files from the submodule source to the target directory. The `pre-commit` hook will warn you if they drift out of sync.
+
 ## Deployments
 
 When development is finished, merge to main. Make sure the ci-test is successful.
 In a new commit, update the version number in `manifest.json`.
-In vscode: select the last commit, right click and select `Create Tag`. Follow the versioning scheme.
+In vscode: select the last commit, right click and select `Create Tag`. Follow the versioning scheme. - or use the `just tag` command.
 The tag needs to be pushed to the remote repo seperatly. The GitHub Actions workflow will automatically create a new release and upload the `.xpi` file.
-
-Might add message to the tag to be included in release notes. (Not tested yet).
 
 ### Prerequisites
 

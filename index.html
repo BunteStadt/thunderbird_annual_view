@@ -295,33 +295,6 @@
         animation-delay: -4s;
       }
 
-      .stats {
-        position: relative;
-        z-index: 2;
-        margin-top: clamp(18px, 2.5vw, 28px);
-        display: grid;
-        gap: 12px;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      }
-
-      .stat {
-        background: color-mix(in srgb, var(--panel) 88%, transparent);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px;
-      }
-
-      .stat strong {
-        display: block;
-        font-size: 1.15rem;
-        line-height: 1.2;
-      }
-
-      .stat span {
-        color: var(--muted);
-        font-size: 0.82rem;
-      }
-
       @keyframes drift {
         0%,
         100% {
@@ -404,25 +377,6 @@
           </div>
         </div>
         <img class="hero-image" src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Calendar Annual View screenshot" />
-      </section>
-
-      <section class="stats" aria-label="At a glance">
-        <article class="stat">
-          <strong>12 Months</strong>
-          <span>See your full Thunderbird calendar year without switching tabs or views.</span>
-        </article>
-        <article class="stat">
-          <strong>3 Layouts</strong>
-          <span>Choose compact, day-aligned, or 4-week layouts for yearly planning.</span>
-        </article>
-        <article class="stat">
-          <strong>Multi-Calendar</strong>
-          <span>Combine work, personal, and shared calendars with native color coding.</span>
-        </article>
-        <article class="stat">
-          <strong>Light + Dark</strong>
-          <span>Use the annual calendar view comfortably in both light and dark themes.</span>
-        </article>
       </section>
 
       <section class="grid" aria-label="Feature highlights">

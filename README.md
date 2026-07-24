@@ -52,6 +52,13 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 
 Alternatively, install directly from the [Thunderbird Add-ons site](https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/) using the ID: `GlamorousPotato.calendar-annual-view@addons.thunderbird.net`.
 
+## GitHub Pages Demo
+
+The repository root contains a landing page (`index.html`) designed for GitHub Pages.
+
+- Landing page: `https://buntestadt.github.io/thunderbird_annual_view/`
+- Dummy demo button target: `src/ui/year-view/year-view.html?dummy=1`
+
 ## Usage
 
 1. After installation, new buttons (on the left in the spaces toolbar and at the top left) will appear.

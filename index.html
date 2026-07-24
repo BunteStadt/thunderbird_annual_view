@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendar Annual View for Thunderbird</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f4f6ff;
+        --panel: #ffffff;
+        --text: #1c2240;
+        --muted: #5e6482;
+        --primary: #5b6dff;
+        --primary-strong: #4458ff;
+        --border: #dfe4ff;
+        --shadow: 0 20px 40px rgba(55, 75, 190, 0.15);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #10142a;
+          --panel: #151b35;
+          --text: #eff2ff;
+          --muted: #b1b8df;
+          --primary: #7f8cff;
+          --primary-strong: #9aa4ff;
+          --border: #28305d;
+          --shadow: 0 24px 44px rgba(5, 7, 20, 0.45);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+        background: radial-gradient(circle at 20% -10%, #8fa0ff 0%, transparent 50%), var(--bg);
+        color: var(--text);
+        line-height: 1.45;
+      }
+
+      .page {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 56px 24px 80px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 28px;
+        align-items: center;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .hero-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--primary) 16%, transparent);
+        color: var(--primary-strong);
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.02em;
+      }
+
+      h1 {
+        margin: 16px 0 12px;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1.1;
+      }
+
+      .lead {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        padding: 12px 18px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 150ms ease;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-strong);
+      }
+
+      .btn-secondary {
+        border-color: var(--border);
+        color: var(--text);
+      }
+
+      .btn-secondary:hover {
+        background: color-mix(in srgb, var(--primary) 10%, transparent);
+      }
+
+      .hero-image {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        display: block;
+      }
+
+      .grid {
+        margin-top: 28px;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      }
+
+      .feature {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+      }
+
+      .feature h2 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+      }
+
+      .feature p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="eyebrow">Thunderbird Add-on</span>
+          <h1>Calendar Annual View</h1>
+          <p class="lead">
+            See your complete year at a glance with compact layouts, calendar filters, and theme-aware styling built for Thunderbird.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="./src/ui/year-view/year-view.html?dummy=1">Open Dummy Demo</a>
+            <a class="btn btn-secondary" href="https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/">Install Add-on</a>
+            <a class="btn btn-secondary" href="https://github.com/BunteStadt/thunderbird_annual_view">Source Code</a>
+          </div>
+        </div>
+        <img class="hero-image" src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Calendar Annual View screenshot" />
+      </section>
+
+      <section class="grid" aria-label="Feature highlights">
+        <article class="feature">
+          <h2>Full-Year Planning</h2>
+          <p>Display all 12 months in one continuous view and scroll seamlessly across year boundaries.</p>
+        </article>
+        <article class="feature">
+          <h2>Flexible Layouts</h2>
+          <p>Switch between compact, day-aligned, and 4-week layouts to match your planning style.</p>
+        </article>
+        <article class="feature">
+          <h2>Smart Filtering</h2>
+          <p>Filter by calendar, all-day mode, and minimum event length for a clear and focused overview.</p>
+        </article>
+        <article class="feature">
+          <h2>Theme-Aware UI</h2>
+          <p>Works cleanly in light and dark mode while keeping calendar colors easy to read.</p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

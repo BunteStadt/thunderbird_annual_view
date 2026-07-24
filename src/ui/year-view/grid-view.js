@@ -95,12 +95,12 @@ function createMonthLabelCell(meta) {
 
     const name = document.createElement("span");
     name.className = "month-name";
-    name.textContent = MONTH_NAMES[meta.month];
+    name.textContent = meta.monthLabel ?? MONTH_NAMES[meta.month].slice(0, 3);
     cell.appendChild(name);
 
     const year = document.createElement("span");
     year.className = "month-year";
-    year.textContent = String(meta.year);
+    year.textContent = String(meta.yearLabel ?? meta.year);
     cell.appendChild(year);
 
     return cell;
@@ -134,7 +134,19 @@ function createWeekRowsMode(className, daysPerRow) {
         className,
         meta(key) {
             const startDayNum = WEEK_EPOCH_DAY + key * daysPerRow;
-            return { startDayNum, endDayNum: startDayNum + daysPerRow - 1 };
+            const endDayNum = startDayNum + daysPerRow - 1;
+            const startDate = dateFromDayNumber(startDayNum);
+            const endDate = dateFromDayNumber(endDayNum);
+            const startMonthLabel = MONTH_NAMES[startDate.getMonth()].slice(0, 3);
+            const endMonthLabel = MONTH_NAMES[endDate.getMonth()].slice(0, 3);
+            const startYearLabel = String(startDate.getFullYear());
+            const endYearLabel = String(endDate.getFullYear());
+            return {
+                startDayNum,
+                endDayNum,
+                monthLabel: startMonthLabel === endMonthLabel ? startMonthLabel : `${startMonthLabel} / ${endMonthLabel}`,
+                yearLabel: startYearLabel === endYearLabel ? startYearLabel : `${startYearLabel} / ${endYearLabel}`
+            };
         },
         keyForDayNumber: (dayNum) => Math.floor((dayNum - WEEK_EPOCH_DAY) / daysPerRow),
         keyForYearStart(year) {
@@ -142,7 +154,7 @@ function createWeekRowsMode(className, daysPerRow) {
         },
         dominantYear: (meta) => yearOfDay(meta.startDayNum + Math.trunc(daysPerRow / 2)),
         headerCells() {
-            const cells = [];
+            const cells = [{ className: "cell month", text: "" }];
             for (let week = 0; week < daysPerRow / 7; week += 1) {
                 for (const name of WEEKDAYS_MONDAY_FIRST) {
                     cells.push({ className: "weekday-header", text: name });
@@ -150,25 +162,12 @@ function createWeekRowsMode(className, daysPerRow) {
             }
             return cells;
         },
-        columnStart: (meta, dayNum) => dayNum - meta.startDayNum + 1,
+        columnStart: (meta, dayNum) => dayNum - meta.startDayNum + 2,
         buildCells(row, meta, ctx) {
+            row.appendChild(createMonthLabelCell(meta));
             for (let i = 0; i < daysPerRow; i += 1) {
                 const date = dateFromDayNumber(meta.startDayNum + i);
-                const cell = createDayCell(date, ctx);
-                if (date.getDate() === 1) {
-                    // First of the month shows the month name; January also
-                    // gets a year label so year transitions are visible.
-                    const label = cell.querySelector(".day-number");
-                    label.textContent = MONTH_NAMES[date.getMonth()].slice(0, 3);
-                    label.classList.add("month-label");
-                    if (date.getMonth() === 0) {
-                        const yearLabel = document.createElement("span");
-                        yearLabel.className = "year-label";
-                        yearLabel.textContent = String(date.getFullYear());
-                        cell.appendChild(yearLabel);
-                    }
-                }
-                row.appendChild(cell);
+                row.appendChild(createDayCell(date, ctx));
             }
         }
     };

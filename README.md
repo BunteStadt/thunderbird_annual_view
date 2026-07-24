@@ -11,6 +11,7 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 ## Features
 
 - **Multiple View Modes**: Choose from compact linear (each row is a month), day-aligned, 4-week, 2-week, or 1-week row layouts for flexible annual viewing.
+- **Row Month/Year Labels**: Every row shows a left-side short month label (`Jan`) plus year; week-row modes show range labels like `Jan / Feb` (and `2026 / 2027` when needed).
 - **Infinite Scrolling**: Scroll seamlessly up and down across year boundaries. In the month-based views, December is directly followed by January of the next year; in the week-row views, years change within a row. Events for neighboring years are prefetched in the background, so scrolling stays smooth.
 - **Multi-Calendar Support**: Show events from multiple calendars at once.
 - **Automatic Calendar Detection**: Pulls calendars and colors from Thunderbird's settings.

@@ -1,4 +1,4 @@
-import { resolveCalendarAllDayOnly } from "../../core/src/index.js";
+import { resolveCalendarAllDayOnly } from "../../core/src/index.mjs";
 
 const DUMMY_CALENDARS = [
     { id: "dummy-work", name: "Work", color: "#0ea5e9" },

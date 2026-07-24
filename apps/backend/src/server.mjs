@@ -1,5 +1,5 @@
 import http from "node:http";
-import { createProviderRegistry } from "../../../packages/provider-adapters/src/index.js";
+import { createProviderRegistry } from "../../../packages/provider-adapters/src/index.mjs";
 
 const registry = createProviderRegistry({ browserApi: null, useDummyData: false });
 

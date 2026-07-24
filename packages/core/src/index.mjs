@@ -3,4 +3,4 @@ export {
     dedupeEventsByIdentity,
     filterEventsByDisplayFilters,
     buildCalendarSummary
-} from "./calendar-domain.js";
+} from "./calendar-domain.mjs";

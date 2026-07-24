@@ -1,4 +1,4 @@
-import { buildCalendarSummary } from "../../../packages/core/src/index.js";
+import { buildCalendarSummary } from "../../../packages/core/src/index.mjs";
 
 const output = document.getElementById("output");
 const signInButton = document.getElementById("signInButton");

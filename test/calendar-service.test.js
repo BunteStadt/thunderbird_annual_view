@@ -1,13 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs/promises');
 const path = require('node:path');
 
 async function loadCalendarServiceModule() {
     const modulePath = path.resolve(__dirname, '../apps/thunderbird-addon/src/ui/year-view/calendar-service.js');
-    const source = await fs.readFile(modulePath, 'utf8');
-    const moduleUrl = `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`;
-    return import(moduleUrl);
+    return import(`file://${modulePath.replace(/\\/g, '/')}`);
 }
 
 test('fetchCalendars returns dummy calendars when enabled', async (t) => {

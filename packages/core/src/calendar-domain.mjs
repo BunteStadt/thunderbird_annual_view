@@ -33,21 +33,6 @@ export function filterEventsByDisplayFilters(events = [], filters = {}) {
         return { events: [], stats: { filteredOut: 0, total: 0 } };
     }
 
-    export function buildCalendarSummary(events = []) {
-        const total = events.length;
-        const byCalendar = new Map();
-
-        for (const event of events) {
-            const key = event.calendarId || "unknown";
-            byCalendar.set(key, (byCalendar.get(key) || 0) + 1);
-        }
-
-        return {
-            total,
-            calendars: Array.from(byCalendar.entries()).map(([calendarId, count]) => ({ calendarId, count }))
-        };
-    }
-
     const wanted = new Set(calendarIds);
     const candidates = events.filter((event) => wanted.has(event.calendarId));
     const visible = candidates.filter((event) => {
@@ -63,5 +48,20 @@ export function filterEventsByDisplayFilters(events = [], filters = {}) {
             filteredOut: candidates.length - visible.length,
             total: candidates.length
         }
+    };
+}
+
+export function buildCalendarSummary(events = []) {
+    const total = events.length;
+    const byCalendar = new Map();
+
+    for (const event of events) {
+        const key = event.calendarId || "unknown";
+        byCalendar.set(key, (byCalendar.get(key) || 0) + 1);
+    }
+
+    return {
+        total,
+        calendars: Array.from(byCalendar.entries()).map(([calendarId, count]) => ({ calendarId, count }))
     };
 }

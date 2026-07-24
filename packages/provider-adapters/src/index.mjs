@@ -1,4 +1,4 @@
-import { createThunderbirdProvider } from "./thunderbird.js";
+import { createThunderbirdProvider } from "./thunderbird.mjs";
 
 export function createProviderRegistry({ browserApi = globalThis.browser, useDummyData = false } = {}) {
     const thunderbird = createThunderbirdProvider({ browserApi, useDummyData });

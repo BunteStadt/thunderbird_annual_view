@@ -12,7 +12,7 @@ import { normalizeEvents, eventDurationMs } from "./date-utils.js";
 import {
     dedupeEventsByIdentity,
     filterEventsByDisplayFilters
-} from "../../../../../packages/core/src/index.js";
+} from "../../../../../packages/core/src/index.mjs";
 
 const PREFETCH_MARGIN_YEARS = 1;
 

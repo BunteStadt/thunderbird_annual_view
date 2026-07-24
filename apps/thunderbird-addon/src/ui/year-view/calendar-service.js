@@ -1,4 +1,4 @@
-import { createThunderbirdProvider } from "../../../../../packages/provider-adapters/src/index.js";
+import { createThunderbirdProvider } from "../../../../../packages/provider-adapters/src/index.mjs";
 
 function getProvider() {
     return createThunderbirdProvider({

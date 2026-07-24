@@ -3,13 +3,14 @@
 // Every visible row is an independent DOM element (a CSS grid) so rows can be
 // prepended and appended without limit while scrolling. In the month-based
 // modes (linear, day-aligned) each row is one month, so December of one year
-// is directly followed by January of the next. In week-rows mode each row is
-// a fixed 28-day block anchored to a global Monday epoch, so years change
-// mid-row (the last day of one year sits next to the first day of the next).
+// is directly followed by January of the next. In the week-row modes each row
+// is a fixed 4/2/1-week block anchored to a global Monday epoch, so years
+// change mid-row (the last day of one year sits next to the first day of the
+// next).
 //
 // Row keys are global integers:
 //   - month modes:  key = year * 12 + monthIndex
-//   - week-rows:    key = floor((dayNumber - WEEK_EPOCH_DAY) / 28)
+//   - week-row:     key = floor((dayNumber - WEEK_EPOCH_DAY) / daysPerRow)
 
 import {
     MONTH_NAMES,
@@ -33,7 +34,9 @@ const ROW_GAP = 1; // Must match the flex gap of .calendar-rows in CSS.
 const RENDER_AHEAD_PX = 900;
 const TRIM_DISTANCE_PX = 2700;
 
-const WEEK_ROW_DAYS = 28;
+const WEEK_ROW_DAYS_4 = 28;
+const WEEK_ROW_DAYS_2 = 14;
+const WEEK_ROW_DAYS_1 = 7;
 const WEEK_EPOCH_DAY = dayNumber(new Date(2001, 0, 1)); // A Monday.
 
 const DAY_ALIGNED_COLS = 37; // 6 max weekday offset + 31 days.
@@ -92,12 +95,12 @@ function createMonthLabelCell(meta) {
 
     const name = document.createElement("span");
     name.className = "month-name";
-    name.textContent = MONTH_NAMES[meta.month];
+    name.textContent = meta.monthLabel ?? MONTH_NAMES[meta.month].slice(0, 3);
     cell.appendChild(name);
 
     const year = document.createElement("span");
     year.className = "month-year";
-    year.textContent = String(meta.year);
+    year.textContent = String(meta.yearLabel ?? meta.year);
     cell.appendChild(year);
 
     return cell;
@@ -124,6 +127,50 @@ function monthMeta(key) {
 function monthKeyForDayNumber(dayNum) {
     const d = dateFromDayNumber(dayNum);
     return d.getFullYear() * 12 + d.getMonth();
+}
+
+function createWeekRowsMode(className, daysPerRow) {
+    return {
+        className,
+        meta(key) {
+            const startDayNum = WEEK_EPOCH_DAY + key * daysPerRow;
+            const endDayNum = startDayNum + daysPerRow - 1;
+            const startDate = dateFromDayNumber(startDayNum);
+            const endDate = dateFromDayNumber(endDayNum);
+            const startMonthLabel = MONTH_NAMES[startDate.getMonth()].slice(0, 3);
+            const endMonthLabel = MONTH_NAMES[endDate.getMonth()].slice(0, 3);
+            const startYearLabel = String(startDate.getFullYear());
+            const endYearLabel = String(endDate.getFullYear());
+            return {
+                startDayNum,
+                endDayNum,
+                monthLabel: startMonthLabel === endMonthLabel ? startMonthLabel : `${startMonthLabel} / ${endMonthLabel}`,
+                yearLabel: startYearLabel === endYearLabel ? startYearLabel : `${startYearLabel} / ${endYearLabel}`
+            };
+        },
+        keyForDayNumber: (dayNum) => Math.floor((dayNum - WEEK_EPOCH_DAY) / daysPerRow),
+        keyForYearStart(year) {
+            return this.keyForDayNumber(dayNumber(new Date(year, 0, 1)));
+        },
+        dominantYear: (meta) => yearOfDay(meta.startDayNum + Math.trunc(daysPerRow / 2)),
+        headerCells() {
+            const cells = [{ className: "cell month", text: "" }];
+            for (let week = 0; week < daysPerRow / 7; week += 1) {
+                for (const name of WEEKDAYS_MONDAY_FIRST) {
+                    cells.push({ className: "weekday-header", text: name });
+                }
+            }
+            return cells;
+        },
+        columnStart: (meta, dayNum) => dayNum - meta.startDayNum + 2,
+        buildCells(row, meta, ctx) {
+            row.appendChild(createMonthLabelCell(meta));
+            for (let i = 0; i < daysPerRow; i += 1) {
+                const date = dateFromDayNumber(meta.startDayNum + i);
+                row.appendChild(createDayCell(date, ctx));
+            }
+        }
+    };
 }
 
 const MODE_IMPLS = {
@@ -178,48 +225,9 @@ const MODE_IMPLS = {
         }
     },
 
-    "week-rows": {
-        className: "week-rows",
-        meta(key) {
-            const startDayNum = WEEK_EPOCH_DAY + key * WEEK_ROW_DAYS;
-            return { startDayNum, endDayNum: startDayNum + WEEK_ROW_DAYS - 1 };
-        },
-        keyForDayNumber: (dayNum) => Math.floor((dayNum - WEEK_EPOCH_DAY) / WEEK_ROW_DAYS),
-        keyForYearStart(year) {
-            return this.keyForDayNumber(dayNumber(new Date(year, 0, 1)));
-        },
-        dominantYear: (meta) => yearOfDay(meta.startDayNum + Math.trunc(WEEK_ROW_DAYS / 2)),
-        headerCells() {
-            const cells = [];
-            for (let week = 0; week < 4; week += 1) {
-                for (const name of WEEKDAYS_MONDAY_FIRST) {
-                    cells.push({ className: "weekday-header", text: name });
-                }
-            }
-            return cells;
-        },
-        columnStart: (meta, dayNum) => dayNum - meta.startDayNum + 1,
-        buildCells(row, meta, ctx) {
-            for (let i = 0; i < WEEK_ROW_DAYS; i += 1) {
-                const date = dateFromDayNumber(meta.startDayNum + i);
-                const cell = createDayCell(date, ctx);
-                if (date.getDate() === 1) {
-                    // First of the month shows the month name; January also
-                    // gets a year label so year transitions are visible.
-                    const label = cell.querySelector(".day-number");
-                    label.textContent = MONTH_NAMES[date.getMonth()].slice(0, 3);
-                    label.classList.add("month-label");
-                    if (date.getMonth() === 0) {
-                        const yearLabel = document.createElement("span");
-                        yearLabel.className = "year-label";
-                        yearLabel.textContent = String(date.getFullYear());
-                        cell.appendChild(yearLabel);
-                    }
-                }
-                row.appendChild(cell);
-            }
-        }
-    }
+    "week-rows": createWeekRowsMode("week-rows", WEEK_ROW_DAYS_4),
+    "two-week-rows": createWeekRowsMode("two-week-rows", WEEK_ROW_DAYS_2),
+    "one-week-rows": createWeekRowsMode("one-week-rows", WEEK_ROW_DAYS_1)
 };
 
 // ---------------------------------------------------------------------------

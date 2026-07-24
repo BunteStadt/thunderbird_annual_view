@@ -274,7 +274,13 @@ export async function loadViewMode() {
         const stored = await browser.storage.local.get("viewMode");
         if (Object.prototype.hasOwnProperty.call(stored, "viewMode")) {
             const mode = stored.viewMode;
-            if (mode === "linear" || mode === "day-aligned" || mode === "week-rows") {
+            if (
+                mode === "linear" ||
+                mode === "day-aligned" ||
+                mode === "week-rows" ||
+                mode === "two-week-rows" ||
+                mode === "one-week-rows"
+            ) {
                 return mode;
             }
         }

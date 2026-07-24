@@ -575,9 +575,17 @@ input[type="number"] {
   grid-template-columns: 120px repeat(37, minmax(0, 1fr));
 }
 
-/* Week-rows view: 28 columns for 4 weeks (no separate month column) */
+/* Week-row views: month label column plus 4/2/1 weeks */
 .grid-row.week-rows {
-  grid-template-columns: repeat(28, minmax(0, 1fr));
+  grid-template-columns: 120px repeat(28, minmax(0, 1fr));
+}
+
+.grid-row.two-week-rows {
+  grid-template-columns: 120px repeat(14, minmax(0, 1fr));
+}
+
+.grid-row.one-week-rows {
+  grid-template-columns: 120px repeat(7, minmax(0, 1fr));
 }
 
 /* Sticky weekday header shared by all rows */
@@ -601,7 +609,15 @@ input[type="number"] {
 }
 
 .grid-header.week-rows {
-  grid-template-columns: repeat(28, minmax(0, 1fr));
+  grid-template-columns: 120px repeat(28, minmax(0, 1fr));
+}
+
+.grid-header.two-week-rows {
+  grid-template-columns: 120px repeat(14, minmax(0, 1fr));
+}
+
+.grid-header.one-week-rows {
+  grid-template-columns: 120px repeat(7, minmax(0, 1fr));
 }
 
 .weekday-header {
@@ -636,7 +652,15 @@ input[type="number"] {
 }
 
 .row-events.week-rows {
-  grid-template-columns: repeat(28, minmax(0, 1fr));
+  grid-template-columns: 120px repeat(28, minmax(0, 1fr));
+}
+
+.row-events.two-week-rows {
+  grid-template-columns: 120px repeat(14, minmax(0, 1fr));
+}
+
+.row-events.one-week-rows {
+  grid-template-columns: 120px repeat(7, minmax(0, 1fr));
 }
 
 .cell {
@@ -652,11 +676,6 @@ input[type="number"] {
   font-size: 0.76rem;
   color: var(--weekday-text);
   font-weight: 500;
-}
-
-.cell .month-label {
-  font-weight: 900;
-  color: var(--text);
 }
 
 .cell .week-number {
@@ -731,17 +750,6 @@ input[type="number"] {
   color: var(--muted);
 }
 
-/* Year marker shown on January 1st in the week-rows view */
-.cell .year-label {
-  position: absolute;
-  top: 20px;
-  left: 6px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--accent);
-}
-
-
 .event {
   position: relative;
   z-index: 2;
@@ -784,6 +792,24 @@ input[type="number"] {
   .grid-header.day-aligned {
     grid-template-columns: 100px repeat(37, minmax(0, 1fr));
   }
+
+  .grid-row.week-rows,
+  .row-events.week-rows,
+  .grid-header.week-rows {
+    grid-template-columns: 100px repeat(28, minmax(0, 1fr));
+  }
+
+  .grid-row.two-week-rows,
+  .row-events.two-week-rows,
+  .grid-header.two-week-rows {
+    grid-template-columns: 100px repeat(14, minmax(0, 1fr));
+  }
+
+  .grid-row.one-week-rows,
+  .row-events.one-week-rows,
+  .grid-header.one-week-rows {
+    grid-template-columns: 100px repeat(7, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -806,6 +832,24 @@ input[type="number"] {
   .row-events.day-aligned,
   .grid-header.day-aligned {
     grid-template-columns: 88px repeat(37, minmax(0, 1fr));
+  }
+
+  .grid-row.week-rows,
+  .row-events.week-rows,
+  .grid-header.week-rows {
+    grid-template-columns: 88px repeat(28, minmax(0, 1fr));
+  }
+
+  .grid-row.two-week-rows,
+  .row-events.two-week-rows,
+  .grid-header.two-week-rows {
+    grid-template-columns: 88px repeat(14, minmax(0, 1fr));
+  }
+
+  .grid-row.one-week-rows,
+  .row-events.one-week-rows,
+  .grid-header.one-week-rows {
+    grid-template-columns: 88px repeat(7, minmax(0, 1fr));
   }
 }
 

@@ -1,17 +1,18 @@
 # Thunderbird Annual View
 Calendar Annual View is a Thunderbird add-on that shows an entire year in one compact, readable grid with multiple layout options.
-It displays all 12 months in various formats (compact linear, day-aligned, or 4-week rows), scrolls continuously across year boundaries, supports multiple calendars with automatic color matching, and keeps the view read-only for quick planning and overview use cases.
+It displays all 12 months in various formats (compact linear, day-aligned, 4-week rows, 2-week rows, or 1-week rows), scrolls continuously across year boundaries, supports multiple calendars with automatic color matching, and keeps the view read-only for quick planning and overview use cases.
 
 ## Marketplace Description
 
-Calendar Annual View adds a full-year calendar layout to Thunderbird with multiple view modes: compact linear grid (each row is a month), day-aligned layout, or 4-week row format. It is designed for fast yearly planning and conflict spotting.
+Calendar Annual View adds a full-year calendar layout to Thunderbird with multiple view modes: compact linear grid (each row is a month), day-aligned layout, or 4/2/1-week row formats. It is designed for fast yearly planning and conflict spotting.
 
 The add-on automatically detects your Thunderbird calendars, applies their configured colors, and lets you filter what is shown (per-calendar visibility, per-calendar all-day overrides, minimum event duration, all-day events only, week numbers, past day graying, and current day highlighting). The annual view is intentionally read-only, so event editing remains in Thunderbird's standard day/week/month views.
 
 ## Features
 
-- **Multiple View Modes**: Choose from compact linear (each row is a month), day-aligned, or 4-week row layouts for flexible annual viewing.
-- **Infinite Scrolling**: Scroll seamlessly up and down across year boundaries. In the month-based views, December is directly followed by January of the next year; in the 4-week view, years change within a row. Events for neighboring years are prefetched in the background, so scrolling stays smooth.
+- **Multiple View Modes**: Choose from compact linear (each row is a month), day-aligned, 4-week, 2-week, or 1-week row layouts for flexible annual viewing.
+- **Row Month/Year Labels**: Every row shows a left-side short month label (`Jan`) plus year; week-row modes show range labels like `Jan / Feb` (and `2026 / 2027` when needed).
+- **Infinite Scrolling**: Scroll seamlessly up and down across year boundaries. In the month-based views, December is directly followed by January of the next year; in the week-row views, years change within a row. Events for neighboring years are prefetched in the background, so scrolling stays smooth.
 - **Multi-Calendar Support**: Show events from multiple calendars at once.
 - **Automatic Calendar Detection**: Pulls calendars and colors from Thunderbird's settings.
 - **Configurable Filters**:
@@ -66,7 +67,7 @@ It is responsive from mobile to wide desktop layouts, includes animated visual a
 1. After installation, new buttons (on the left in the spaces toolbar and at the top left) will appear.
 2. Click a button to open the annual calendar view.
 3. Scroll the grid to move through time — the view continues endlessly into past and future years. The year input always shows the year at the center of the view; type a year or use the +/- buttons to jump directly.
-4. Choose the view mode (compact, aligned, or 4-week) from the dropdown in the header.
+4. Choose the view mode (compact, aligned, 4-week, 2-week, or 1-week) from the dropdown in the header.
 5. Click on `show options` to open the configuration sidebar for filters and calendar selection.
 
 ## Configuration
@@ -83,7 +84,7 @@ Access the add-on options through Thunderbird's Add-ons Manager:
 - **Gray Past Days**: Toggle to gray out days before today for better focus.
 - **Highlight Current Day**: Toggle to highlight today's date.
 
-The view mode can be changed directly in the annual view header: select between compact (linear), aligned, or 4-week layouts.
+The view mode can be changed directly in the annual view header: select between compact (linear), aligned, 4-week, 2-week, or 1-week layouts.
 
 ## Development
 

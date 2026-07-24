@@ -33,12 +33,12 @@
     },
     "experiment_apis": {
         "calendar_calendars": {
-            "schema": "submodules/calendar/experiments/calendar/schema/calendar-calendars.json",
+            "schema": "experiments/calendar/schema/calendar-calendars.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "submodules/calendar/experiments/calendar/parent/ext-calendar-calendars.js",
+                "script": "experiments/calendar/parent/ext-calendar-calendars.js",
                 "paths": [
                     [
                         "calendar",
@@ -48,12 +48,12 @@
             }
         },
         "calendar_items": {
-            "schema": "submodules/calendar/experiments/calendar/schema/calendar-items.json",
+            "schema": "experiments/calendar/schema/calendar-items.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "submodules/calendar/experiments/calendar/parent/ext-calendar-items.js",
+                "script": "experiments/calendar/parent/ext-calendar-items.js",
                 "paths": [
                     [
                         "calendar",
@@ -63,12 +63,12 @@
             }
         },
         "calendar_provider": {
-            "schema": "submodules/calendar/experiments/calendar/schema/calendar-provider.json",
+            "schema": "experiments/calendar/schema/calendar-provider.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "submodules/calendar/experiments/calendar/parent/ext-calendar-provider.js",
+                "script": "experiments/calendar/parent/ext-calendar-provider.js",
                 "events": [
                     "startup"
                 ],
@@ -81,12 +81,12 @@
             }
         },
         "calendar_timezones": {
-            "schema": "submodules/calendar/experiments/calendar/schema/calendar-timezones.json",
+            "schema": "experiments/calendar/schema/calendar-timezones.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "submodules/calendar/experiments/calendar/parent/ext-calendar-timezones.js",
+                "script": "experiments/calendar/parent/ext-calendar-timezones.js",
                 "paths": [
                     [
                         "calendar",
@@ -98,7 +98,7 @@
                 "scopes": [
                     "addon_child"
                 ],
-                "script": "submodules/calendar/experiments/calendar/child/ext-calendar-timezones.js",
+                "script": "experiments/calendar/child/ext-calendar-timezones.js",
                 "paths": [
                     [
                         "calendar",
@@ -108,12 +108,12 @@
             }
         },
         "calendarItemAction": {
-            "schema": "submodules/calendar/experiments/calendar/schema/calendarItemAction.json",
+            "schema": "experiments/calendar/schema/calendarItemAction.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "submodules/calendar/experiments/calendar/parent/ext-calendarItemAction.js",
+                "script": "experiments/calendar/parent/ext-calendarItemAction.js",
                 "events": [
                     "startup"
                 ],
@@ -125,12 +125,12 @@
             }
         },
         "calendarItemDetails": {
-            "schema": "submodules/calendar/experiments/calendar/schema/calendarItemDetails.json",
+            "schema": "experiments/calendar/schema/calendarItemDetails.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "submodules/calendar/experiments/calendar/parent/ext-calendarItemDetails.js",
+                "script": "experiments/calendar/parent/ext-calendarItemDetails.js",
                 "events": [
                     "startup"
                 ],

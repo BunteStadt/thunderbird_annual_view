@@ -294,6 +294,21 @@ input[type="number"] {
   flex-wrap: wrap;
 }
 
+.duration-filters-notice {
+  width: 100%;
+  padding: 0.38rem 0.55rem;
+  border-radius: 10px;
+  border: 1px dashed var(--grid-line);
+  background: var(--chip-hover);
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.duration-filters-notice[hidden] {
+  display: none;
+}
+
 .cal-list {
   display: flex;
   flex-direction: column;
@@ -343,6 +358,24 @@ input[type="number"] {
 
 .calendar-duration-control:hover {
   background: var(--chip-hover);
+}
+
+.filter-overridden {
+  opacity: 0.55;
+}
+
+.cal-chip-toggle.filter-overridden,
+.cal-chip.filter-overridden,
+.calendar-duration-control.filter-overridden,
+.calendar-mode-toggle.filter-overridden {
+  cursor: not-allowed;
+}
+
+.calendar-mode-toggle:disabled,
+.calendar-duration-step:disabled,
+#minDurationDown:disabled,
+#minDurationUp:disabled {
+  opacity: 0.55;
 }
 
 .calendar-duration-input {

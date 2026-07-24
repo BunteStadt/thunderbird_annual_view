@@ -180,16 +180,17 @@ function updateDurationFilterToggleLabel() {
     durationFilterToggleBtn.textContent = `⏱ Duration filter: ${stateLabel}`;
     durationFilterToggleBtn.setAttribute("aria-pressed", String(durationFilteringEnabled));
     durationFilterToggleBtn.title = durationFilteringEnabled
-        ? "Disable duration filtering"
-        : "Enable duration filtering";
+        ? "Disable duration and all-day filtering"
+        : "Enable duration and all-day filtering";
 }
 
 function getFilters() {
+    const durationFiltersActive = durationFilteringEnabled;
     return {
         calendarIds: Array.from(selectedCalendarIds),
-        allDayOnly: allDayOnlyEnabled,
-        calendarAllDayModes,
-        getMinDurationMs: getEffectiveMinDurationMs
+        allDayOnly: durationFiltersActive ? allDayOnlyEnabled : false,
+        calendarAllDayModes: durationFiltersActive ? calendarAllDayModes : {},
+        getMinDurationMs: durationFiltersActive ? getEffectiveMinDurationMs : () => 0
     };
 }
 

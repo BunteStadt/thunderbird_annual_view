@@ -58,6 +58,7 @@ const showWeekNumbersInput = document.getElementById("showWeekNumbers");
 const minDurationInput = document.getElementById("minDurationHours");
 const minDurationDownBtn = document.getElementById("minDurationDown");
 const minDurationUpBtn = document.getElementById("minDurationUp");
+const durationFilterToggleBtn = document.getElementById("durationFilterToggle");
 const selectAllBtn = document.getElementById("selectAllCals");
 const deselectAllBtn = document.getElementById("deselectAllCals");
 const toggleCalendarsBtn = document.getElementById("toggleCalendars");
@@ -85,6 +86,7 @@ let selectedCalendarIds = new Set();
 let calendarAllDayModes = {};
 let calendarMinDurationHours = {};
 let allDayOnlyEnabled = false;
+let durationFilteringEnabled = true;
 let currentYear = new Date().getFullYear();
 let lastFilterStats = { filteredOut: 0, total: 0 };
 let themeMode = "auto";
@@ -164,9 +166,22 @@ function getGlobalMinDurationHours() {
 }
 
 function getEffectiveMinDurationMs(calendarId) {
+    if (!durationFilteringEnabled) {
+        return 0;
+    }
     const overrideHours = getCalendarMinDurationHours(calendarId);
     const effectiveHours = overrideHours >= 0 ? overrideHours : getGlobalMinDurationHours();
     return effectiveHours > 0 ? effectiveHours * 60 * 60 * 1000 : 0;
+}
+
+function updateDurationFilterToggleLabel() {
+    if (!durationFilterToggleBtn) return;
+    const stateLabel = durationFilteringEnabled ? "On" : "Off";
+    durationFilterToggleBtn.textContent = `⏱ Duration filter: ${stateLabel}`;
+    durationFilterToggleBtn.setAttribute("aria-pressed", String(durationFilteringEnabled));
+    durationFilterToggleBtn.title = durationFilteringEnabled
+        ? "Disable duration filtering"
+        : "Enable duration filtering";
 }
 
 function getFilters() {
@@ -512,6 +527,11 @@ async function init() {
     });
     onClick(minDurationDownBtn, () => adjustMinDuration(-1));
     onClick(minDurationUpBtn, () => adjustMinDuration(1));
+    onClick(durationFilterToggleBtn, () => {
+        durationFilteringEnabled = !durationFilteringEnabled;
+        updateDurationFilterToggleLabel();
+        applyFilterChange();
+    });
     onClick(selectAllBtn, () => setAllCalendars(true));
     onClick(deselectAllBtn, () => setAllCalendars(false));
 
@@ -544,6 +564,8 @@ async function init() {
         const modes = ["auto", "light", "dark"];
         setThemeMode(modes[(modes.indexOf(themeMode) + 1) % modes.length]);
     });
+
+    updateDurationFilterToggleLabel();
 }
 
 document.addEventListener("DOMContentLoaded", init);

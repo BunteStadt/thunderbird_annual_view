@@ -40,26 +40,30 @@
         background: radial-gradient(circle at 20% -10%, #8fa0ff 0%, transparent 50%), var(--bg);
         color: var(--text);
         line-height: 1.45;
+        overflow-x: hidden;
       }
 
       .page {
-        max-width: 1120px;
+        position: relative;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 56px 24px 80px;
+        padding: clamp(24px, 5vw, 64px) clamp(16px, 4vw, 40px) clamp(40px, 7vw, 100px);
       }
 
       .hero {
         display: grid;
-        gap: 28px;
+        gap: clamp(18px, 3vw, 34px);
         align-items: center;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr);
       }
 
       .hero-card {
+        position: relative;
+        z-index: 2;
         background: var(--panel);
         border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 30px;
+        border-radius: 24px;
+        padding: clamp(20px, 4vw, 34px);
         box-shadow: var(--shadow);
       }
 
@@ -104,7 +108,7 @@
         padding: 12px 18px;
         font-weight: 700;
         text-decoration: none;
-        transition: 150ms ease;
+        transition: 180ms ease;
       }
 
       .btn-primary {
@@ -114,6 +118,7 @@
 
       .btn-primary:hover {
         background: var(--primary-strong);
+        transform: translateY(-1px);
       }
 
       .btn-secondary {
@@ -123,20 +128,28 @@
 
       .btn-secondary:hover {
         background: color-mix(in srgb, var(--primary) 10%, transparent);
+        transform: translateY(-1px);
       }
 
       .hero-image {
+        position: relative;
+        z-index: 2;
         width: 100%;
+        max-width: 100%;
         border-radius: 16px;
         border: 1px solid var(--border);
         display: block;
+        box-shadow: var(--shadow);
+        animation: floatFrame 6s ease-in-out infinite;
       }
 
       .grid {
-        margin-top: 28px;
+        position: relative;
+        z-index: 2;
+        margin-top: clamp(20px, 3vw, 34px);
         display: grid;
         gap: 16px;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       }
 
       .feature {
@@ -144,6 +157,12 @@
         border: 1px solid var(--border);
         border-radius: 14px;
         padding: 16px;
+        transition: transform 200ms ease, box-shadow 200ms ease;
+      }
+
+      .feature:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
       }
 
       .feature h2 {
@@ -156,10 +175,128 @@
         color: var(--muted);
         font-size: 0.95rem;
       }
+
+      .bg-orb {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(6px);
+        pointer-events: none;
+        opacity: 0.5;
+        z-index: 1;
+        animation: drift 16s ease-in-out infinite;
+      }
+
+      .bg-orb-1 {
+        width: 240px;
+        height: 240px;
+        top: 5%;
+        right: -70px;
+        background: radial-gradient(circle, color-mix(in srgb, var(--primary) 50%, #fff), transparent 70%);
+      }
+
+      .bg-orb-2 {
+        width: 180px;
+        height: 180px;
+        bottom: 4%;
+        left: -60px;
+        background: radial-gradient(circle, color-mix(in srgb, var(--primary-strong) 45%, #fff), transparent 72%);
+        animation-delay: -4s;
+      }
+
+      .stats {
+        position: relative;
+        z-index: 2;
+        margin-top: clamp(18px, 2.5vw, 28px);
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      }
+
+      .stat {
+        background: color-mix(in srgb, var(--panel) 88%, transparent);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.15rem;
+        line-height: 1.2;
+      }
+
+      .stat span {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      @keyframes floatFrame {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+
+      @keyframes drift {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+          transform: translate3d(-10px, -12px, 0) scale(1.06);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-image {
+          max-width: 720px;
+          justify-self: center;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .bg-orb {
+          opacity: 0.35;
+        }
+      }
+
+      @media (min-width: 1700px) {
+        .page {
+          max-width: 1600px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
     </style>
   </head>
   <body>
     <main class="page">
+      <div class="bg-orb bg-orb-1" aria-hidden="true"></div>
+      <div class="bg-orb bg-orb-2" aria-hidden="true"></div>
       <section class="hero">
         <div class="hero-card">
           <span class="eyebrow">Thunderbird Add-on</span>
@@ -168,12 +305,31 @@
             See your complete year at a glance with compact layouts, calendar filters, and theme-aware styling built for Thunderbird.
           </p>
           <div class="actions">
-            <a class="btn btn-primary" href="./src/ui/year-view/year-view.html?dummy=1">Open Dummy Demo</a>
-            <a class="btn btn-secondary" href="https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/">Install Add-on</a>
-            <a class="btn btn-secondary" href="https://github.com/BunteStadt/thunderbird_annual_view">Source Code</a>
+            <a class="btn btn-primary" href="./src/ui/year-view/year-view.html?dummy=1" target="_blank" rel="noopener noreferrer">Open Dummy Demo</a>
+            <a class="btn btn-secondary" href="https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/" target="_blank" rel="noopener noreferrer">Install Add-on</a>
+            <a class="btn btn-secondary" href="https://github.com/BunteStadt/thunderbird_annual_view" target="_blank" rel="noopener noreferrer">Source Code</a>
           </div>
         </div>
         <img class="hero-image" src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Calendar Annual View screenshot" />
+      </section>
+
+      <section class="stats" aria-label="At a glance">
+        <article class="stat">
+          <strong>12 Months</strong>
+          <span>Entire year visible in one flow</span>
+        </article>
+        <article class="stat">
+          <strong>3 Layouts</strong>
+          <span>Compact, aligned, and 4-week modes</span>
+        </article>
+        <article class="stat">
+          <strong>Multi-Calendar</strong>
+          <span>Per-calendar filters and color matching</span>
+        </article>
+        <article class="stat">
+          <strong>Light + Dark</strong>
+          <span>Theme-aware experience out of the box</span>
+        </article>
       </section>
 
       <section class="grid" aria-label="Feature highlights">

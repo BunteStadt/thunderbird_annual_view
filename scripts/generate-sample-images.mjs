@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
 const releaseTag = process.env.RELEASE_TAG || process.env.GITHUB_REF_NAME || "local";
 const outputDir = path.join(repoRoot, "media", "generated", releaseTag);
-const yearViewUrl = process.env.YEAR_VIEW_URL || pathToFileURL(path.join(repoRoot, "src", "ui", "year-view", "year-view.html")).href;
+const yearViewUrl = process.env.YEAR_VIEW_URL || pathToFileURL(path.join(repoRoot, "apps", "thunderbird-addon", "src", "ui", "year-view", "year-view.html")).href;
 
 const baseScenarios = [
     { mode: "linear", theme: "light" },

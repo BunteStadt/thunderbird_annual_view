@@ -16,7 +16,7 @@ this.calendarItemDetails = class extends ExtensionAPI {
     const root = `experiments-calendar-${uuid}`;
     const query = this.extension.manifest.version;
     const { setupE10sBrowser } = ChromeUtils.importESModule(
-      `resource://${root}/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
+      `resource://${root}/apps/thunderbird-addon/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
     );
 
     const res = origLoadCalendarItemPanel(iframeId, url);
@@ -117,7 +117,7 @@ this.calendarItemDetails = class extends ExtensionAPI {
     const root = `experiments-calendar-${uuid}`;
     const query = this.extension.manifest.version;
     const { setupE10sBrowser } = ChromeUtils.importESModule(
-      `resource://${root}/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
+      `resource://${root}/apps/thunderbird-addon/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
     );
 
     const document = window.document;

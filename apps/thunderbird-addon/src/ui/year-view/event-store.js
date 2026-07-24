@@ -9,6 +9,10 @@
 
 import { fetchCalendarEvents } from "./calendar-service.js";
 import { normalizeEvents, eventDurationMs } from "./date-utils.js";
+import {
+    dedupeEventsByIdentity,
+    filterEventsByDisplayFilters
+} from "../../../../../packages/core/src/index.js";
 
 const PREFETCH_MARGIN_YEARS = 1;
 
@@ -58,19 +62,7 @@ export class EventStore {
             Array.from({ length: lastYear - firstYear + 1 }, (_, i) => this._fetchYear(firstYear + i))
         );
 
-        const seen = new Set();
-        const events = [];
-        for (const yearEvents of perYear) {
-            for (const ev of yearEvents) {
-                // Key includes the start time because occurrences of a
-                // recurring event can share the same id.
-                const key = `${ev.id ?? `${ev.calendarId}|${ev.title}`}|${ev.start?.getTime?.()}`;
-                if (seen.has(key)) continue;
-                seen.add(key);
-                events.push(ev);
-            }
-        }
-        return events;
+        return dedupeEventsByIdentity(perYear.flat());
     }
 
     // Applies display filters and returns both the visible events and stats
@@ -83,32 +75,13 @@ export class EventStore {
             getMinDurationMs = () => 0
         } = filters;
 
-        if (!calendarIds.length) {
-            return { events: [], stats: { filteredOut: 0, total: 0 } };
-        }
-
         const raw = await this.getRawEvents(firstYear, lastYear);
-        const wanted = new Set(calendarIds);
-
-        const resolveAllDayOnly = (calendarId) => {
-            const mode = calendarAllDayModes[calendarId];
-            if (mode === "yes") return true;
-            if (mode === "no") return false;
-            return allDayOnly;
-        };
-
-        const candidates = raw.filter((ev) => wanted.has(ev.calendarId));
-        const events = candidates.filter((ev) => {
-            if (resolveAllDayOnly(ev.calendarId) && !ev.isAllDay) return false;
-            return eventDurationMs(ev) >= getMinDurationMs(ev.calendarId);
+        return filterEventsByDisplayFilters(raw, {
+            calendarIds,
+            allDayOnly,
+            calendarAllDayModes,
+            getMinDurationMs,
+            eventDurationMs
         });
-
-        return {
-            events,
-            stats: {
-                filteredOut: candidates.length - events.length,
-                total: candidates.length
-            }
-        };
     }
 }

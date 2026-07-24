@@ -19,7 +19,7 @@ this.calendar_calendars = class extends ExtensionAPI {
       isOwnCalendar,
       convertCalendar,
     } = ChromeUtils.importESModule(
-      `resource://${root}/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
+      `resource://${root}/apps/thunderbird-addon/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
     );
 
     return {

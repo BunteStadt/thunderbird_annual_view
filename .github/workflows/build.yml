@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p dist
           zip -r dist/calendar-annual-view.xpi \
-            manifest.json src experiments icons
+            manifest.json apps packages
           echo "xpi-path=dist/calendar-annual-view.xpi" >> "$GITHUB_OUTPUT"
 
       - name: Upload XPI artifact

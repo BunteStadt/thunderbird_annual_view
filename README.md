@@ -53,14 +53,30 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 
 Alternatively, install directly from the [Thunderbird Add-ons site](https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/) using the ID: `GlamorousPotato.calendar-annual-view@addons.thunderbird.net`.
 
+## Monorepo Structure
+
+```text
+apps/
+  thunderbird-addon/
+  web/
+  backend/
+packages/
+  core/
+  provider-adapters/
+```
+
+- The release manifest remains at repository root (`manifest.json`) and references add-on runtime files in `apps/thunderbird-addon/`.
+- Shared calendar domain helpers live in `packages/core/`.
+- Provider abstractions and Thunderbird adapter logic live in `packages/provider-adapters/`.
+
 ## GitHub Pages Demo
 
 The repository root contains a landing page (`index.html`) designed for GitHub Pages.
 It is responsive from mobile to wide desktop layouts, includes animated visual accents, and now embeds an interactive dummy demo directly on the page.
 
 - Landing page: `https://buntestadt.github.io/thunderbird_annual_view/`
-- Dummy demo button target (opens in a new tab): `src/ui/year-view/year-view.html?dummy=1`
-- Embedded demo target (inside an iframe): `src/ui/year-view/year-view.html?dummy=1`
+- Dummy demo button target (opens in a new tab): `apps/thunderbird-addon/src/ui/year-view/year-view.html?dummy=1`
+- Embedded demo target (inside an iframe): `apps/thunderbird-addon/src/ui/year-view/year-view.html?dummy=1`
 
 ## Usage
 
@@ -98,7 +114,7 @@ Use a seperate Thunderbird profile.
 ```
 
 ### Dummy Data
-Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
+Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `apps/thunderbird-addon/src/ui/year-view/year-view.html?dummy=1`.
 Or use the commented out code in main.js.
 
 ### Build standalone html
@@ -106,7 +122,7 @@ Or use the commented out code in main.js.
 Work wihtout Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
 
 1. Install `Live Server (Five Server)` extension in Visual Studio Code.
-2. Right click `/src/ui/year-view/year-view.html` and select `Open with Live Server`.
+2. Right click `/apps/thunderbird-addon/src/ui/year-view/year-view.html` and select `Open with Live Server`.
 3. Add `?dummy=1` to the URL to load the built-in sample calendars and events.
 
 ### Run in Thunderbird
@@ -123,7 +139,7 @@ The repository ships with custom Git hooks in `.githooks/`. To enable them, run 
 git config core.hooksPath .githooks
 ```
 
-- **`pre-commit`** — Checks that the submodule has no unpulled commits and that `experiments/` is in sync with `submodules/calendar/experiments/calendar/`. If they differ, run `just sync-experiments` to sync them before committing.
+- **`pre-commit`** — Checks that the submodule has no unpulled commits and that `apps/thunderbird-addon/experiments/` is in sync with `submodules/calendar/experiments/calendar/`. If they differ, run `just sync-experiments` to sync them before committing.
 
 #### Just Commands
 
@@ -131,13 +147,13 @@ git config core.hooksPath .githooks
 
 | Command | Description |
 |---------|-------------|
-| `just sync-experiments` | Copies experiment APIs from `submodules/calendar/experiments/calendar/` to `experiments/` for development |
+| `just sync-experiments` | Copies experiment APIs from `submodules/calendar/experiments/calendar/` to `apps/thunderbird-addon/experiments/` for development |
 | `just build-xpi` | Builds the `.xpi` release package into `dist/` |
 | `just tag` | Creates a Git tag from the version in `manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |
 
 #### Syncing the Experiment Submodule
 
-The experimental calendar APIs live in `submodules/calendar/experiments/calendar/` (a Git submodule). For the add-on to work, they must also be present at `experiments/calendar/`. To sync manually:
+The experimental calendar APIs live in `submodules/calendar/experiments/calendar/` (a Git submodule). For the add-on to work, they must also be present at `apps/thunderbird-addon/experiments/calendar/`. To sync manually:
 
 ```bash
 just sync-experiments
@@ -159,8 +175,8 @@ The tag needs to be pushed to the remote repo seperatly. The GitHub Actions work
 To create an `.xpi` file manually:
 
 1. Clone or download the repository.
-2. Stage the package layout so `submodules/calendar/experiments/calendar/` is also available as `experiments/calendar/` at the archive root.
-3. Zip the staged contents (excluding the `.git` folder).
+2. Stage the package layout with `manifest.json`, `apps/`, and `packages/` at the archive root.
+3. Zip the staged contents (excluding the `.git` folder), for example with `just build-xpi`.
 4. Rename the zip file extension to `.xpi`.
 
 ### Releasing a New Version

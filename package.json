@@ -1,0 +1,12 @@
+{
+  "name": "thunderbird-annual-view-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "build:xpi": "just build-xpi"
+  }
+}

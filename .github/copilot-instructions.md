@@ -6,11 +6,11 @@ This is a Thunderbird WebExtension add-on that provides an annual calendar view 
 
 ## Project Structure
 
-- `manifest.json` - WebExtension manifest (v3) with experimental APIs
-- `src/background/` - Background scripts for handling extension actions
-- `src/ui/year-view/` - UI components for the annual view
-- `experiments/calendar/` - Experimental calendar APIs for Thunderbird integration
-- `icons/` - SVG icons for light and dark themes
+- `manifest.json` - WebExtension manifest (v3) at repository root
+- `apps/thunderbird-addon/src/background/` - Background scripts for handling extension actions
+- `apps/thunderbird-addon/src/ui/year-view/` - UI components for the annual view
+- `apps/thunderbird-addon/experiments/calendar/` - Experimental calendar APIs for Thunderbird integration
+- `apps/thunderbird-addon/icons/` - SVG icons for light and dark themes
 - `media/` - Screenshots and documentation assets
 
 ## Technology Stack
@@ -35,9 +35,9 @@ This is a Thunderbird WebExtension add-on that provides an annual calendar view 
 
 ### File Organization
 - Keep related functionality together in single files
-- Background scripts in `src/background/`
-- UI components in `src/ui/`
-- Experimental APIs in `experiments/calendar/`
+- Background scripts in `apps/thunderbird-addon/src/background/`
+- UI components in `apps/thunderbird-addon/src/ui/`
+- Experimental APIs in `apps/thunderbird-addon/experiments/calendar/`
 
 ### Comments
 - Add comments to explain complex logic or Thunderbird-specific behavior
@@ -50,7 +50,7 @@ This is a Thunderbird WebExtension add-on that provides an annual calendar view 
 ### Creating XPI Package
 The project uses a manual zip-based build process:
 ```bash
-zip -r calendar-annual-view.xpi manifest.json src experiments icons
+zip -r calendar-annual-view.xpi manifest.json apps packages
 ```
 
 ### Testing in Thunderbird
@@ -101,12 +101,12 @@ This project currently has no automated test suite. Manual testing in Thunderbir
 6. Create git tag for release
 
 ### Modifying Calendar Behavior
-- Calendar data access: `experiments/calendar/parent/ext-calendar-*.js`
-- UI rendering: `src/ui/year-view/`
-- Storage/settings: `src/ui/year-view/storage.js`
+- Calendar data access: `apps/thunderbird-addon/experiments/calendar/parent/ext-calendar-*.js`
+- UI rendering: `apps/thunderbird-addon/src/ui/year-view/`
+- Storage/settings: `apps/thunderbird-addon/src/ui/year-view/storage.js`
 
 ### Styling Changes
-- Main styles: `src/ui/year-view/year-view.css`
+- Main styles: `apps/thunderbird-addon/src/ui/year-view/year-view.css`
 - Support both light and dark themes
 - Use CSS variables for theme-dependent colors
 - Test in both theme modes

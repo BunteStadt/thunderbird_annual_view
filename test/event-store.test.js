@@ -6,7 +6,7 @@ const path = require('node:path');
 // event-store.js imports calendar-service.js and date-utils.js with relative
 // specifiers, so load it via a file URL to keep module resolution intact.
 async function loadEventStoreModule() {
-    const modulePath = path.resolve(__dirname, '../src/ui/year-view/event-store.js');
+    const modulePath = path.resolve(__dirname, '../apps/thunderbird-addon/src/ui/year-view/event-store.js');
     await fs.access(modulePath);
     return import(`file://${modulePath.replace(/\\/g, '/')}`);
 }

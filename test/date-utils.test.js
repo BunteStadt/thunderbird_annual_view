@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 
 async function loadDateUtilsModule() {
-    const modulePath = path.resolve(__dirname, '../src/ui/year-view/date-utils.js');
+    const modulePath = path.resolve(__dirname, '../apps/thunderbird-addon/src/ui/year-view/date-utils.js');
     const source = await fs.readFile(modulePath, 'utf8');
     const moduleUrl = `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`;
     return import(moduleUrl);

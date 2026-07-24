@@ -1,5 +1,5 @@
 // Keep the annual view easy to reach by reusing a single tab.
-const yearViewUrl = browser.runtime.getURL("src/ui/year-view/year-view.html");
+const yearViewUrl = browser.runtime.getURL("apps/thunderbird-addon/src/ui/year-view/year-view.html");
 
 browser.action.onClicked.addListener(() => {
     createCustomSpace().catch(console.error);
@@ -18,8 +18,8 @@ async function createCustomSpace() {
         {
 
             "defaultIcons": {
-                "16": "icons/annual_view_prefers-color.svg",
-                "32": "icons/annual_view_prefers-color.svg"
+                "16": "apps/thunderbird-addon/icons/annual_view_prefers-color.svg",
+                "32": "apps/thunderbird-addon/icons/annual_view_prefers-color.svg"
             }
         }
 

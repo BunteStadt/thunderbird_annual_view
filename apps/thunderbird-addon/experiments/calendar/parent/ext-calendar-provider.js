@@ -549,11 +549,11 @@ this.calendar_provider = class extends ExtensionAPI {
       .setSubstitution(root, this.extension.rootURI);
 
     const { setupE10sBrowser, unwrapCalendar } = ChromeUtils.importESModule(
-      `resource://${root}/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
+      `resource://${root}/apps/thunderbird-addon/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
     );
 
     ChromeUtils.registerWindowActor(`CalendarProvider-${uuid}`, { child: { esModuleURI:
-      `resource://${root}/experiments/calendar/child/ext-calendar-provider-actor.sys.mjs?${query}`
+      `resource://${root}/apps/thunderbird-addon/experiments/calendar/child/ext-calendar-provider-actor.sys.mjs?${query}`
     }});
 
     ExtensionSupport.registerWindowListener("ext-calendar-provider-properties-" + this.extension.id, {
@@ -720,7 +720,7 @@ this.calendar_provider = class extends ExtensionAPI {
       convertItem,
       convertCalendar,
     } = ChromeUtils.importESModule(
-      `resource://${root}/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
+      `resource://${root}/apps/thunderbird-addon/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
     );
 
     return {

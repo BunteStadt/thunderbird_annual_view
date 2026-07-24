@@ -4,7 +4,7 @@
 #
 # Checks:
 # 1. Whether the submodule has unpulled commits — warns and prompts to abort
-# 2. Whether experiments/ is in sync with submodules/calendar/experiments/calendar/
+# 2. Whether apps/thunderbird-addon/experiments/ is in sync with submodules/calendar/experiments/calendar/
 #    — if not, prompts to run 'just sync-experiments'
 #
 # Install: run `git config core.hooksPath .githooks` once, or copy to .git/hooks/  dfs
@@ -13,7 +13,7 @@ set -e
 
 SUBMODULE_PATH="submodules"
 EXPERIMENTS_SRC="$SUBMODULE_PATH/calendar/experiments/calendar"
-EXPERIMENTS_DST="experiments/calendar"
+EXPERIMENTS_DST="apps/thunderbird-addon/experiments/calendar"
 
 # ---- Step 1: Check for unpulled submodule commits ----
 echo "🔍 Checking submodule for unpulled commits..."
@@ -34,7 +34,7 @@ else
     echo "✅ Submodule is up to date."
 fi
 
-echo "🔍 Checking if experiments/ matches the submodule..."
+echo "🔍 Checking if apps/thunderbird-addon/experiments/ matches the submodule..."
 echo "   Source: $EXPERIMENTS_SRC"
 echo "   Target: $EXPERIMENTS_DST"
 
@@ -49,7 +49,7 @@ else
     if [ -n "$DIFF_OUTPUT" ]; then
         echo ""
         echo "⚠️  ╔══════════════════════════════════════════════════════════════╗"
-        echo "⚠️  ║  experiments/ is OUT OF SYNC with the submodule!             ║"
+        echo "⚠️  ║  add-on experiments are OUT OF SYNC with the submodule!      ║"
         echo "⚠️  ╚══════════════════════════════════════════════════════════════╝"
         echo ""
         echo "$DIFF_OUTPUT" | head -30
@@ -58,7 +58,7 @@ else
         echo ""
         exit 1
     else
-        echo "✅ experiments/ is in sync with the submodule."
+        echo "✅ add-on experiments are in sync with the submodule."
     fi
 fi
 

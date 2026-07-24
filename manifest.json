@@ -16,29 +16,29 @@
     ],
     "background": {
         "scripts": [
-            "src/background/background.js"
+            "apps/thunderbird-addon/src/background/background.js"
         ]
     },
     "icons": {
-        "16": "icons/annual_view_prefers-color.svg",
-        "32": "icons/annual_view_prefers-color.svg"
+        "16": "apps/thunderbird-addon/icons/annual_view_prefers-color.svg",
+        "32": "apps/thunderbird-addon/icons/annual_view_prefers-color.svg"
     },
     "action": {
         "allowed_spaces": [],
         "default_title": "Open Annual View",
         "default_icon": {
-            "16": "icons/annual_view_prefers-color.svg",
-            "32": "icons/annual_view_prefers-color.svg"
+            "16": "apps/thunderbird-addon/icons/annual_view_prefers-color.svg",
+            "32": "apps/thunderbird-addon/icons/annual_view_prefers-color.svg"
         }
     },
     "experiment_apis": {
         "calendar_calendars": {
-            "schema": "experiments/calendar/schema/calendar-calendars.json",
+            "schema": "apps/thunderbird-addon/experiments/calendar/schema/calendar-calendars.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "experiments/calendar/parent/ext-calendar-calendars.js",
+                "script": "apps/thunderbird-addon/experiments/calendar/parent/ext-calendar-calendars.js",
                 "paths": [
                     [
                         "calendar",
@@ -48,12 +48,12 @@
             }
         },
         "calendar_items": {
-            "schema": "experiments/calendar/schema/calendar-items.json",
+            "schema": "apps/thunderbird-addon/experiments/calendar/schema/calendar-items.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "experiments/calendar/parent/ext-calendar-items.js",
+                "script": "apps/thunderbird-addon/experiments/calendar/parent/ext-calendar-items.js",
                 "paths": [
                     [
                         "calendar",
@@ -63,12 +63,12 @@
             }
         },
         "calendar_provider": {
-            "schema": "experiments/calendar/schema/calendar-provider.json",
+            "schema": "apps/thunderbird-addon/experiments/calendar/schema/calendar-provider.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "experiments/calendar/parent/ext-calendar-provider.js",
+                "script": "apps/thunderbird-addon/experiments/calendar/parent/ext-calendar-provider.js",
                 "events": [
                     "startup"
                 ],
@@ -81,12 +81,12 @@
             }
         },
         "calendar_timezones": {
-            "schema": "experiments/calendar/schema/calendar-timezones.json",
+            "schema": "apps/thunderbird-addon/experiments/calendar/schema/calendar-timezones.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "experiments/calendar/parent/ext-calendar-timezones.js",
+                "script": "apps/thunderbird-addon/experiments/calendar/parent/ext-calendar-timezones.js",
                 "paths": [
                     [
                         "calendar",
@@ -98,7 +98,7 @@
                 "scopes": [
                     "addon_child"
                 ],
-                "script": "experiments/calendar/child/ext-calendar-timezones.js",
+                "script": "apps/thunderbird-addon/experiments/calendar/child/ext-calendar-timezones.js",
                 "paths": [
                     [
                         "calendar",
@@ -108,12 +108,12 @@
             }
         },
         "calendarItemAction": {
-            "schema": "experiments/calendar/schema/calendarItemAction.json",
+            "schema": "apps/thunderbird-addon/experiments/calendar/schema/calendarItemAction.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "experiments/calendar/parent/ext-calendarItemAction.js",
+                "script": "apps/thunderbird-addon/experiments/calendar/parent/ext-calendarItemAction.js",
                 "events": [
                     "startup"
                 ],
@@ -125,12 +125,12 @@
             }
         },
         "calendarItemDetails": {
-            "schema": "experiments/calendar/schema/calendarItemDetails.json",
+            "schema": "apps/thunderbird-addon/experiments/calendar/schema/calendarItemDetails.json",
             "parent": {
                 "scopes": [
                     "addon_parent"
                 ],
-                "script": "experiments/calendar/parent/ext-calendarItemDetails.js",
+                "script": "apps/thunderbird-addon/experiments/calendar/parent/ext-calendarItemDetails.js",
                 "events": [
                     "startup"
                 ],

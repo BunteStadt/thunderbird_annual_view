@@ -51,19 +51,13 @@ test('addon package can be built and validated as a zip archive', (t) => {
         fs.rmSync(tempDir, { recursive: true, force: true });
     });
 
-    fs.mkdirSync(path.join(packageDir, 'experiments', 'calendar'), { recursive: true });
-    for (const entry of ['manifest.json', 'src', 'submodules', 'icons']) {
+    for (const entry of ['manifest.json', 'apps', 'packages']) {
         fs.cpSync(path.join(repoRoot, entry), path.join(packageDir, entry), { recursive: true });
     }
-    fs.cpSync(
-        path.join(repoRoot, 'submodules', 'calendar', 'experiments', 'calendar'),
-        path.join(packageDir, 'experiments', 'calendar'),
-        { recursive: true }
-    );
 
     const build = spawnSync(
         'zip',
-        ['-r', xpiPath, 'manifest.json', 'src', 'submodules', 'icons', 'experiments'],
+        ['-r', xpiPath, 'manifest.json', 'apps', 'packages'],
         { cwd: packageDir, encoding: 'utf8' }
     );
     assert.equal(build.status, 0, `zip command failed: ${build.stderr || build.stdout}`);
@@ -75,7 +69,7 @@ test('addon package can be built and validated as a zip archive', (t) => {
     const list = spawnSync('unzip', ['-l', xpiPath], { encoding: 'utf8' });
     assert.equal(list.status, 0, `Unable to list archive entries: ${list.stderr || list.stdout}`);
     assert.match(list.stdout, /manifest\.json/);
-    assert.match(list.stdout, /src\/background\/background\.js/);
-    assert.match(list.stdout, /src\/ui\/year-view\/year-view\.html/);
-    assert.match(list.stdout, /experiments\/calendar\/ext-calendar-utils\.sys\.mjs/);
+    assert.match(list.stdout, /apps\/thunderbird-addon\/src\/background\/background\.js/);
+    assert.match(list.stdout, /apps\/thunderbird-addon\/src\/ui\/year-view\/year-view\.html/);
+    assert.match(list.stdout, /apps\/thunderbird-addon\/experiments\/calendar\/ext-calendar-utils\.sys\.mjs/);
 });

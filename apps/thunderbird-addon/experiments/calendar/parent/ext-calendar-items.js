@@ -22,7 +22,7 @@ this.calendar_items = class extends ExtensionAPI {
       convertItem,
       convertAlarm,
     } = ChromeUtils.importESModule(
-      `resource://${root}/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
+      `resource://${root}/apps/thunderbird-addon/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
     );
 
     return {

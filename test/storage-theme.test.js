@@ -33,7 +33,7 @@ test('storage module load/persist helpers use browser.storage.local correctly', 
         delete globalThis.browser;
     });
 
-    const storage = await loadModule('src/ui/year-view/storage.js');
+    const storage = await loadModule('apps/thunderbird-addon/src/ui/year-view/storage.js');
 
     const initialSelection = await storage.loadPersistedSelection();
     assert.equal(initialSelection.found, false);
@@ -144,7 +144,7 @@ test('theme module applies dark class and detects system mode', async (t) => {
         delete globalThis.window;
     });
 
-    const theme = await loadModule('src/ui/year-view/theme.js');
+    const theme = await loadModule('apps/thunderbird-addon/src/ui/year-view/theme.js');
 
     theme.applyTheme('dark');
     assert.equal(classSet.has('theme-dark'), true);

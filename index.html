@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendar Annual View for Thunderbird</title>
+    <link rel="icon" type="image/svg+xml" href="./icons/annual_view_prefers-color.svg" />
+    <link rel="shortcut icon" type="image/jpeg" href="./icons/crop.jpg" />
     <style>
       :root {
         color-scheme: light dark;
@@ -78,6 +80,12 @@
         font-weight: 700;
         font-size: 13px;
         letter-spacing: 0.02em;
+      }
+
+      .eyebrow-icon {
+        width: 14px;
+        height: 14px;
+        display: block;
       }
 
       h1 {
@@ -381,7 +389,10 @@
       <div class="bg-orb bg-orb-2" aria-hidden="true"></div>
       <section class="hero">
         <div class="hero-card">
-          <span class="eyebrow">Thunderbird Add-on</span>
+          <span class="eyebrow">
+            <img class="eyebrow-icon" src="./icons/annual_view_prefers-color.svg" alt="" aria-hidden="true" />
+            Thunderbird Add-on
+          </span>
           <h1>Calendar Annual View</h1>
           <p class="lead">
             See your complete year at a glance with compact layouts, calendar filters, and theme-aware styling built for Thunderbird.

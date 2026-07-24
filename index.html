@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendar Annual View for Thunderbird</title>
+    <link rel="icon" type="image/svg+xml" href="./icons/annual_view_prefers-color.svg" />
+    <link rel="shortcut icon" type="image/jpeg" href="./icons/crop.jpg" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f4f6ff;
+        --panel: #ffffff;
+        --text: #1c2240;
+        --muted: #5e6482;
+        --primary: #5b6dff;
+        --primary-strong: #4458ff;
+        --border: #dfe4ff;
+        --shadow: 0 20px 40px rgba(55, 75, 190, 0.15);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #10142a;
+          --panel: #151b35;
+          --text: #eff2ff;
+          --muted: #b1b8df;
+          --primary: #7f8cff;
+          --primary-strong: #9aa4ff;
+          --border: #28305d;
+          --shadow: 0 24px 44px rgba(5, 7, 20, 0.45);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+        background: radial-gradient(circle at 20% -10%, #8fa0ff 0%, transparent 50%), var(--bg);
+        color: var(--text);
+        line-height: 1.45;
+        overflow-x: hidden;
+      }
+
+      .page {
+        position: relative;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: clamp(24px, 5vw, 64px) clamp(16px, 4vw, 40px) clamp(40px, 7vw, 100px);
+      }
+
+      .hero {
+        display: grid;
+        gap: clamp(18px, 3vw, 34px);
+        align-items: center;
+        grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr);
+      }
+
+      .hero-card {
+        position: relative;
+        z-index: 2;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: clamp(20px, 4vw, 34px);
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--primary) 16%, transparent);
+        color: var(--primary-strong);
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.02em;
+      }
+
+      .eyebrow-icon {
+        width: 14px;
+        height: 14px;
+        display: block;
+      }
+
+      h1 {
+        margin: 16px 0 12px;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1.1;
+      }
+
+      .lead {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        padding: 12px 18px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 180ms ease;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-strong);
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        border-color: var(--border);
+        color: var(--text);
+      }
+
+      .btn-secondary:hover {
+        background: color-mix(in srgb, var(--primary) 10%, transparent);
+        transform: translateY(-1px);
+      }
+
+      .hero-image {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        display: block;
+        box-shadow: var(--shadow);
+      }
+
+      .grid {
+        position: relative;
+        z-index: 2;
+        margin-top: clamp(20px, 3vw, 34px);
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .feature {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        transition: transform 200ms ease, box-shadow 200ms ease;
+      }
+
+      .feature:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+      }
+
+      .feature h2 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+      }
+
+      .feature p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .section-title {
+        position: relative;
+        z-index: 2;
+        margin: clamp(30px, 4.5vw, 52px) 0 12px;
+        font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+      }
+
+      .gallery {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .shot {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .shot:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+      }
+
+      .shot img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+      }
+
+      .shot span {
+        display: block;
+        padding: 10px 12px;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      .demo-shell {
+        position: relative;
+        z-index: 2;
+        margin-top: 14px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: clamp(10px, 1.8vw, 14px);
+        box-shadow: var(--shadow);
+      }
+
+      .demo-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .demo-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .demo-frame-wrap {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        min-height: 420px;
+        background: #0e1328;
+      }
+
+      .demo-frame {
+        width: 100%;
+        height: clamp(420px, 72vh, 860px);
+        border: 0;
+        background: transparent;
+      }
+
+      .bg-orb {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(6px);
+        pointer-events: none;
+        opacity: 0.5;
+        z-index: 1;
+        animation: drift 16s ease-in-out infinite;
+      }
+
+      .bg-orb-1 {
+        width: 240px;
+        height: 240px;
+        top: 5%;
+        right: -70px;
+        background: radial-gradient(circle, color-mix(in srgb, var(--primary) 50%, #fff), transparent 70%);
+      }
+
+      .bg-orb-2 {
+        width: 180px;
+        height: 180px;
+        bottom: 4%;
+        left: -60px;
+        background: radial-gradient(circle, color-mix(in srgb, var(--primary-strong) 45%, #fff), transparent 72%);
+        animation-delay: -4s;
+      }
+
+      @keyframes drift {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+          transform: translate3d(-10px, -12px, 0) scale(1.06);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-image {
+          max-width: 720px;
+          justify-self: center;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .bg-orb {
+          opacity: 0.35;
+        }
+
+        .demo-frame-wrap {
+          min-height: 360px;
+        }
+
+        .demo-frame {
+          height: 70vh;
+        }
+      }
+
+      @media (min-width: 1700px) {
+        .page {
+          max-width: 1600px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="bg-orb bg-orb-1" aria-hidden="true"></div>
+      <div class="bg-orb bg-orb-2" aria-hidden="true"></div>
+      <section class="hero">
+        <div class="hero-card">
+          <span class="eyebrow">
+            <img class="eyebrow-icon" src="./icons/annual_view_prefers-color.svg" alt="" aria-hidden="true" />
+            Thunderbird Add-on
+          </span>
+          <h1>Calendar Annual View</h1>
+          <p class="lead">
+            See your complete year at a glance with compact layouts, calendar filters, and theme-aware styling built for Thunderbird.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="./src/ui/year-view/year-view.html?dummy=1" target="_blank" rel="noopener noreferrer">Open Dummy Demo</a>
+            <a class="btn btn-secondary" href="https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/" target="_blank" rel="noopener noreferrer">Install Add-on</a>
+            <a class="btn btn-secondary" href="https://github.com/BunteStadt/thunderbird_annual_view" target="_blank" rel="noopener noreferrer">Source Code</a>
+          </div>
+        </div>
+        <img class="hero-image" src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Calendar Annual View screenshot" />
+      </section>
+
+      <section class="grid" aria-label="Feature highlights">
+        <article class="feature">
+          <h2>Full-Year Calendar in Thunderbird</h2>
+          <p>Get a true annual calendar overview in Thunderbird, then scroll naturally into past or future years.</p>
+        </article>
+        <article class="feature">
+          <h2>Three Practical Year View Modes</h2>
+          <p>Switch between compact, day-aligned, and 4-week structures to match scheduling, vacation, or project planning.</p>
+        </article>
+        <article class="feature">
+          <h2>Calendar Filters That Save Time</h2>
+          <p>Filter by calendar, all-day behavior, and event duration so important appointments stand out fast.</p>
+        </article>
+        <article class="feature">
+          <h2>Readable in Light and Dark Themes</h2>
+          <p>Enjoy a clean, high-contrast Thunderbird add-on interface that keeps calendar colors easy to scan.</p>
+        </article>
+      </section>
+
+      <h2 class="section-title">Three views in light and dark mode</h2>
+      <section class="gallery" aria-label="Screenshot gallery">
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Compact linear view screenshot" />
+          <span>Compact linear layout (light mode)</span>
+        </a>
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-dark.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-dark.png" alt="Compact linear view dark mode screenshot" />
+          <span>Compact linear layout (dark mode)</span>
+        </a>
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png" alt="Day-aligned view screenshot" />
+          <span>Day-aligned layout (light mode)</span>
+        </a>
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-dark.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-dark.png" alt="Day-aligned view dark mode screenshot" />
+          <span>Day-aligned layout (dark mode)</span>
+        </a>
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png" alt="4-week view screenshot" />
+          <span>4-week layout (light mode)</span>
+        </a>
+        <a class="shot" href="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-dark.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-dark.png" alt="4-week view dark mode screenshot" />
+          <span>4-week layout (dark mode)</span>
+        </a>
+      </section>
+
+      <h2 class="section-title">Try it right here</h2>
+      <section class="demo-shell" aria-label="Interactive dummy demo">
+        <div class="demo-header">
+          <p>Interactive demo using dummy data. Scroll, change year, and switch modes directly in this page.</p>
+          <a class="btn btn-primary" href="./src/ui/year-view/year-view.html?dummy=1" target="_blank" rel="noopener noreferrer">Open Full Screen Demo</a>
+        </div>
+        <div class="demo-frame-wrap">
+          <iframe
+            class="demo-frame"
+            src="./src/ui/year-view/year-view.html?dummy=1"
+            title="Interactive Calendar Annual View demo"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

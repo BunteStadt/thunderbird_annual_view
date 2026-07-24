@@ -38,7 +38,7 @@ jobs:
           cp -R submodules/calendar/experiments/calendar/. dist/package/experiments/calendar/
           cd dist/package
           zip -r ../calendar-annual-view.xpi \
-            manifest.json src icons submodules experiments
+            manifest.json src icons experiments
           echo "xpi-path=dist/calendar-annual-view.xpi" >> "$GITHUB_OUTPUT"
 
       - name: Upload XPI artifact

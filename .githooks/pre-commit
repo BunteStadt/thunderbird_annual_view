@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+#
+# Pre-commit hook for thunderbird_annual_view
+#
+# Checks:
+# 1. Whether the submodule has unpulled commits — warns and prompts to abort
+# 2. Whether experiments/ is in sync with submodules/calendar/experiments/calendar/
+#    — if not, prompts to run 'just sync-experiments'
+#
+# Install: run `git config core.hooksPath .githooks` once, or copy to .git/hooks/  dfs
+
+set -e
+
+SUBMODULE_PATH="submodules"
+EXPERIMENTS_SRC="$SUBMODULE_PATH/calendar/experiments/calendar"
+EXPERIMENTS_DST="experiments/calendar"
+
+# ---- Step 1: Check for unpulled submodule commits ----
+echo "🔍 Checking submodule for unpulled commits..."
+
+UNPULLED=$(git -C "$SUBMODULE_PATH" rev-list HEAD..origin/main --count 2>/dev/null || echo "0")
+
+if [ "$UNPULLED" -gt 0 ] 2>/dev/null; then
+    echo ""
+    echo "⚠️  ╔══════════════════════════════════════════════════════════════╗"
+    echo "⚠️  ║  The submodule has $UNPULLED unpulled commit(s)!             ║"
+    echo "⚠️  ╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    git -C "$SUBMODULE_PATH" log --oneline --no-decorate HEAD..origin/main
+    exit 1
+
+# ---- Step 2: Check if experiments/ is in sync with submodule ----
+else
+    echo "✅ Submodule is up to date."
+fi
+
+echo "🔍 Checking if experiments/ matches the submodule..."
+echo "   Source: $EXPERIMENTS_SRC"
+echo "   Target: $EXPERIMENTS_DST"
+
+# Check if the directories exist first
+if [ ! -d "$EXPERIMENTS_SRC" ] || [ ! -d "$EXPERIMENTS_DST" ]; then
+    echo "⚠️  One of the experiment directories is missing!"
+    exit 1
+else
+    # Check for files that differ or are missing
+    DIFF_OUTPUT=$(diff -rq "$EXPERIMENTS_SRC" "$EXPERIMENTS_DST" 2>/dev/null || true)
+
+    if [ -n "$DIFF_OUTPUT" ]; then
+        echo ""
+        echo "⚠️  ╔══════════════════════════════════════════════════════════════╗"
+        echo "⚠️  ║  experiments/ is OUT OF SYNC with the submodule!             ║"
+        echo "⚠️  ╚══════════════════════════════════════════════════════════════╝"
+        echo ""
+        echo "$DIFF_OUTPUT" | head -30
+        echo ""
+        echo "💡 Run 'just sync-experiments' to sync them."
+        echo ""
+        exit 1
+    else
+        echo "✅ experiments/ is in sync with the submodule."
+    fi
+fi
+
+echo ""
+echo "✅ All pre-commit checks passed. Proceeding with commit."
+exit 0

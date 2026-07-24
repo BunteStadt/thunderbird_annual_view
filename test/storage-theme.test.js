@@ -98,6 +98,17 @@ test('storage module load/persist helpers use browser.storage.local correctly', 
     const persistedWeekNumbers = await storage.loadWeekNumbersPreference();
     assert.equal(persistedWeekNumbers, false);
 
+    const initialViewMode = await storage.loadViewMode();
+    assert.equal(initialViewMode, 'linear');
+
+    await storage.persistViewMode('two-week-rows');
+    const persistedTwoWeekViewMode = await storage.loadViewMode();
+    assert.equal(persistedTwoWeekViewMode, 'two-week-rows');
+
+    await storage.persistViewMode('one-week-rows');
+    const persistedOneWeekViewMode = await storage.loadViewMode();
+    assert.equal(persistedOneWeekViewMode, 'one-week-rows');
+
     const initialTheme = await storage.loadThemePreference();
     assert.equal(initialTheme, 'auto');
 

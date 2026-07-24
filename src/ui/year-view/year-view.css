@@ -547,6 +547,14 @@ input[type="number"] {
   grid-template-columns: repeat(28, minmax(0, 1fr));
 }
 
+.grid-row.two-week-rows {
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+}
+
+.grid-row.one-week-rows {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
 /* Sticky weekday header shared by all rows */
 .grid-header {
   position: sticky;
@@ -569,6 +577,14 @@ input[type="number"] {
 
 .grid-header.week-rows {
   grid-template-columns: repeat(28, minmax(0, 1fr));
+}
+
+.grid-header.two-week-rows {
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+}
+
+.grid-header.one-week-rows {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .weekday-header {
@@ -604,6 +620,14 @@ input[type="number"] {
 
 .row-events.week-rows {
   grid-template-columns: repeat(28, minmax(0, 1fr));
+}
+
+.row-events.two-week-rows {
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+}
+
+.row-events.one-week-rows {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .cell {

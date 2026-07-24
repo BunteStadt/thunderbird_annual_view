@@ -24,6 +24,7 @@
             <option value="week-rows">4-week</option>
           </select>
         </label>
+        <button id="durationFilterToggle" class="btn" data-size="compact" type="button" aria-pressed="true" title="Enable or disable duration and all-day filtering">⏱ Duration filter: On</button>
         <div id="selectedSummary" class="selected-summary" aria-live="polite"></div>
         <button id="refreshButton" class="btn" data-size="compact" type="button" title="Refresh calendar data">⟳ Refresh</button>
         <button id="themeToggle" class="btn" data-size="compact" type="button">Toggle theme</button>
@@ -51,6 +52,7 @@
           </label>
           <div class="separator"></div>
           <!-- Calendar options -->
+          <div id="durationFiltersNotice" class="duration-filters-notice" hidden>Duration filter is off. All-day and duration options below are inactive.</div>
           <label for="allDayOnly" class="btn cal-chip-toggle" data-size="compact">
             <input id="allDayOnly" type="checkbox" />
             <span class="chip-indicator" aria-hidden="true"></span>

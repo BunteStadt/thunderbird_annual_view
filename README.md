@@ -75,6 +75,7 @@ Access the add-on options through Thunderbird's Add-ons Manager:
 
 - **Calendars**: Select which calendars to include in the annual view.
 - **Duration Filter**: Set a minimum event duration (in hours) to display.
+- **Duration Filter Toggle (Header)**: Quickly enable or disable duration/all-day filtering without changing calendar selection. When off, all events from selected calendars are shown and the overridden sidebar controls are visibly marked inactive.
 - **All-Day Events Only**: Toggle to show only full-day events.
 - **Per-Calendar All-Day Mode**: Use the per-calendar symbol to force all-day-only on, off, or follow the global setting.
 - **Per-Calendar Duration Override**: Set a calendar-specific minimum duration, or `-1` to follow the global duration filter.

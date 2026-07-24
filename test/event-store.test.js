@@ -47,6 +47,24 @@ test('EventStore caches years and applies filters without refetching', async (t)
     });
     assert.ok(longOnly.stats.filteredOut > 0);
     assert.equal(longOnly.stats.total, stats.total);
+
+    // When UI-level duration filtering is off, both all-day and duration filters
+    // are bypassed by passing neutral values.
+    const strict = await store.getFilteredEvents(2026, 2026, {
+        ...filters,
+        allDayOnly: true,
+        getMinDurationMs: () => 999 * 24 * 60 * 60 * 1000
+    });
+    assert.ok(strict.events.length < events.length);
+
+    const bypassed = await store.getFilteredEvents(2026, 2026, {
+        ...filters,
+        allDayOnly: false,
+        calendarAllDayModes: {},
+        getMinDurationMs: () => 0
+    });
+    assert.equal(bypassed.events.length, events.length);
+    assert.equal(bypassed.stats.filteredOut, 0);
 });
 
 test('EventStore deduplicates events that span a year boundary', async (t) => {

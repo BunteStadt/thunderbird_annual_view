@@ -58,6 +58,8 @@ const showWeekNumbersInput = document.getElementById("showWeekNumbers");
 const minDurationInput = document.getElementById("minDurationHours");
 const minDurationDownBtn = document.getElementById("minDurationDown");
 const minDurationUpBtn = document.getElementById("minDurationUp");
+const durationFilterToggleBtn = document.getElementById("durationFilterToggle");
+const durationFiltersNotice = document.getElementById("durationFiltersNotice");
 const selectAllBtn = document.getElementById("selectAllCals");
 const deselectAllBtn = document.getElementById("deselectAllCals");
 const toggleCalendarsBtn = document.getElementById("toggleCalendars");
@@ -85,6 +87,7 @@ let selectedCalendarIds = new Set();
 let calendarAllDayModes = {};
 let calendarMinDurationHours = {};
 let allDayOnlyEnabled = false;
+let durationFilteringEnabled = true;
 let currentYear = new Date().getFullYear();
 let lastFilterStats = { filteredOut: 0, total: 0 };
 let themeMode = "auto";
@@ -164,17 +167,69 @@ function getGlobalMinDurationHours() {
 }
 
 function getEffectiveMinDurationMs(calendarId) {
+    if (!durationFilteringEnabled) {
+        return 0;
+    }
     const overrideHours = getCalendarMinDurationHours(calendarId);
     const effectiveHours = overrideHours >= 0 ? overrideHours : getGlobalMinDurationHours();
     return effectiveHours > 0 ? effectiveHours * 60 * 60 * 1000 : 0;
 }
 
+function updateDurationFilterToggleLabel() {
+    if (!durationFilterToggleBtn) return;
+    const stateLabel = durationFilteringEnabled ? "On" : "Off";
+    durationFilterToggleBtn.textContent = `⏱ Duration filter: ${stateLabel}`;
+    durationFilterToggleBtn.setAttribute("aria-pressed", String(durationFilteringEnabled));
+    durationFilterToggleBtn.title = durationFilteringEnabled
+        ? "Disable duration and all-day filtering"
+        : "Enable duration and all-day filtering";
+}
+
+function updateDurationFilterControlsState() {
+    const filtersInactive = !durationFilteringEnabled;
+    durationFiltersNotice?.toggleAttribute("hidden", !filtersInactive);
+
+    const globalDurationControl = minDurationInput?.closest(".cal-chip");
+    const globalAllDayControl = allDayOnlyInput?.closest(".cal-chip-toggle");
+
+    if (globalDurationControl) {
+        globalDurationControl.classList.toggle("filter-overridden", filtersInactive);
+        globalDurationControl.setAttribute("aria-disabled", String(filtersInactive));
+    }
+    if (globalAllDayControl) {
+        globalAllDayControl.classList.toggle("filter-overridden", filtersInactive);
+        globalAllDayControl.setAttribute("aria-disabled", String(filtersInactive));
+    }
+
+    if (allDayOnlyInput) allDayOnlyInput.disabled = filtersInactive;
+    if (minDurationInput) minDurationInput.disabled = filtersInactive;
+    if (minDurationDownBtn) minDurationDownBtn.disabled = filtersInactive;
+    if (minDurationUpBtn) minDurationUpBtn.disabled = filtersInactive;
+
+    calendarList?.classList.toggle("duration-filters-inactive", filtersInactive);
+    calendarList?.querySelectorAll(".calendar-mode-toggle").forEach((button) => {
+        button.disabled = filtersInactive;
+        button.classList.toggle("filter-overridden", filtersInactive);
+    });
+    calendarList?.querySelectorAll(".calendar-duration-control").forEach((control) => {
+        control.classList.toggle("filter-overridden", filtersInactive);
+        control.setAttribute("aria-disabled", String(filtersInactive));
+    });
+    calendarList?.querySelectorAll(".calendar-duration-input").forEach((input) => {
+        input.disabled = filtersInactive;
+    });
+    calendarList?.querySelectorAll(".calendar-duration-step").forEach((button) => {
+        button.disabled = filtersInactive;
+    });
+}
+
 function getFilters() {
+    const durationFiltersActive = durationFilteringEnabled;
     return {
         calendarIds: Array.from(selectedCalendarIds),
-        allDayOnly: allDayOnlyEnabled,
-        calendarAllDayModes,
-        getMinDurationMs: getEffectiveMinDurationMs
+        allDayOnly: durationFiltersActive ? allDayOnlyEnabled : false,
+        calendarAllDayModes: durationFiltersActive ? calendarAllDayModes : {},
+        getMinDurationMs: durationFiltersActive ? getEffectiveMinDurationMs : () => 0
     };
 }
 
@@ -309,6 +364,7 @@ function renderCalendarList(calendars) {
         row.appendChild(createDurationControl(cal));
         calendarList.appendChild(row);
     });
+    updateDurationFilterControlsState();
     updateSelectedSummary();
 }
 
@@ -512,6 +568,12 @@ async function init() {
     });
     onClick(minDurationDownBtn, () => adjustMinDuration(-1));
     onClick(minDurationUpBtn, () => adjustMinDuration(1));
+    onClick(durationFilterToggleBtn, () => {
+        durationFilteringEnabled = !durationFilteringEnabled;
+        updateDurationFilterToggleLabel();
+        updateDurationFilterControlsState();
+        applyFilterChange();
+    });
     onClick(selectAllBtn, () => setAllCalendars(true));
     onClick(deselectAllBtn, () => setAllCalendars(false));
 
@@ -544,6 +606,9 @@ async function init() {
         const modes = ["auto", "light", "dark"];
         setThemeMode(modes[(modes.indexOf(themeMode) + 1) % modes.length]);
     });
+
+    updateDurationFilterToggleLabel();
+    updateDurationFilterControlsState();
 }
 
 document.addEventListener("DOMContentLoaded", init);

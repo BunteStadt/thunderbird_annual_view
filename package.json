@@ -1,7 +1,6 @@
 {
   "name": "thunderbird-annual-view",
   "private": true,
-  "type": "module",
   "scripts": {
     "build-ui": "node scripts/build-year-view-ui.mjs",
     "test": "node --test"

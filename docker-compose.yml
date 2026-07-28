@@ -1,0 +1,16 @@
+# https://github.com/jlesage/docker-thunderbird/tree/master
+services:
+  dev:
+    build:
+      context: .
+    container_name: test1
+    hostname: thunderbird-dev
+    stdin_open: true
+    tty: true
+
+    volumes:
+      # Mount the project source code
+      - .:/workspace:cached
+
+    ports:
+      - "5800:5800"

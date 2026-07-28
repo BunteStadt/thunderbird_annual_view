@@ -99,7 +99,7 @@ Use a seperate Thunderbird profile.
 
 ### Dummy Data
 Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
-Or use the commented out code in main.js.
+Dummy mode is enabled by adding `?dummy=1` to the URL.
 
 ### Build standalone html
 
@@ -127,12 +127,25 @@ git config core.hooksPath .githooks
 
 #### Just Commands
 
+
+#### React + TypeScript UI Build
+
+The year-view UI is implemented with React + TypeScript and bundled into `src/ui/year-view/app.js`.
+
+```bash
+npm ci
+npm run build-ui
+```
+
+Run `npm run build-ui` after changing files in `src/ui/year-view/ts/` and before packaging or testing the extension.
+
 [`just`](https://github.com/casey/just) is a command runner. Available recipes:
 
 | Command | Description |
 |---------|-------------|
 | `just sync-experiments` | Copies experiment APIs from `submodules/calendar/experiments/calendar/` to `experiments/` for development |
-| `just build-xpi` | Builds the `.xpi` release package into `dist/` |
+| `just build-ui` | Bundles the React + TypeScript year-view UI into `src/ui/year-view/app.js` |
+| `just build-xpi` | Builds the `.xpi` release package into `dist/` (includes UI bundling) |
 | `just tag` | Creates a Git tag from the version in `manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |
 
 #### Syncing the Experiment Submodule

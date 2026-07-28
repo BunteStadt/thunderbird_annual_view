@@ -874,3 +874,38 @@ input[type="number"] {
     transform: rotate(360deg);
   }
 }
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-summary {
+  flex: 1;
+  min-width: 220px;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1100px) {
+  .year-layout {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .calendar-filters {
+    max-width: none;
+    min-width: 0;
+    max-height: 42vh;
+  }
+
+  .controls {
+    gap: 0.5rem;
+  }
+
+  .selected-summary {
+    min-width: 0;
+    width: 100%;
+    order: 10;
+  }
+}

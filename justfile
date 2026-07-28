@@ -6,8 +6,13 @@ sync-experiments:
 	mkdir -p experiments/calendar
 	cp -R submodules/calendar/experiments/calendar/* experiments/calendar/
 
+# Builds the React + TypeScript year-view UI bundle
+build-ui:
+	npm run build-ui
+
 # Builds the XPI package for release
 build-xpi:
+	npm run build-ui
 	mkdir -p dist/package
 	cp -R manifest.json src experiments icons dist/package/
 	cd dist/package && zip -r ../calendar-annual-view.xpi manifest.json src experiments icons

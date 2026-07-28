@@ -1,0 +1,19 @@
+{
+  "name": "thunderbird-annual-view",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build-ui": "node scripts/build-year-view-ui.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "esbuild": "^0.28.1",
+    "typescript": "^5.6.3"
+  }
+}

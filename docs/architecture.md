@@ -45,9 +45,9 @@ The current implementation is organized into three practical layers:
   - coordinates the event store and grid view
 
 - [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
-  - resolves the active calendar provider (dummy, Thunderbird, Google web, or ICS)
-  - uses uploaded `.ics` calendars as the active provider whenever `setIcsCalendars()` receives one or more ICS descriptors
-  - falls back to the default provider when no uploaded ICS calendars are present
+  - resolves the primary calendar provider (dummy, Thunderbird, Google web, or empty)
+  - keeps uploaded `.ics` calendars in a dedicated `IcsCalendarProvider` instance
+  - merges `IcsCalendarProvider` calendars/events with the active provider output in `fetchCalendars()` and `fetchCalendarEvents()`
   - exports `IcsCalendarProvider`, `GoogleCalendarProvider`, `ThunderbirdCalendarProvider`, `DummyCalendarProvider`, and `EmptyCalendarProvider`
   - keeps provider selection out of the renderer
 
@@ -69,6 +69,7 @@ The current implementation is organized into three practical layers:
 - [src/ui/year-view/ics-calendar-integration.js](../src/ui/year-view/ics-calendar-integration.js)
   - owns the manual ICS upload button shown below the calendar list
   - loads and persists uploaded ICS descriptors in browser storage
+  - supports removing individual uploaded ICS calendars from the sidebar list
   - updates the active ICS provider without adding provider-specific state to `main.js`
 
 - [src/ui/year-view/event-store.js](../src/ui/year-view/event-store.js)

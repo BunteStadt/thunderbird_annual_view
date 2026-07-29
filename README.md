@@ -15,6 +15,8 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 - **Infinite Scrolling**: Scroll seamlessly up and down across year boundaries. In the month-based views, December is directly followed by January of the next year; in the week-row views, years change within a row. Events for neighboring years are prefetched in the background, so scrolling stays smooth.
 - **Multi-Calendar Support**: Show events from multiple calendars at once.
 - **Automatic Calendar Detection**: Pulls calendars and colors from Thunderbird's settings.
+- **ICS Upload and Removal**: Add one or more `.ics` files from the options sidebar and remove uploaded calendars individually with the `✕` button.
+- **Merged Calendar Sources**: Uploaded `.ics` calendars are merged with the active provider (Thunderbird, Google standalone, or dummy mode) instead of replacing it.
 - **Configurable Filters**:
   - Enable/disable specific calendars.
   - Set each calendar's all-day-only mode to on, off, or follow the global setting.
@@ -77,6 +79,7 @@ It is responsive from mobile to wide desktop layouts, includes animated visual a
 3. Scroll the grid to move through time — the view continues endlessly into past and future years. The year input always shows the year at the center of the view; type a year or use the +/- buttons to jump directly.
 4. Choose the view mode (compact, aligned, 4-week, 2-week, or 1-week) from the dropdown in the header.
 5. Click on `show options` to open the configuration sidebar for filters and calendar selection.
+6. Use `Upload ICS` below the calendar list to add local `.ics` calendars, then use `✕` on an uploaded calendar row to remove it.
 
 ## Configuration
 

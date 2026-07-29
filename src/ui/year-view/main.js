@@ -1,7 +1,7 @@
 import { createDefaultCalendarProvider, fetchCalendars, getCalendarProvider, setCalendarProvider } from "./calendar-service.js";
 import { EventStore } from "./event-store.js";
 import { GridView } from "./grid-view.js";
-import { GOOGLE_OAUTH_CLIENT_ID } from "./google-client-id.js";
+import { setupGoogleStandaloneAuth } from "./google-standalone-auth.js";
 import {
     loadPersistedSelection,
     persistSelection,
@@ -138,9 +138,7 @@ const grayPastDaysInput = document.getElementById("grayPastDays");
 const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
 const viewModeSelect = document.getElementById("viewMode");
 const yearButtons = document.querySelectorAll("[data-year-step]");
-const googleAuthPanel = document.getElementById("googleAuthPanel");
-const googleConnectButton = document.getElementById("googleConnectButton");
-const googleAuthStatus = document.getElementById("googleAuthStatus");
+const providerAuthMount = document.getElementById("providerAuthMount");
 
 const YEAR_MIN = Number(yearInput.min) || 1900;
 const YEAR_MAX = Number(yearInput.max) || 2999;
@@ -168,7 +166,7 @@ let isRefreshing = false;
 let grayPastDaysEnabled = false;
 let highlightCurrentDayEnabled = false;
 let viewMode = "linear";
-let googleAuthError = "";
+let providerAuthController = null;
 
 const eventStore = new EventStore();
 const gridView = new GridView({
@@ -474,89 +472,6 @@ function setCalendarPanelVisible(expanded) {
     persistPanelState(expanded);
 }
 
-function getGoogleProvider() {
-    const provider = getCalendarProvider();
-    const hasGoogleAuthMethods = typeof provider?.setClientId === "function"
-        && typeof provider?.getAuthState === "function"
-        && typeof provider?.signIn === "function"
-        && typeof provider?.signOut === "function";
-    return hasGoogleAuthMethods ? provider : null;
-}
-
-function updateGoogleAuthUi() {
-    const provider = getGoogleProvider();
-    if (!provider) {
-        googleAuthPanel?.toggleAttribute("hidden", true);
-        return;
-    }
-
-    googleAuthPanel?.toggleAttribute("hidden", false);
-    const state = provider.getAuthState();
-    const configured = state?.configured === true;
-    const authenticated = state?.authenticated === true;
-
-    if (googleConnectButton) {
-        googleConnectButton.textContent = authenticated ? "Log out" : "Connect to Google";
-        googleConnectButton.disabled = !configured;
-    }
-    if (googleAuthStatus) {
-        const message = googleAuthError
-            || (!configured
-                ? "Set your Google OAuth client ID in src/ui/year-view/google-client-id.js."
-                : (authenticated ? "Connected to Google Calendar." : "Not connected to Google Calendar."));
-        googleAuthStatus.textContent = message;
-        googleAuthStatus.classList.toggle("is-error", !!googleAuthError);
-    }
-}
-
-function setupGoogleAuthControls() {
-    const provider = getGoogleProvider();
-    if (!provider) {
-        googleAuthPanel?.toggleAttribute("hidden", true);
-        return;
-    }
-
-    googleAuthPanel?.toggleAttribute("hidden", false);
-
-    provider.setClientId(GOOGLE_OAUTH_CLIENT_ID);
-
-    onClick(googleConnectButton, async () => {
-        googleAuthError = "";
-        const { configured, authenticated } = provider.getAuthState();
-        if (!configured) {
-            updateGoogleAuthUi();
-            return;
-        }
-
-        updateGoogleAuthUi();
-
-        let authSucceeded = false;
-        try {
-            if (authenticated) {
-                await provider.signOut();
-            } else {
-                await provider.signIn();
-            }
-            authSucceeded = true;
-        } catch (err) {
-            googleAuthError = err?.message || (authenticated ? "Google sign-out failed." : "Google sign-in failed.");
-            console.error(authenticated ? "[google-auth] sign-out failed" : "[google-auth] sign-in failed", err);
-        }
-
-        if (authSucceeded) {
-            try {
-                await refreshCalendarData();
-            } catch (err) {
-                googleAuthError = err?.message || "Calendar refresh failed after Google authentication.";
-                console.error("[google-auth] calendar refresh failed", err);
-            }
-        }
-        updateGoogleAuthUi();
-    });
-
-    updateGoogleAuthUi();
-}
-
 async function loadCalendars() {
     availableCalendars = await fetchCalendars();
     const { ids: persistedIds, found } = await loadPersistedSelection();
@@ -590,7 +505,7 @@ async function refreshCalendarData() {
     } finally {
         isRefreshing = false;
         refreshButton?.classList.remove("refreshing");
-        updateGoogleAuthUi();
+        providerAuthController?.update();
     }
 }
 
@@ -662,7 +577,11 @@ async function adjustMinDuration(deltaHours) {
 async function init() {
     setThemeMode(await loadThemePreference());
     refreshSettings = await loadRefreshSettings();
-    setupGoogleAuthControls();
+    providerAuthController = setupGoogleStandaloneAuth({
+        mount: providerAuthMount,
+        getProvider: () => getCalendarProvider(),
+        refreshCalendars: refreshCalendarData
+    });
 
     if (minDurationInput) {
         minDurationInput.value = String(await loadMinDurationPreference());

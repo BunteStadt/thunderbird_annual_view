@@ -409,11 +409,6 @@ input[type="number"] {
   gap: 0.45rem;
 }
 
-.ics-upload-section {
-  padding: 0.45rem 0.55rem 0.55rem;
-  border-top: 1px solid var(--border, rgba(128, 128, 128, 0.3));
-}
-
 .cal-chip,
 .cal-chip-toggle {
   display: inline-flex;

@@ -41,6 +41,7 @@ The current implementation is organized into three practical layers:
   - initializes DOM references and state
   - wires filters, navigation, loading, refresh, and rendering updates
   - owns Google connect/log-out header control wiring for standalone web mode
+  - attaches provider-specific sidebar integrations through a generic mount
   - coordinates the event store and grid view
 
 - [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
@@ -65,6 +66,11 @@ The current implementation is organized into three practical layers:
   - supports `calendarIds`, `allDayOnly`, and `calendarAllDayModes` filter options
   - can be selected by calendar-service as the active provider, and can be constructed directly in tests
 
+- [src/ui/year-view/ics-calendar-integration.js](../src/ui/year-view/ics-calendar-integration.js)
+  - owns the manual ICS upload button shown below the calendar list
+  - loads and persists uploaded ICS descriptors in browser storage
+  - updates the active ICS provider without adding provider-specific state to `main.js`
+
 - [src/ui/year-view/event-store.js](../src/ui/year-view/event-store.js)
   - caches events by year
   - applies filtering logic without re-fetching data repeatedly
@@ -75,7 +81,6 @@ The current implementation is organized into three practical layers:
 
 - [src/ui/year-view/storage.js](../src/ui/year-view/storage.js)
   - persists UI and filter state in browser storage
-  - includes `loadIcsCalendars` / `persistIcsCalendars` for user-uploaded ICS calendar descriptors
 
 - [src/ui/year-view/theme.js](../src/ui/year-view/theme.js)
   - applies light/dark theme behavior

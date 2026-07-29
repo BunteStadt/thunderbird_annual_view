@@ -13,7 +13,9 @@ test('background script loads and click handler executes without console errors'
 
     const browser = {
         runtime: {
-            getURL: (urlPath) => `moz-extension://test/${urlPath}`
+            getURL: (urlPath) => `moz-extension://test/${urlPath}`,
+            onInstalled: { addListener() {} },
+            onStartup: { addListener() {} }
         },
         action: {
             onClicked: {

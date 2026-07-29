@@ -25,6 +25,25 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
   - Highlight the current day.
 - **Theming**: Supports light and dark themes with appropriate icons.
 
+## Screenshots
+
+### Compact Linear View
+![Compact Linear View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png)
+
+### Day-Aligned View
+![Day-Aligned View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png)
+
+### 4-Week View
+![4-Week View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png)
+
+### Collapsable Options Sidebar
+![Options Sidebar Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/options-disabled.png)
+
+### Dark Theme Screenshots
+![Compact Linear Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-dark.png)
+![Day-Aligned Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-dark.png)
+![4-Week Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-dark.png)
+
 ## Installation
 
 1. Download the latest `.xpi` file from the [Releases](https://github.com/BunteStadt/thunderbird_annual_view/releases) page.
@@ -132,7 +151,7 @@ git config core.hooksPath .githooks
 [`just`](https://github.com/casey/just) is a command runner. Available recipes:
 
 | Command | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `just sync-experiments` | Copies experiment APIs from `submodules/calendar/experiments/calendar/` to `experiments/` for development |
 | `just build-xpi` | Builds the `.xpi` release package into `dist/` |
 | `just tag` | Creates a Git tag from the version in `manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |

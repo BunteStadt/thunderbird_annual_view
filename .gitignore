@@ -12,3 +12,6 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# E2E test output (screenshots, logs, results)
+test-results/

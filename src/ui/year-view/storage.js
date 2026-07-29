@@ -297,3 +297,28 @@ export async function persistViewMode(mode) {
         console.error("[storage] save view mode failed", err);
     }
 }
+
+export async function loadIcsCalendars() {
+    try {
+        const stored = await browser.storage.local.get("icsCalendars");
+        if (Object.prototype.hasOwnProperty.call(stored, "icsCalendars")) {
+            const list = stored.icsCalendars;
+            if (Array.isArray(list)) {
+                return list.filter(
+                    (c) => c && typeof c.id === "string" && typeof c.content === "string"
+                );
+            }
+        }
+    } catch (err) {
+        console.error("[storage] load ICS calendars failed", err);
+    }
+    return [];
+}
+
+export async function persistIcsCalendars(calendars) {
+    try {
+        await browser.storage.local.set({ icsCalendars: calendars });
+    } catch (err) {
+        console.error("[storage] save ICS calendars failed", err);
+    }
+}

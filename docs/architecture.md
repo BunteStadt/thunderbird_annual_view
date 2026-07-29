@@ -45,6 +45,8 @@ The current implementation is organized into three practical layers:
 
 - [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
   - resolves the active calendar provider (dummy, Thunderbird, Google web, or ICS)
+  - maintains a separate ICS overlay provider for user-uploaded `.ics` files; call `setIcsCalendars()` to update it
+  - `fetchCalendars()` and `fetchCalendarEvents()` merge results from both the active provider and the ICS overlay
   - exports `IcsCalendarProvider`, `GoogleCalendarProvider`, `ThunderbirdCalendarProvider`, `DummyCalendarProvider`, and `EmptyCalendarProvider`
   - keeps provider selection out of the renderer
 
@@ -61,6 +63,7 @@ The current implementation is organized into three practical layers:
   - accepts an array of `{ id, name, color, content }` descriptors; the caller supplies the raw ICS text
   - handles iCalendar line unfolding, `VALUE=DATE` and `TZID`-qualified `DTSTART`/`DTEND`, and UTC timestamps
   - supports `calendarIds`, `allDayOnly`, and `calendarAllDayModes` filter options
+  - used as the ICS overlay in calendar-service, and can be constructed directly in tests
 
 - [src/ui/year-view/event-store.js](../src/ui/year-view/event-store.js)
   - caches events by year
@@ -72,6 +75,7 @@ The current implementation is organized into three practical layers:
 
 - [src/ui/year-view/storage.js](../src/ui/year-view/storage.js)
   - persists UI and filter state in browser storage
+  - includes `loadIcsCalendars` / `persistIcsCalendars` for user-uploaded ICS calendar descriptors
 
 - [src/ui/year-view/theme.js](../src/ui/year-view/theme.js)
   - applies light/dark theme behavior

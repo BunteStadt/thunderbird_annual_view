@@ -56,18 +56,6 @@ jobs:
           trap "kill $SERVER_PID" EXIT
           node scripts/generate-sample-images.mjs
 
-      - name: Commit screenshots to repo
-        run: |
-          mkdir -p media/screenshots
-          cp media/generated/${{ github.ref_name }}/*.png media/screenshots/
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git checkout main
-          git add media/screenshots/
-          git diff --cached --quiet || git commit -m "chore: update screenshots for ${{ github.ref_name }}"
-          git push origin main
-
       - name: Archive sample images
         run: |
           mkdir -p dist

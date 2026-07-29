@@ -1,4 +1,4 @@
-import { createDefaultCalendarProvider, fetchCalendars, getCalendarProvider, setCalendarProvider } from "./calendar-service.js";
+import { createDefaultCalendarProvider, fetchCalendars, getCalendarProvider, setCalendarProvider, setIcsCalendars } from "./calendar-service.js";
 import { EventStore } from "./event-store.js";
 import { GridView } from "./grid-view.js";
 import { setupGoogleStandaloneAuth } from "./google-standalone-auth.js";
@@ -25,7 +25,9 @@ import {
     loadHighlightCurrentDay,
     persistHighlightCurrentDay,
     loadViewMode,
-    persistViewMode
+    persistViewMode,
+    loadIcsCalendars,
+    persistIcsCalendars
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./theme.js";
 
@@ -139,6 +141,8 @@ const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
 const viewModeSelect = document.getElementById("viewMode");
 const yearButtons = document.querySelectorAll("[data-year-step]");
 const providerAuthMount = document.getElementById("providerAuthMount");
+const uploadIcsBtn = document.getElementById("uploadIcsBtn");
+const icsFileInput = document.getElementById("icsFileInput");
 
 const YEAR_MIN = Number(yearInput.min) || 1900;
 const YEAR_MAX = Number(yearInput.max) || 2999;
@@ -154,6 +158,7 @@ let availableCalendars = [];
 let selectedCalendarIds = new Set();
 let calendarAllDayModes = {};
 let calendarMinDurationHours = {};
+let icsCalendarDescriptors = [];
 let allDayOnlyEnabled = false;
 let durationFilteringEnabled = true;
 let currentYear = new Date().getFullYear();
@@ -562,6 +567,36 @@ function applyResolvedTheme() {
 }
 
 // ---------------------------------------------------------------------------
+// ICS file upload
+// ---------------------------------------------------------------------------
+
+async function handleIcsFiles(files) {
+    if (!files || !files.length) return;
+
+    for (const file of Array.from(files)) {
+        const content = await file.text();
+        const baseName = file.name.replace(/\.ics$/i, "").replace(/[^a-zA-Z0-9_-]/g, "-");
+        const id = `ics-${baseName}-${Date.now()}`;
+        const descriptor = { id, name: file.name.replace(/\.ics$/i, ""), color: null, content };
+        icsCalendarDescriptors.push(descriptor);
+    }
+
+    await persistIcsCalendars(icsCalendarDescriptors);
+    setIcsCalendars(icsCalendarDescriptors);
+    eventStore.invalidate();
+    await loadCalendars();
+    applyFilterChange();
+}
+
+function setupIcsUpload() {
+    onClick(uploadIcsBtn, () => icsFileInput?.click());
+    icsFileInput?.addEventListener("change", async () => {
+        await handleIcsFiles(icsFileInput.files);
+        icsFileInput.value = "";
+    });
+}
+
+// ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
 
@@ -601,6 +636,10 @@ async function init() {
     highlightCurrentDayEnabled = await loadHighlightCurrentDay();
     if (grayPastDaysInput) grayPastDaysInput.checked = grayPastDaysEnabled;
     if (highlightCurrentDayInput) highlightCurrentDayInput.checked = highlightCurrentDayEnabled;
+
+    icsCalendarDescriptors = await loadIcsCalendars();
+    setIcsCalendars(icsCalendarDescriptors);
+    setupIcsUpload();
 
     await loadCalendars();
 

@@ -2,12 +2,6 @@
 *.xpi
 dist/
 
-# Generated screenshots (CI temp output; committed copies live in media/screenshots/)
-media/generated/
-
-# Node modules
-node_modules/
-
 # OS files
 .DS_Store
 Thumbs.db

@@ -43,8 +43,15 @@ The current implementation is organized into three practical layers:
   - coordinates the event store and grid view
 
 - [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
-  - fetches calendars and events from Thunderbird calendar APIs
+  - fetches calendars and events through the active provider
+  - exports `IcsCalendarProvider`, `ThunderbirdCalendarProvider`, `DummyCalendarProvider`, and `EmptyCalendarProvider`
   - contains the dummy-data fallback used in standalone development
+
+- [src/ui/year-view/ics-calendar-provider.js](../src/ui/year-view/ics-calendar-provider.js)
+  - platform-agnostic provider that reads events from in-memory ICS (iCalendar) content
+  - accepts an array of `{ id, name, color, content }` descriptors; the caller supplies the raw ICS text
+  - handles iCalendar line unfolding, `VALUE=DATE` and `TZID`-qualified `DTSTART`/`DTEND`, and UTC timestamps
+  - supports `calendarIds`, `allDayOnly`, and `calendarAllDayModes` filter options
 
 - [src/ui/year-view/event-store.js](../src/ui/year-view/event-store.js)
   - caches events by year
@@ -129,6 +136,7 @@ The user can change:
 - Must degrade gracefully when calendar APIs are unavailable or incomplete.
 - Must support local development without requiring a full Thunderbird runtime.
 - Must preserve a lightweight and dependency-free implementation style for now.
+- `IcsCalendarProvider` must be platform-agnostic and work in both the add-on and future web contexts.
 
 ## 6. Target shared architecture for the monorepo
 

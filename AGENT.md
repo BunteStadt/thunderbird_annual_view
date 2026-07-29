@@ -13,6 +13,7 @@ The add-on currently provides:
 
 - a read-only annual calendar grid with month and week-row layouts
 - event loading from Thunderbird calendar APIs
+- event loading from `.ics` (iCalendar) files via `IcsCalendarProvider`
 - calendar filtering, all-day filtering, minimum-duration filtering, and theme preferences
 - a standalone HTML debug surface for local development via dummy data
 
@@ -21,6 +22,7 @@ The add-on currently provides:
 - [manifest.json](manifest.json) defines the Thunderbird add-on entry point and experiment APIs.
 - [src/background/background.js](src/background/background.js) creates the custom Thunderbird space entry point.
 - [src/ui/year-view](src/ui/year-view) contains the calendar UI, event-store logic, grid rendering, storage, theming, and HTML shell.
+- [src/ui/year-view/ics-calendar-provider.js](src/ui/year-view/ics-calendar-provider.js) is a platform-agnostic provider that parses `.ics` (iCalendar) file content passed as strings.
 - [experiments/calendar](experiments/calendar) holds Thunderbird-specific experimental calendar APIs used by the add-on.
 - [apps](apps) is the starting point for the future monorepo split into addon, web, and backend surfaces.
 - [test](test) contains integration and unit-style checks for the current calendar behavior.

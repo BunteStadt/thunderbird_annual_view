@@ -54,11 +54,47 @@ When changing manifest behavior, release packaging, or any shared calendar logic
 
 ## 5. Testing expectations
 
-The repository currently uses manual and test-file-based validation rather than a large automated suite. When possible:
+The repository uses two complementary layers of automated and manual testing.
+
+### Automated tests (CI)
+
+All tests in `test/` are run with `node --test` and execute on every push via
+GitHub Actions.  The test suite covers:
+
+| File | Coverage |
+|---|---|
+| `test/addon-integration.test.js` | Manifest integrity and XPI build |
+| `test/background-runtime.test.js` | Background script click handler |
+| `test/calendar-service.test.js` | Calendar service with dummy and injected providers |
+| `test/thunderbird-provider.test.js` | `ThunderbirdCalendarProvider` end-to-end with mocked `browser.calendar.*` API fed from `feiertage_nrw.ics` |
+| `test/date-utils.test.js` | Date utility functions |
+| `test/event-store.test.js` | Event store filtering and caching |
+| `test/storage-theme.test.js` | Storage and theme helpers |
+
+The `thunderbird-provider.test.js` file simulates the exact API shape that
+Thunderbird exposes to the add-on background and verifies that
+`ThunderbirdCalendarProvider` correctly parses real ICS calendar data into
+normalised event objects.
+
+### Manual / Docker integration test
+
+A pre-configured Thunderbird profile lives in `test/thunderbird-profile/`.  It
+installs the add-on from source via an extension proxy file and pre-registers
+the NRW ICS calendars.  Use it for end-to-end verification:
+
+```sh
+docker compose up      # opens GUI at http://localhost:5800
+```
+
+See [thunderbird-profile/README.md](../thunderbird-profile/README.md)
+for full instructions.
+
+### When adding tests
 
 - prefer regression tests for shared domain logic
 - verify UI behavior manually in the browser or Thunderbird
 - validate filter and rendering changes with dummy data first
+- update the table above when adding a new test file
 
 ## 6. Coding standards
 

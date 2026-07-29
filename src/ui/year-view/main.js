@@ -522,13 +522,13 @@ function setupGoogleAuthControls() {
 
     onClick(googleConnectButton, async () => {
         googleAuthError = "";
-        updateGoogleAuthUi();
-
         const { configured, authenticated } = provider.getAuthState();
         if (!configured) {
             updateGoogleAuthUi();
             return;
         }
+
+        updateGoogleAuthUi();
 
         try {
             if (authenticated) {

@@ -137,7 +137,7 @@ export class GoogleAuthSession {
         });
     }
 
-    async signInWithConsent() {
+    async _signInWithConsent() {
         return this._requestAccessToken({ prompt: "consent" });
     }
 
@@ -176,7 +176,7 @@ export class GoogleAuthSession {
             if (isScopeOrPermissionError(parsed403)) {
                 this._accessToken = "";
                 this._expiresAt = 0;
-                await this.signInWithConsent();
+                await this._signInWithConsent();
                 response = await fetch(url, {
                     headers: {
                         Authorization: "Bearer " + this._accessToken

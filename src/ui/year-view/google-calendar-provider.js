@@ -118,7 +118,12 @@ export class GoogleAuthSession {
     }
 
     async signIn() {
+        return this._requestAccessToken({ prompt: this.isAuthenticated() ? "" : "consent" });
+    }
+
+    async _requestAccessToken(options = {}) {
         const tokenClient = await this._ensureTokenClient();
+        const { prompt = "" } = options;
         return new Promise((resolve, reject) => {
             tokenClient.callback = (response) => {
                 if (response?.error) {
@@ -128,8 +133,12 @@ export class GoogleAuthSession {
                 this._setToken(response);
                 resolve({ authenticated: this.isAuthenticated() });
             };
-            tokenClient.requestAccessToken({ prompt: this.isAuthenticated() ? "" : "consent" });
+            tokenClient.requestAccessToken({ prompt });
         });
+    }
+
+    async signInWithConsent() {
+        return this._requestAccessToken({ prompt: "consent" });
     }
 
     async signOut() {
@@ -156,20 +165,75 @@ export class GoogleAuthSession {
         if (!this.isAuthenticated()) {
             throw new Error("Not authenticated with Google Calendar.");
         }
-        const response = await fetch(url, {
+        let response = await fetch(url, {
             headers: {
                 Authorization: "Bearer " + this._accessToken
             }
         });
-        if (response.status === 401) {
+
+        if (response.status === 403) {
+            const parsed403 = await parseGoogleErrorPayload(response);
+            if (isScopeOrPermissionError(parsed403)) {
+                this._accessToken = "";
+                this._expiresAt = 0;
+                await this.signInWithConsent();
+                response = await fetch(url, {
+                    headers: {
+                        Authorization: "Bearer " + this._accessToken
+                    }
+                });
+            }
+        }
+
+        const parsedError = response.ok ? null : await parseGoogleErrorPayload(response);
+        if (response.status === 401 || response.status === 403) {
             this._accessToken = "";
             this._expiresAt = 0;
         }
         if (!response.ok) {
-            throw new Error(`Google Calendar request failed (${response.status})`);
+            const details = formatGoogleErrorDetails(parsedError);
+            throw new Error(details
+                ? `Google Calendar request failed (${response.status}): ${details}`
+                : `Google Calendar request failed (${response.status})`);
         }
         return response.json();
     }
+}
+
+async function parseGoogleErrorPayload(response) {
+    try {
+        const payload = await response.clone().json();
+        return payload?.error || null;
+    } catch {
+        return null;
+    }
+}
+
+function isScopeOrPermissionError(error) {
+    const status = String(error?.status || "");
+    if (status === "PERMISSION_DENIED") return true;
+    const messages = [
+        error?.message,
+        ...(Array.isArray(error?.errors) ? error.errors.map((entry) => `${entry?.reason || ""} ${entry?.message || ""}`) : [])
+    ].join(" ").toLowerCase();
+    return messages.includes("scope")
+        || messages.includes("permission")
+        || messages.includes("insufficient");
+}
+
+function formatGoogleErrorDetails(error) {
+    if (!error) return "";
+    const details = [];
+    if (error.message) details.push(error.message);
+    if (Array.isArray(error.errors)) {
+        for (const entry of error.errors) {
+            const reason = String(entry?.reason || "").trim();
+            const message = String(entry?.message || "").trim();
+            const merged = [reason, message].filter(Boolean).join(": ");
+            if (merged) details.push(merged);
+        }
+    }
+    return Array.from(new Set(details)).join(" | ");
 }
 
 function mapCalendar(calendar) {

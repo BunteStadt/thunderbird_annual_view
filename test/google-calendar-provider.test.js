@@ -85,3 +85,83 @@ test('GoogleCalendarProvider maps calendars and events from Google API responses
     assert.equal(onlyAllDayForTeam[0].allDay, true);
     assert.equal(requests.some((url) => url.includes('/calendarList')), true);
 });
+
+test('GoogleAuthSession retries once with consent when Google returns scope-related 403', async (t) => {
+    const { GoogleAuthSession } = await loadGoogleProviderModule();
+
+    const originalGoogle = globalThis.google;
+    const originalFetch = globalThis.fetch;
+    t.after(() => {
+        if (originalGoogle === undefined) delete globalThis.google;
+        else globalThis.google = originalGoogle;
+        if (originalFetch === undefined) delete globalThis.fetch;
+        else globalThis.fetch = originalFetch;
+    });
+
+    let tokenClientCallback = null;
+    const requestedPrompts = [];
+    let accessTokenCounter = 0;
+
+    globalThis.google = {
+        accounts: {
+            oauth2: {
+                initTokenClient() {
+                    return {
+                        set callback(fn) {
+                            tokenClientCallback = fn;
+                        },
+                        requestAccessToken({ prompt }) {
+                            requestedPrompts.push(prompt ?? "");
+                            accessTokenCounter += 1;
+                            tokenClientCallback({
+                                access_token: `token-${accessTokenCounter}`,
+                                expires_in: 3600
+                            });
+                        }
+                    };
+                }
+            }
+        }
+    };
+
+    const fetchCalls = [];
+    globalThis.fetch = async (url, options = {}) => {
+        fetchCalls.push(options?.headers?.Authorization || "");
+        if (fetchCalls.length === 1) {
+            return {
+                ok: false,
+                status: 403,
+                clone() {
+                    return {
+                        async json() {
+                            return {
+                                error: {
+                                    message: 'Request had insufficient authentication scopes.',
+                                    status: 'PERMISSION_DENIED',
+                                    errors: [{ reason: 'insufficientPermissions' }]
+                                }
+                            };
+                        }
+                    };
+                }
+            };
+        }
+        return {
+            ok: true,
+            status: 200,
+            async json() {
+                return { items: [] };
+            }
+        };
+    };
+
+    const session = new GoogleAuthSession();
+    session.setClientId('test-client-id.apps.googleusercontent.com');
+    await session.signIn();
+
+    const result = await session.authorizedFetch('https://www.googleapis.com/calendar/v3/users/me/calendarList');
+    assert.deepEqual(result, { items: [] });
+    assert.deepEqual(requestedPrompts, ['consent', 'consent']);
+    assert.equal(fetchCalls[0].endsWith('token-1'), true);
+    assert.equal(fetchCalls[1].endsWith('token-2'), true);
+});

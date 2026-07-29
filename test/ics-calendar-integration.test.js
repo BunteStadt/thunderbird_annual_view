@@ -208,3 +208,85 @@ test('ICS calendar integration persists uploaded files and triggers refresh call
     assert.equal(storageData.icsCalendars[0].content.includes('BEGIN:VCALENDAR'), true);
     assert.equal(fileInput.value, '');
 });
+
+test('ICS calendar integration removeCalendar removes calendar and triggers refresh', async (t) => {
+    const storageData = {};
+
+    const fileInput = {
+        files: null,
+        value: '',
+        hidden: false,
+        type: '',
+        accept: '',
+        multiple: false,
+        listeners: {},
+        addEventListener(type, handler) { this.listeners[type] = handler; }
+    };
+    const uploadButton = {
+        className: '',
+        dataset: {},
+        type: '',
+        textContent: '',
+        listeners: {},
+        addEventListener(type, handler) { this.listeners[type] = handler; }
+    };
+    const separator = { className: '' };
+    const buttonRow = { className: '', appendChild() {} };
+    const mount = { replaceChildren() {} };
+
+    let icsCalendarsSnapshot = [];
+
+    globalThis.browser = {
+        storage: {
+            local: {
+                async get(key) { return Object.prototype.hasOwnProperty.call(storageData, key) ? { [key]: storageData[key] } : {}; },
+                async set(obj) { Object.assign(storageData, obj); }
+            }
+        }
+    };
+
+    const createCallCount = {};
+    globalThis.document = {
+        createElement(tag) {
+            const id = `${tag}-${(createCallCount[tag] = (createCallCount[tag] || 0) + 1)}`;
+            if (tag === 'input') return fileInput;
+            if (tag === 'button') return uploadButton;
+            if (tag === 'div') return id.endsWith('-1') ? separator : buttonRow;
+            return { className: '', textContent: '', appendChild() {} };
+        }
+    };
+
+    t.after(() => {
+        delete globalThis.browser;
+        delete globalThis.document;
+    });
+
+    const { setupIcsCalendarIntegration, setIcsCalendars: _setIcs } = await loadIntegrationModule();
+
+    // Patch setIcsCalendars to capture snapshots
+    const calService = await import(`file://${path.resolve(__dirname, '../src/ui/year-view/calendar-service.js').replace(/\\/g, '/')}`);
+
+    let refreshCount = 0;
+    const integration = setupIcsCalendarIntegration({
+        mount,
+        onCalendarsChanged: async (cals) => {
+            refreshCount += 1;
+            icsCalendarsSnapshot = cals;
+        }
+    });
+
+    // Seed two calendars via storage
+    storageData.icsCalendars = [
+        { id: 'ics-a', name: 'Calendar A', color: null, content: 'BEGIN:VCALENDAR\nEND:VCALENDAR' },
+        { id: 'ics-b', name: 'Calendar B', color: null, content: 'BEGIN:VCALENDAR\nEND:VCALENDAR' }
+    ];
+
+    await integration.initialize();
+
+    // Remove the first calendar
+    await integration.removeCalendar('ics-a');
+
+    assert.equal(refreshCount, 1, 'onCalendarsChanged fired once');
+    assert.equal(storageData.icsCalendars.length, 1, 'one calendar remains in storage');
+    assert.equal(storageData.icsCalendars[0].id, 'ics-b', 'correct calendar retained');
+});

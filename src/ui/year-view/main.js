@@ -169,6 +169,7 @@ let grayPastDaysEnabled = false;
 let highlightCurrentDayEnabled = false;
 let viewMode = "linear";
 let providerAuthController = null;
+let icsRemoveCalendar = null;
 
 const eventStore = new EventStore();
 const gridView = new GridView({
@@ -425,14 +426,30 @@ function createDurationControl(cal) {
     return durationControl;
 }
 
+function createRemoveButton(cal) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn calendar-remove-btn";
+    btn.dataset.size = "compact";
+    btn.textContent = "✕";
+    btn.title = `Remove ${cal.name || "(unnamed)"}`;
+    btn.setAttribute("aria-label", `Remove calendar ${cal.name || "(unnamed)"}`);
+    btn.addEventListener("click", () => icsRemoveCalendar?.(cal.id));
+    return btn;
+}
+
 function renderCalendarList(calendars) {
     calendarList.innerHTML = "";
     calendars.forEach((cal) => {
         const row = document.createElement("div");
-        row.className = "calendar-row";
+        const isIcs = cal.id.startsWith("ics-");
+        row.className = `calendar-row${isIcs ? " calendar-row-ics" : ""}`;
         row.appendChild(createCalendarChip(cal));
         row.appendChild(createAllDayModeButton(cal));
         row.appendChild(createDurationControl(cal));
+        if (isIcs) {
+            row.appendChild(createRemoveButton(cal));
+        }
         calendarList.appendChild(row);
     });
     updateDurationFilterControlsState();
@@ -592,6 +609,7 @@ async function init() {
             applyFilterChange();
         }
     });
+    icsRemoveCalendar = (id) => icsCalendarIntegration.removeCalendar(id);
 
     if (minDurationInput) {
         minDurationInput.value = String(await loadMinDurationPreference());

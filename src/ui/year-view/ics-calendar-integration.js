@@ -123,6 +123,10 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged } = {}) 
         async initialize() {
             await syncStoredCalendars();
             render();
+        },
+
+        async removeCalendar(id) {
+            await updateCalendars(calendars.filter((c) => c.id !== id));
         }
     };
 }

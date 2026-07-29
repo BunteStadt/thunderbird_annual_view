@@ -134,7 +134,7 @@ header {
 }
 
 .google-auth-panel {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.65rem;
   flex-wrap: wrap;
@@ -143,11 +143,6 @@ header {
 
 .google-auth-panel[hidden] {
   display: none;
-}
-
-.google-client-id-input {
-  width: min(32rem, 75vw);
-  text-align: left;
 }
 
 .google-auth-status {

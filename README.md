@@ -25,25 +25,6 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
   - Highlight the current day.
 - **Theming**: Supports light and dark themes with appropriate icons.
 
-## Screenshots
-
-### Compact Linear View
-![Compact Linear View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png)
-
-### Day-Aligned View
-![Day-Aligned View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png)
-
-### 4-Week View
-![4-Week View Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png)
-
-### Collapsable Options Sidebar
-![Options Sidebar Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/options-disabled.png)
-
-### Dark Theme Screenshots
-![Compact Linear Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-dark.png)
-![Day-Aligned Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-dark.png)
-![4-Week Dark Theme Screenshot](https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-dark.png)
-
 ## Installation
 
 1. Download the latest `.xpi` file from the [Releases](https://github.com/BunteStadt/thunderbird_annual_view/releases) page.
@@ -68,9 +49,10 @@ The year-view page can now run as a local website with Google Calendar integrati
 
 1. Start a local web server from the repository root (for example `python -m http.server 4173`).
 2. Open `http://localhost:4173/src/ui/year-view/year-view.html?google=1`.
-3. Enter a Google OAuth client ID in the `Google OAuth Client ID` field.
-4. Click `Sign in with Google` and complete the Google login/consent flow.
-5. The year view then loads your Google calendars and events.
+3. Set your OAuth client ID in `src/ui/year-view/google-client-id.js`.
+4. Click `Connect to Google` and complete the Google login/consent flow.
+5. The button switches to `Log out` when connected.
+6. The year view then loads your Google calendars and events.
 
 Google setup requirements:
 
@@ -78,11 +60,6 @@ Google setup requirements:
 - Add your local origin (for example `http://localhost:4173`) to **Authorized JavaScript origins**.
 - Use scope `https://www.googleapis.com/auth/calendar.readonly`.
 - This integration is read-only.
-
-### Local Website Screenshots
-
-![Website landing with Google entry](docs/screenshots/website-landing-with-google-entry.png)
-![Year-view Google sign-in mode](docs/screenshots/google-calendar-signin-view.png)
 
 ## Usage
 
@@ -124,7 +101,7 @@ Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in s
 Or use the commented out code in main.js.
 
 ### Google Calendar Data
-Open the standalone page with `?google=1` (for example `src/ui/year-view/year-view.html?google=1`) to enable the Google provider and the sign-in controls.
+Open the standalone page with `?google=1` (for example `src/ui/year-view/year-view.html?google=1`) to enable the Google provider and the connect/log-out button.
 
 ### Build standalone html
 

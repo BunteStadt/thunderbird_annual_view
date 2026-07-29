@@ -13,7 +13,7 @@ The add-on currently provides:
 
 - a read-only annual calendar grid with month and week-row layouts
 - event loading from Thunderbird calendar APIs
-- optional local-website loading from Google Calendar APIs through OAuth sign-in
+- optional local-website loading from Google Calendar APIs through OAuth sign-in (client ID configured in source)
 - calendar filtering, all-day filtering, minimum-duration filtering, and theme preferences
 - a standalone HTML debug surface for local development via dummy data
 

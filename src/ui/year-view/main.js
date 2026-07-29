@@ -1,6 +1,7 @@
 import { createDefaultCalendarProvider, fetchCalendars, getCalendarProvider, setCalendarProvider } from "./calendar-service.js";
 import { EventStore } from "./event-store.js";
 import { GridView } from "./grid-view.js";
+import { GOOGLE_OAUTH_CLIENT_ID } from "./google-client-id.js";
 import {
     loadPersistedSelection,
     persistSelection,
@@ -35,9 +36,8 @@ import { applyTheme, detectSystemMode } from "./theme.js";
 
 
 
-// Shared URL flags for standalone modes (?dummy=1, ?google=1, ?googleClientId=...).
+// Shared URL flags for standalone modes (?dummy=1, ?google=1).
 const queryParams = new URLSearchParams(globalThis.location?.search || "");
-const GOOGLE_CLIENT_ID_STORAGE_KEY = "annualView.googleClientId";
 
 function ensureBrowserStorageBridge() {
     if (globalThis.browser?.storage?.local) {
@@ -139,9 +139,7 @@ const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
 const viewModeSelect = document.getElementById("viewMode");
 const yearButtons = document.querySelectorAll("[data-year-step]");
 const googleAuthPanel = document.getElementById("googleAuthPanel");
-const googleClientIdInput = document.getElementById("googleClientIdInput");
 const googleConnectButton = document.getElementById("googleConnectButton");
-const googleDisconnectButton = document.getElementById("googleDisconnectButton");
 const googleAuthStatus = document.getElementById("googleAuthStatus");
 
 const YEAR_MIN = Number(yearInput.min) || 1900;
@@ -485,31 +483,6 @@ function getGoogleProvider() {
     return hasGoogleAuthMethods ? provider : null;
 }
 
-function loadGoogleClientIdPreference() {
-    const clientIdParam = String(queryParams.get("googleClientId") || "").trim();
-    if (clientIdParam) {
-        return clientIdParam;
-    }
-    try {
-        return String(globalThis.localStorage?.getItem(GOOGLE_CLIENT_ID_STORAGE_KEY) || "").trim();
-    } catch (err) {
-        console.error("[google-auth] unable to load client id", err);
-        return "";
-    }
-}
-
-function persistGoogleClientIdPreference(clientId) {
-    try {
-        if (clientId) {
-            globalThis.localStorage?.setItem(GOOGLE_CLIENT_ID_STORAGE_KEY, clientId);
-        } else {
-            globalThis.localStorage?.removeItem(GOOGLE_CLIENT_ID_STORAGE_KEY);
-        }
-    } catch (err) {
-        console.error("[google-auth] unable to persist client id", err);
-    }
-}
-
 function updateGoogleAuthUi() {
     const provider = getGoogleProvider();
     if (!provider) {
@@ -523,15 +496,13 @@ function updateGoogleAuthUi() {
     const authenticated = state?.authenticated === true;
 
     if (googleConnectButton) {
-        googleConnectButton.textContent = authenticated ? "Reconnect Google" : "Sign in with Google";
-    }
-    if (googleDisconnectButton) {
-        googleDisconnectButton.toggleAttribute("hidden", !authenticated);
+        googleConnectButton.textContent = authenticated ? "Log out" : "Connect to Google";
+        googleConnectButton.disabled = !configured;
     }
     if (googleAuthStatus) {
         const message = googleAuthError
             || (!configured
-                ? "Enter your Google OAuth client ID, then sign in."
+                ? "Set your Google OAuth client ID in src/ui/year-view/google-client-id.js."
                 : (authenticated ? "Connected to Google Calendar." : "Not connected to Google Calendar."));
         googleAuthStatus.textContent = message;
         googleAuthStatus.classList.toggle("is-error", !!googleAuthError);
@@ -547,40 +518,28 @@ function setupGoogleAuthControls() {
 
     googleAuthPanel?.toggleAttribute("hidden", false);
 
-    const preferredClientId = loadGoogleClientIdPreference();
-    if (preferredClientId) {
-        provider.setClientId(preferredClientId);
-        if (googleClientIdInput) {
-            googleClientIdInput.value = preferredClientId;
-        }
-    }
+    provider.setClientId(GOOGLE_OAUTH_CLIENT_ID);
 
     onClick(googleConnectButton, async () => {
-        const clientId = String(googleClientIdInput?.value || "").trim();
-        provider.setClientId(clientId);
-        persistGoogleClientIdPreference(clientId);
         googleAuthError = "";
         updateGoogleAuthUi();
 
-        try {
-            await provider.signIn();
-            googleAuthError = "";
-            await refreshCalendarData();
-        } catch (err) {
-            googleAuthError = err?.message || "Google sign-in failed.";
-            console.error("[google-auth] sign-in failed", err);
+        const { configured, authenticated } = provider.getAuthState();
+        if (!configured) {
+            updateGoogleAuthUi();
+            return;
         }
-        updateGoogleAuthUi();
-    });
 
-    onClick(googleDisconnectButton, async () => {
-        googleAuthError = "";
         try {
-            await provider.signOut();
+            if (authenticated) {
+                await provider.signOut();
+            } else {
+                await provider.signIn();
+            }
             await refreshCalendarData();
         } catch (err) {
-            googleAuthError = err?.message || "Google sign-out failed.";
-            console.error("[google-auth] sign-out failed", err);
+            googleAuthError = err?.message || (authenticated ? "Google sign-out failed." : "Google sign-in failed.");
+            console.error(authenticated ? "[google-auth] sign-out failed" : "[google-auth] sign-in failed", err);
         }
         updateGoogleAuthUi();
     });

@@ -30,15 +30,10 @@
         <div id="selectedSummary" class="selected-summary" aria-live="polite"></div>
         <button id="refreshButton" class="btn" data-size="compact" type="button" title="Refresh calendar data">⟳ Refresh</button>
         <button id="themeToggle" class="btn" data-size="compact" type="button">Toggle theme</button>
-      </div>
-      <div id="googleAuthPanel" class="google-auth-panel" hidden>
-        <label for="googleClientIdInput">
-          <span>Google OAuth Client ID:</span>
-          <input id="googleClientIdInput" class="input google-client-id-input" type="text" placeholder="...apps.googleusercontent.com" />
-        </label>
-        <button id="googleConnectButton" class="btn" data-size="compact" type="button">Sign in with Google</button>
-        <button id="googleDisconnectButton" class="btn" data-size="compact" type="button" hidden>Sign out</button>
-        <div id="googleAuthStatus" class="google-auth-status" aria-live="polite"></div>
+        <div id="googleAuthPanel" class="google-auth-panel" hidden>
+          <button id="googleConnectButton" class="btn" data-size="compact" type="button">Connect to Google</button>
+          <div id="googleAuthStatus" class="google-auth-status" aria-live="polite"></div>
+        </div>
       </div>
     </header>
 

@@ -40,6 +40,7 @@ The current implementation is organized into three practical layers:
 - [src/ui/year-view/main.js](../src/ui/year-view/main.js)
   - initializes DOM references and state
   - wires filters, navigation, loading, refresh, and rendering updates
+  - owns Google connect/log-out header control wiring for standalone web mode
   - coordinates the event store and grid view
 
 - [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
@@ -50,6 +51,9 @@ The current implementation is organized into three practical layers:
   - handles Google OAuth token flow (Google Identity Services)
   - queries Google Calendar list/events endpoints in read-only mode
   - maps Google payloads into the shared event shape
+
+- [src/ui/year-view/google-client-id.js](../src/ui/year-view/google-client-id.js)
+  - stores the Google OAuth web client ID used by standalone Google mode
 
 - [src/ui/year-view/event-store.js](../src/ui/year-view/event-store.js)
   - caches events by year

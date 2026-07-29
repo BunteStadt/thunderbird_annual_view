@@ -25,6 +25,7 @@ The add-on currently provides:
 - [apps](apps) is the starting point for the future monorepo split into addon, web, and backend surfaces.
 - [test](test) contains integration and unit-style checks for the current calendar behavior.
 - [thunderbird-profile](thunderbird-profile) is a pre-configured Thunderbird profile for real-Thunderbird integration testing via Docker or a local installation.
+- [e2e](e2e) contains the real-Thunderbird end-to-end test that installs the add-on from source, captures a screenshot, and validates the Thunderbird log.
 
 ## Architecture principles
 
@@ -59,6 +60,7 @@ Use the following documents as the authoritative deeper references:
 - [docs/monorepo-roadmap.md](docs/monorepo-roadmap.md) — phased plan to evolve the repository into a monorepo.
 - [docs/contributor-workflow.md](docs/contributor-workflow.md) — development workflow, testing expectations, and release conventions.
 - [docs/thunderbird-profile/README.md](../thunderbird-profile/README.md) — how to use the pre-configured Thunderbird profile for end-to-end manual and Docker-based testing.
+- [e2e/README.md](../e2e/README.md) — how to run the real-Thunderbird installation test from the terminal.
 
 ## Working rules for contributors
 

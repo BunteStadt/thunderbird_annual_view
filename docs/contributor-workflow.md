@@ -76,11 +76,40 @@ Thunderbird exposes to the add-on background and verifies that
 `ThunderbirdCalendarProvider` correctly parses real ICS calendar data into
 normalised event objects.
 
-### Manual / Docker integration test
+### Real-Thunderbird end-to-end test
 
-A pre-configured Thunderbird profile lives in `test/thunderbird-profile/`.  It
+`e2e/run-e2e-test.sh` installs the add-on on a **real Thunderbird 153**
+instance (the host snap installation), verifies the log is clean, and
+saves a screenshot.  Run it from the repository root:
+
+```sh
+./e2e/run-e2e-test.sh
+```
+
+Prerequisites (once):
+
+```sh
+sudo snap install thunderbird   # already present on GitHub runners
+sudo apt install -y xvfb scrot xdotool
+```
+
+Artifacts are written to `test-results/` (gitignored):
+
+| File | Contents |
+|---|---|
+| `test-results/addon-installed.png` | Screenshot of the Thunderbird window |
+| `test-results/thunderbird.log` | Full Thunderbird log |
+| `test-results/result.txt` | `PASS` or `FAIL` |
+
+The test exits with code `0` on PASS and `1` on FAIL and is safe to run
+inside an agent's terminal loop.  See [e2e/README.md](../e2e/README.md)
+for full details.
+
+### Manual / Docker GUI
+
+A pre-configured Thunderbird profile lives in `thunderbird-profile/`.  It
 installs the add-on from source via an extension proxy file and pre-registers
-the NRW ICS calendars.  Use it for end-to-end verification:
+the NRW ICS calendars.  Use it for interactive end-to-end verification:
 
 ```sh
 docker compose up      # opens GUI at http://localhost:5800

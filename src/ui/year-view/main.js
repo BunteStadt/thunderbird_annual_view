@@ -1,6 +1,7 @@
-import { createDefaultCalendarProvider, fetchCalendars, setCalendarProvider } from "./calendar-service.js";
+import { createDefaultCalendarProvider, fetchCalendars, getCalendarProvider, setCalendarProvider } from "./calendar-service.js";
 import { EventStore } from "./event-store.js";
 import { GridView } from "./grid-view.js";
+import { setupGoogleStandaloneAuth } from "./google-standalone-auth.js";
 import {
     loadPersistedSelection,
     persistSelection,
@@ -35,12 +36,76 @@ import { applyTheme, detectSystemMode } from "./theme.js";
 
 
 
+// Shared URL flags for standalone modes (?dummy=1, ?google=1).
+const queryParams = new URLSearchParams(globalThis.location?.search || "");
+
+function ensureBrowserStorageBridge() {
+    if (globalThis.browser?.storage?.local) {
+        return;
+    }
+
+    const browserRoot = globalThis.browser && typeof globalThis.browser === "object" ? globalThis.browser : {};
+    const localStorageApi = globalThis.localStorage;
+
+    browserRoot.storage = browserRoot.storage || {};
+    browserRoot.storage.local = {
+        async get(key) {
+            if (!localStorageApi) {
+                return {};
+            }
+            if (typeof key === "string") {
+                const raw = localStorageApi.getItem(`annualView.storage.${key}`);
+                if (raw == null) return {};
+                try {
+                    return { [key]: JSON.parse(raw) };
+                } catch (err) {
+                    console.error("[storage-bridge] parse failed", err);
+                    return {};
+                }
+            }
+
+            const out = {};
+            const prefix = "annualView.storage.";
+            for (let i = 0; i < localStorageApi.length; i += 1) {
+                const storageKey = localStorageApi.key(i);
+                if (!storageKey?.startsWith(prefix)) continue;
+                const logicalKey = storageKey.slice(prefix.length);
+                const raw = localStorageApi.getItem(storageKey);
+                if (raw == null) continue;
+                try {
+                    out[logicalKey] = JSON.parse(raw);
+                } catch (err) {
+                    console.error("[storage-bridge] parse failed", err);
+                }
+            }
+            return out;
+        },
+        async set(values) {
+            if (!localStorageApi) return;
+            for (const [key, value] of Object.entries(values || {})) {
+                localStorageApi.setItem(`annualView.storage.${key}`, JSON.stringify(value));
+            }
+        }
+    };
+
+    globalThis.browser = browserRoot;
+}
+
+function isTruthyQueryFlag(value) {
+    return value === "" || value === "1" || value === "true";
+}
+
 // Enable dummy data only when explicitly requested via ?dummy=1 (or when a
 // test harness pre-set the flag before this module loaded).
 if (typeof globalThis.ENABLE_DUMMY_CALENDARS !== "boolean") {
-    const dummyParam = new URLSearchParams(globalThis.location?.search || "").get("dummy");
-    globalThis.ENABLE_DUMMY_CALENDARS = dummyParam === "" || dummyParam === "1" || dummyParam === "true";
+    globalThis.ENABLE_DUMMY_CALENDARS = isTruthyQueryFlag(queryParams.get("dummy"));
 }
+
+if (typeof globalThis.ENABLE_GOOGLE_CALENDARS !== "boolean") {
+    globalThis.ENABLE_GOOGLE_CALENDARS = isTruthyQueryFlag(queryParams.get("google"));
+}
+
+ensureBrowserStorageBridge();
 
 setCalendarProvider(createDefaultCalendarProvider());
 
@@ -73,6 +138,7 @@ const grayPastDaysInput = document.getElementById("grayPastDays");
 const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
 const viewModeSelect = document.getElementById("viewMode");
 const yearButtons = document.querySelectorAll("[data-year-step]");
+const providerAuthMount = document.getElementById("providerAuthMount");
 
 const YEAR_MIN = Number(yearInput.min) || 1900;
 const YEAR_MAX = Number(yearInput.max) || 2999;
@@ -100,6 +166,7 @@ let isRefreshing = false;
 let grayPastDaysEnabled = false;
 let highlightCurrentDayEnabled = false;
 let viewMode = "linear";
+let providerAuthController = null;
 
 const eventStore = new EventStore();
 const gridView = new GridView({
@@ -438,6 +505,7 @@ async function refreshCalendarData() {
     } finally {
         isRefreshing = false;
         refreshButton?.classList.remove("refreshing");
+        providerAuthController?.update();
     }
 }
 
@@ -509,6 +577,11 @@ async function adjustMinDuration(deltaHours) {
 async function init() {
     setThemeMode(await loadThemePreference());
     refreshSettings = await loadRefreshSettings();
+    providerAuthController = setupGoogleStandaloneAuth({
+        mount: providerAuthMount,
+        getProvider: () => getCalendarProvider(),
+        refreshCalendars: refreshCalendarData
+    });
 
     if (minDurationInput) {
         minDurationInput.value = String(await loadMinDurationPreference());

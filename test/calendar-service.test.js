@@ -106,3 +106,18 @@ test('calendar service returns empty arrays when calendar API is unavailable', a
     assert.deepEqual(calendars, []);
     assert.deepEqual(events, []);
 });
+
+test('calendar service selects Google provider when google mode is enabled', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    globalThis.ENABLE_DUMMY_CALENDARS = false;
+    globalThis.ENABLE_GOOGLE_CALENDARS = true;
+    globalThis.browser = {};
+    t.after(() => {
+        delete globalThis.browser;
+        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        delete globalThis.ENABLE_GOOGLE_CALENDARS;
+    });
+
+    const provider = calendarService.createDefaultCalendarProvider();
+    assert.equal(provider?.constructor?.name, 'GoogleCalendarProvider');
+});

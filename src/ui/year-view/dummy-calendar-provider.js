@@ -1,4 +1,4 @@
-import { CalendarProvider } from "./calendar-provider.js";
+import { CalendarProvider, resolveCalendarAllDayOnly } from "./calendar-provider.js";
 
 const DUMMY_CALENDARS = [
     { id: "dummy-work", name: "Work", color: "#0ea5e9" },
@@ -9,14 +9,6 @@ const DUMMY_CALENDARS = [
 
 function getDummyCalendars() {
     return DUMMY_CALENDARS.map((calendar) => ({ ...calendar }));
-}
-
-function resolveCalendarAllDayOnly(calendarId, options = {}) {
-    const { allDayOnly = false, calendarAllDayModes = {} } = options;
-    const mode = calendarAllDayModes?.[calendarId];
-    if (mode === "yes") return true;
-    if (mode === "no") return false;
-    return allDayOnly;
 }
 
 function getDummyEventsForAnchorYear(year) {

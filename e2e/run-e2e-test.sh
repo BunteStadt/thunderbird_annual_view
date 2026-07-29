@@ -9,12 +9,13 @@
 #      pointing to this repository and the ICS calendar URIs patched to
 #      the actual local paths
 #   3. Starts Thunderbird in a headless virtual display (Xvfb)
-#   4. Waits for the Thunderbird window to appear and fully render
-#   5. Takes a screenshot proving the add-on is installed
+#   4. Waits for the Annual View space to open and calendars to fully load
+#   5. Takes a screenshot showing the Annual View calendar page
 #   6. Checks the Thunderbird log for errors and warnings that are
 #      attributable to the add-on installation
 #   7. Verifies the add-on entry appears in the extensions database
-#   8. Reports PASS or FAIL and writes artifacts to test-results/
+#   8. Verifies calendars and events were loaded (calendar names + event counts)
+#   9. Reports PASS or FAIL and writes artifacts to test-results/
 #
 # Usage (from the repository root):
 #   ./e2e/run-e2e-test.sh
@@ -207,9 +208,11 @@ if ! $WINDOW_FOUND; then
     exit 1
 fi
 
-# Give the UI another 25 seconds to fully render the spaces toolbar and
-# load the add-on background script.
-log "Waiting 25s for full render..."
+# Give the add-on time to open the Annual View space, load calendars, and
+# render the full calendar grid.  The background.js onStartup listener fires
+# immediately after the window appears, but calendar fetching over local ICS
+# files still takes a few seconds on a loaded runner.
+log "Waiting 25s for Annual View to load and calendar events to render..."
 sleep 25
 
 # ---------------------------------------------------------------------------
@@ -316,6 +319,37 @@ for a in addons:
     fi
 else
     log "extensions.json not found (Thunderbird may not have written it yet)"
+fi
+
+# ---------------------------------------------------------------------------
+# Step 9: Verify calendar and event loading output in log
+# ---------------------------------------------------------------------------
+echo ""
+echo "=== Verifying calendar and event loading output ==="
+
+CALENDARS_LINE=$(grep -m1 "\[ThunderbirdCalendarProvider\] calendars found:" "$TB_LOG" || true)
+if [ -n "$CALENDARS_LINE" ]; then
+    pass "Calendars loaded: $CALENDARS_LINE"
+else
+    fail "No calendar list in log — add-on may not have fetched calendars"
+fi
+
+# Print each per-calendar event count line so CI output shows exactly which
+# calendars loaded and how many events each produced.
+CALENDAR_LINES=$(grep "\[ThunderbirdCalendarProvider\] calendar loaded:" "$TB_LOG" || true)
+if [ -n "$CALENDAR_LINES" ]; then
+    echo "$CALENDAR_LINES" | while IFS= read -r line; do
+        pass "  $line"
+    done
+else
+    fail "No per-calendar event counts in log — calendar event fetch may have failed"
+fi
+
+EVENTS_DONE_LINE=$(grep -m1 "\[ThunderbirdCalendarProvider\] done" "$TB_LOG" || true)
+if [ -n "$EVENTS_DONE_LINE" ]; then
+    pass "Total events logged: $EVENTS_DONE_LINE"
+else
+    fail "No total event count in log — add-on may not have completed event fetch"
 fi
 
 # ---------------------------------------------------------------------------

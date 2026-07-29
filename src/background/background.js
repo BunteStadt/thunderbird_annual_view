@@ -5,6 +5,16 @@ browser.action.onClicked.addListener(() => {
     createCustomSpace().catch(console.error);
 });
 
+// Open the Annual View automatically whenever Thunderbird starts or the
+// extension is freshly installed, so the calendar is visible right away.
+browser.runtime.onInstalled.addListener(() => {
+    createCustomSpace().catch(console.error);
+});
+
+browser.runtime.onStartup.addListener(() => {
+    createCustomSpace().catch(console.error);
+});
+
 
 async function createCustomSpace() {
 

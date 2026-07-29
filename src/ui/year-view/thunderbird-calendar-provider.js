@@ -39,11 +39,13 @@ export class ThunderbirdCalendarProvider extends CalendarProvider {
 
         try {
             const calendars = await browser.calendar.calendars.query({});
-            return (calendars || []).map((calendar) => ({
+            const result = (calendars || []).map((calendar) => ({
                 id: calendar.id,
                 name: calendar.name || "(unnamed)",
                 color: calendar.color || calendar.backgroundColor || null
             }));
+            console.log("[ThunderbirdCalendarProvider] calendars found:", result.map(c => c.name).join(", "));
+            return result;
         } catch (err) {
             console.error("[ThunderbirdCalendarProvider] fetchCalendars failed", err);
             return [];
@@ -130,6 +132,7 @@ export class ThunderbirdCalendarProvider extends CalendarProvider {
                     events.push(event);
                 }
             });
+            console.log("[ThunderbirdCalendarProvider] calendar loaded:", { calendar: cal.name, events: parsed.length });
         }
 
         console.log("[ThunderbirdCalendarProvider] done", { total: events.length, ms: Date.now() - started });

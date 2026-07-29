@@ -41,10 +41,10 @@ Thunderbird fetches the files from `file:///workspace/`.
 1. Copy or symlink this profile to a convenient location:
 
    ```sh
-   cp -r test/thunderbird-profile /tmp/tb-test-profile
+   cp -r thunderbird-profile /tmp/tb-test-profile
    ```
 
-2. Update the calendar URIs in `prefs.js` to match your local repository path:
+2. Update the calendar URIs in `user.js` to match your local repository path:
 
    ```js
    user_pref("calendar.registry.e1a2b3c4-....uri",
@@ -55,7 +55,7 @@ Thunderbird fetches the files from `file:///workspace/`.
 
    ```sh
    echo "/your/path/to/thunderbird_annual_view" \
-     > test/thunderbird-profile/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net
+     > thunderbird-profile/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net
    ```
 
 4. Launch Thunderbird with the profile:

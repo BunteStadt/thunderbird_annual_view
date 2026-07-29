@@ -21,6 +21,29 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
 
-
       - name: Run unit and integration tests
         run: node --test
+
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install prerequisites
+        run: |
+          sudo snap install thunderbird
+          sudo apt-get install -y xvfb scrot xdotool
+
+      - name: Run e2e test
+        run: ./e2e/run-e2e-test.sh
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: test-results/

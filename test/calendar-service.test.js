@@ -5,9 +5,8 @@ const path = require('node:path');
 
 async function loadCalendarServiceModule() {
     const modulePath = path.resolve(__dirname, '../src/ui/year-view/calendar-service.js');
-    const source = await fs.readFile(modulePath, 'utf8');
-    const moduleUrl = `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`;
-    return import(moduleUrl);
+    await fs.access(modulePath);
+    return import(`file://${modulePath.replace(/\\/g, '/')}`);
 }
 
 test('fetchCalendars returns dummy calendars when enabled', async (t) => {
@@ -63,6 +62,33 @@ test('fetchCalendarEvents resolves per-calendar all-day modes against the global
     assert.ok(events.every((event) => event.calendarId === 'dummy-work' || event.calendarId === 'dummy-project'));
     assert.ok(events.some((event) => event.calendarId === 'dummy-work' && event.allDay === false));
     assert.ok(events.every((event) => event.calendarId !== 'dummy-project' || event.allDay === true));
+});
+
+test('calendar service delegates to an injected provider', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    const provider = {
+        async fetchCalendars() {
+            return [{ id: 'custom', name: 'Custom', color: '#123456' }];
+        },
+        async fetchCalendarEvents() {
+            return [{
+                id: 'event-1',
+                calendarId: 'custom',
+                title: 'Custom event',
+                start: new Date(2026, 0, 1),
+                end: new Date(2026, 0, 2),
+                allDay: true
+            }];
+        }
+    };
+
+    calendarService.setCalendarProvider(provider);
+    t.after(() => {
+        calendarService.setCalendarProvider(null);
+    });
+
+    assert.deepEqual(await calendarService.fetchCalendars(), [{ id: 'custom', name: 'Custom', color: '#123456' }]);
+    assert.equal((await calendarService.fetchCalendarEvents(2026))[0].title, 'Custom event');
 });
 
 test('calendar service returns empty arrays when calendar API is unavailable', async (t) => {

@@ -1,4 +1,4 @@
-import { fetchCalendars } from "./calendar-service.js";
+import { createDefaultCalendarProvider, fetchCalendars, setCalendarProvider } from "./calendar-service.js";
 import { EventStore } from "./event-store.js";
 import { GridView } from "./grid-view.js";
 import {
@@ -41,6 +41,8 @@ if (typeof globalThis.ENABLE_DUMMY_CALENDARS !== "boolean") {
     const dummyParam = new URLSearchParams(globalThis.location?.search || "").get("dummy");
     globalThis.ENABLE_DUMMY_CALENDARS = dummyParam === "" || dummyParam === "1" || dummyParam === "true";
 }
+
+setCalendarProvider(createDefaultCalendarProvider());
 
 // ---------------------------------------------------------------------------
 // DOM references

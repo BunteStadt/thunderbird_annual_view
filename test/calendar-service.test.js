@@ -122,7 +122,7 @@ test('calendar service selects Google provider when google mode is enabled', asy
     assert.equal(provider?.constructor?.name, 'GoogleCalendarProvider');
 });
 
-test('calendar service prefers uploaded ICS calendars instead of merging them as an overlay', async (t) => {
+test('calendar service merges uploaded ICS calendars alongside the active provider', async (t) => {
     const calendarService = await loadCalendarServiceModule();
     globalThis.ENABLE_DUMMY_CALENDARS = true;
     t.after(() => {
@@ -132,8 +132,8 @@ test('calendar service prefers uploaded ICS calendars instead of merging them as
 
     calendarService.setIcsCalendars([
         {
-            id: 'ics-only',
-            name: 'ICS Only',
+            id: 'ics-imported',
+            name: 'ICS Imported',
             color: '#ef4444',
             content: [
                 'BEGIN:VCALENDAR',
@@ -152,10 +152,15 @@ test('calendar service prefers uploaded ICS calendars instead of merging them as
     const calendars = await calendarService.fetchCalendars();
     const events = await calendarService.fetchCalendarEvents(2026);
 
-    assert.deepEqual(calendars.map((calendar) => calendar.id), ['ics-only']);
-    assert.equal(events.length, 1);
-    assert.equal(events[0].calendarId, 'ics-only');
-    assert.equal(events[0].title, 'Imported holiday');
+    // ICS calendar appears alongside dummy provider calendars
+    const calendarIds = calendars.map((c) => c.id);
+    assert.ok(calendarIds.includes('ics-imported'), 'ICS calendar present in list');
+    assert.ok(calendarIds.includes('dummy-work'), 'main provider calendars still present');
+
+    // ICS event is included in the merged event list
+    const icsEvent = events.find((e) => e.calendarId === 'ics-imported');
+    assert.ok(icsEvent, 'ICS event present in merged events');
+    assert.equal(icsEvent.title, 'Imported holiday');
 });
 
 test('calendar service falls back to the default provider when no ICS calendars are uploaded', async (t) => {

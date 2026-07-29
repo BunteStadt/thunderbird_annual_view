@@ -21,15 +21,7 @@ export function setCalendarProvider(provider) {
 }
 
 export function getCalendarProvider() {
-    if (activeCalendarProvider) {
-        return activeCalendarProvider;
-    }
-
-    if (activeIcsProvider.hasCalendars()) {
-        return activeIcsProvider;
-    }
-
-    return createDefaultCalendarProvider();
+    return activeCalendarProvider || createDefaultCalendarProvider();
 }
 
 export function setIcsCalendars(calendars) {
@@ -53,9 +45,17 @@ export function createDefaultCalendarProvider() {
 }
 
 export async function fetchCalendars() {
-    return getCalendarProvider().fetchCalendars();
+    const [mainCalendars, icsCalendars] = await Promise.all([
+        getCalendarProvider().fetchCalendars(),
+        activeIcsProvider.fetchCalendars()
+    ]);
+    return [...mainCalendars, ...icsCalendars];
 }
 
 export async function fetchCalendarEvents(year, options = {}) {
-    return getCalendarProvider().fetchCalendarEvents(year, options);
+    const [mainEvents, icsEvents] = await Promise.all([
+        getCalendarProvider().fetchCalendarEvents(year, options),
+        activeIcsProvider.fetchCalendarEvents(year, options)
+    ]);
+    return [...mainEvents, ...icsEvents];
 }

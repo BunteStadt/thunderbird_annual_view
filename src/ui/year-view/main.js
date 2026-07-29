@@ -1,4 +1,4 @@
-import { createDefaultCalendarProvider, fetchCalendars, setCalendarProvider } from "./calendar-service.js";
+import { createDefaultCalendarProvider, fetchCalendars, getCalendarProvider, setCalendarProvider } from "./calendar-service.js";
 import { EventStore } from "./event-store.js";
 import { GridView } from "./grid-view.js";
 import {
@@ -35,12 +35,76 @@ import { applyTheme, detectSystemMode } from "./theme.js";
 
 
 
+const queryParams = new URLSearchParams(globalThis.location?.search || "");
+const GOOGLE_CLIENT_ID_STORAGE_KEY = "annualView.googleClientId";
+
+function ensureBrowserStorageBridge() {
+    if (globalThis.browser?.storage?.local) {
+        return;
+    }
+
+    const browserRoot = globalThis.browser && typeof globalThis.browser === "object" ? globalThis.browser : {};
+    const localStorageApi = globalThis.localStorage;
+
+    browserRoot.storage = browserRoot.storage || {};
+    browserRoot.storage.local = {
+        async get(key) {
+            if (!localStorageApi) {
+                return typeof key === "string" ? {} : {};
+            }
+            if (typeof key === "string") {
+                const raw = localStorageApi.getItem(`annualView.storage.${key}`);
+                if (raw == null) return {};
+                try {
+                    return { [key]: JSON.parse(raw) };
+                } catch (err) {
+                    console.error("[storage-bridge] parse failed", err);
+                    return {};
+                }
+            }
+
+            const out = {};
+            const prefix = "annualView.storage.";
+            for (let i = 0; i < localStorageApi.length; i += 1) {
+                const storageKey = localStorageApi.key(i);
+                if (!storageKey?.startsWith(prefix)) continue;
+                const logicalKey = storageKey.slice(prefix.length);
+                const raw = localStorageApi.getItem(storageKey);
+                if (raw == null) continue;
+                try {
+                    out[logicalKey] = JSON.parse(raw);
+                } catch (err) {
+                    console.error("[storage-bridge] parse failed", err);
+                }
+            }
+            return out;
+        },
+        async set(values) {
+            if (!localStorageApi) return;
+            for (const [key, value] of Object.entries(values || {})) {
+                localStorageApi.setItem(`annualView.storage.${key}`, JSON.stringify(value));
+            }
+        }
+    };
+
+    globalThis.browser = browserRoot;
+}
+
+function isTruthyQueryFlag(value) {
+    return value === "" || value === "1" || value === "true";
+}
+
 // Enable dummy data only when explicitly requested via ?dummy=1 (or when a
 // test harness pre-set the flag before this module loaded).
 if (typeof globalThis.ENABLE_DUMMY_CALENDARS !== "boolean") {
-    const dummyParam = new URLSearchParams(globalThis.location?.search || "").get("dummy");
-    globalThis.ENABLE_DUMMY_CALENDARS = dummyParam === "" || dummyParam === "1" || dummyParam === "true";
+    globalThis.ENABLE_DUMMY_CALENDARS = isTruthyQueryFlag(queryParams.get("dummy"));
 }
+
+if (typeof globalThis.ENABLE_GOOGLE_CALENDARS !== "boolean") {
+    globalThis.ENABLE_GOOGLE_CALENDARS = isTruthyQueryFlag(queryParams.get("google"));
+}
+
+ensureBrowserStorageBridge();
 
 setCalendarProvider(createDefaultCalendarProvider());
 
@@ -73,6 +137,11 @@ const grayPastDaysInput = document.getElementById("grayPastDays");
 const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
 const viewModeSelect = document.getElementById("viewMode");
 const yearButtons = document.querySelectorAll("[data-year-step]");
+const googleAuthPanel = document.getElementById("googleAuthPanel");
+const googleClientIdInput = document.getElementById("googleClientIdInput");
+const googleConnectButton = document.getElementById("googleConnectButton");
+const googleDisconnectButton = document.getElementById("googleDisconnectButton");
+const googleAuthStatus = document.getElementById("googleAuthStatus");
 
 const YEAR_MIN = Number(yearInput.min) || 1900;
 const YEAR_MAX = Number(yearInput.max) || 2999;
@@ -100,6 +169,7 @@ let isRefreshing = false;
 let grayPastDaysEnabled = false;
 let highlightCurrentDayEnabled = false;
 let viewMode = "linear";
+let googleAuthError = "";
 
 const eventStore = new EventStore();
 const gridView = new GridView({
@@ -405,6 +475,118 @@ function setCalendarPanelVisible(expanded) {
     persistPanelState(expanded);
 }
 
+function getGoogleProvider() {
+    const provider = getCalendarProvider();
+    const hasGoogleAuthMethods = typeof provider?.setClientId === "function"
+        && typeof provider?.getAuthState === "function"
+        && typeof provider?.signIn === "function"
+        && typeof provider?.signOut === "function";
+    return hasGoogleAuthMethods ? provider : null;
+}
+
+function loadGoogleClientIdPreference() {
+    const clientIdParam = String(queryParams.get("googleClientId") || "").trim();
+    if (clientIdParam) {
+        return clientIdParam;
+    }
+    try {
+        return String(globalThis.localStorage?.getItem(GOOGLE_CLIENT_ID_STORAGE_KEY) || "").trim();
+    } catch (err) {
+        console.error("[google-auth] unable to load client id", err);
+        return "";
+    }
+}
+
+function persistGoogleClientIdPreference(clientId) {
+    try {
+        if (clientId) {
+            globalThis.localStorage?.setItem(GOOGLE_CLIENT_ID_STORAGE_KEY, clientId);
+        } else {
+            globalThis.localStorage?.removeItem(GOOGLE_CLIENT_ID_STORAGE_KEY);
+        }
+    } catch (err) {
+        console.error("[google-auth] unable to persist client id", err);
+    }
+}
+
+function updateGoogleAuthUi() {
+    const provider = getGoogleProvider();
+    if (!provider) {
+        googleAuthPanel?.toggleAttribute("hidden", true);
+        return;
+    }
+
+    googleAuthPanel?.toggleAttribute("hidden", false);
+    const state = provider.getAuthState();
+    const configured = state?.configured === true;
+    const authenticated = state?.authenticated === true;
+
+    if (googleConnectButton) {
+        googleConnectButton.textContent = authenticated ? "Reconnect Google" : "Sign in with Google";
+    }
+    if (googleDisconnectButton) {
+        googleDisconnectButton.toggleAttribute("hidden", !authenticated);
+    }
+    if (googleAuthStatus) {
+        const message = googleAuthError
+            || (!configured
+                ? "Enter your Google OAuth client ID, then sign in."
+                : (authenticated ? "Connected to Google Calendar." : "Not connected to Google Calendar."));
+        googleAuthStatus.textContent = message;
+        googleAuthStatus.classList.toggle("is-error", !!googleAuthError);
+    }
+}
+
+function setupGoogleAuthControls() {
+    const provider = getGoogleProvider();
+    if (!provider) {
+        googleAuthPanel?.toggleAttribute("hidden", true);
+        return;
+    }
+
+    googleAuthPanel?.toggleAttribute("hidden", false);
+
+    const preferredClientId = loadGoogleClientIdPreference();
+    if (preferredClientId) {
+        provider.setClientId(preferredClientId);
+        if (googleClientIdInput) {
+            googleClientIdInput.value = preferredClientId;
+        }
+    }
+
+    onClick(googleConnectButton, async () => {
+        const clientId = String(googleClientIdInput?.value || "").trim();
+        provider.setClientId(clientId);
+        persistGoogleClientIdPreference(clientId);
+        googleAuthError = "";
+        updateGoogleAuthUi();
+
+        try {
+            await provider.signIn();
+            googleAuthError = "";
+            await refreshCalendarData();
+        } catch (err) {
+            googleAuthError = err?.message || "Google sign-in failed.";
+            console.error("[google-auth] sign-in failed", err);
+        }
+        updateGoogleAuthUi();
+    });
+
+    onClick(googleDisconnectButton, async () => {
+        googleAuthError = "";
+        try {
+            await provider.signOut();
+            await refreshCalendarData();
+        } catch (err) {
+            googleAuthError = err?.message || "Google sign-out failed.";
+            console.error("[google-auth] sign-out failed", err);
+        }
+        updateGoogleAuthUi();
+    });
+
+    updateGoogleAuthUi();
+}
+
 async function loadCalendars() {
     availableCalendars = await fetchCalendars();
     const { ids: persistedIds, found } = await loadPersistedSelection();
@@ -438,6 +620,7 @@ async function refreshCalendarData() {
     } finally {
         isRefreshing = false;
         refreshButton?.classList.remove("refreshing");
+        updateGoogleAuthUi();
     }
 }
 
@@ -509,6 +692,7 @@ async function adjustMinDuration(deltaHours) {
 async function init() {
     setThemeMode(await loadThemePreference());
     refreshSettings = await loadRefreshSettings();
+    setupGoogleAuthControls();
 
     if (minDurationInput) {
         minDurationInput.value = String(await loadMinDurationPreference());

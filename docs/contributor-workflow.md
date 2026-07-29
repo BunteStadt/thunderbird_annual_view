@@ -19,6 +19,7 @@ Use a dedicated profile and install the add-on from a generated XPI package or f
 ### Standalone HTML development
 
 The standalone page can be used for faster iteration and debugging. It supports dummy data via the URL parameter `?dummy=1` and is useful for validating rendering behavior without the Thunderbird environment.
+It also supports Google Calendar integration via `?google=1` using a Google OAuth web client ID entered in the page header.
 
 ## 3. GitHub workflows and CI
 

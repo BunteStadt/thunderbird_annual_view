@@ -62,6 +62,28 @@ It is responsive from mobile to wide desktop layouts, includes animated visual a
 - Dummy demo button target (opens in a new tab): `src/ui/year-view/year-view.html?dummy=1`
 - Embedded demo target (inside an iframe): `src/ui/year-view/year-view.html?dummy=1`
 
+## Browser Website with Google Calendar
+
+The year-view page can now run as a local website with Google Calendar integration.
+
+1. Start a local web server from the repository root (for example `python -m http.server 4173`).
+2. Open `http://localhost:4173/src/ui/year-view/year-view.html?google=1`.
+3. Enter a Google OAuth client ID in the `Google OAuth Client ID` field.
+4. Click `Sign in with Google` and complete the Google login/consent flow.
+5. The year view then loads your Google calendars and events.
+
+Google setup requirements:
+
+- In Google Cloud Console, create an OAuth Web Client.
+- Add your local origin (for example `http://localhost:4173`) to **Authorized JavaScript origins**.
+- Use scope `https://www.googleapis.com/auth/calendar.readonly`.
+- This integration is read-only.
+
+### Local Website Screenshots
+
+![Website landing with Google entry](docs/screenshots/website-landing-with-google-entry.png)
+![Year-view Google sign-in mode](docs/screenshots/google-calendar-signin-view.png)
+
 ## Usage
 
 1. After installation, new buttons (on the left in the spaces toolbar and at the top left) will appear.
@@ -100,6 +122,9 @@ Use a seperate Thunderbird profile.
 ### Dummy Data
 Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
 Or use the commented out code in main.js.
+
+### Google Calendar Data
+Open the standalone page with `?google=1` (for example `src/ui/year-view/year-view.html?google=1`) to enable the Google provider and the sign-in controls.
 
 ### Build standalone html
 

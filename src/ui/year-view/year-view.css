@@ -133,6 +133,32 @@ header {
   font-weight: 600;
 }
 
+.google-auth-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  color: var(--muted);
+}
+
+.google-auth-panel[hidden] {
+  display: none;
+}
+
+.google-client-id-input {
+  width: min(32rem, 75vw);
+  text-align: left;
+}
+
+.google-auth-status {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.google-auth-status.is-error {
+  color: #dc2626;
+}
+
 .input {
   width: 6rem;
   padding: 0.38rem 0.55rem;

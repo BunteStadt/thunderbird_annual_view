@@ -43,8 +43,13 @@ The current implementation is organized into three practical layers:
   - coordinates the event store and grid view
 
 - [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
-  - fetches calendars and events from Thunderbird calendar APIs
-  - contains the dummy-data fallback used in standalone development
+  - resolves the active calendar provider (dummy, Thunderbird, or Google web)
+  - keeps provider selection out of the renderer
+
+- [src/ui/year-view/google-calendar-provider.js](../src/ui/year-view/google-calendar-provider.js)
+  - handles Google OAuth token flow (Google Identity Services)
+  - queries Google Calendar list/events endpoints in read-only mode
+  - maps Google payloads into the shared event shape
 
 - [src/ui/year-view/event-store.js](../src/ui/year-view/event-store.js)
   - caches events by year
@@ -109,10 +114,11 @@ The user can change:
 ## 4. Current data flow
 
 1. The UI initializes and loads persisted preferences.
-2. The event store requests events for the needed year range.
-3. The store caches normalized events and filters them according to current settings.
-4. The grid view renders visible rows and overlays event bars.
-5. User actions change filter or view state and trigger a refresh of the rendered grid.
+2. The UI chooses a provider (Thunderbird APIs, Google web APIs, or dummy data).
+3. The event store requests events for the needed year range.
+4. The store caches normalized events and filters them according to current settings.
+5. The grid view renders visible rows and overlays event bars.
+6. User actions change filter or view state and trigger a refresh of the rendered grid.
 
 ## 5. Constraints and requirements
 

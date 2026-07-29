@@ -530,16 +530,26 @@ function setupGoogleAuthControls() {
 
         updateGoogleAuthUi();
 
+        let authSucceeded = false;
         try {
             if (authenticated) {
                 await provider.signOut();
             } else {
                 await provider.signIn();
             }
-            await refreshCalendarData();
+            authSucceeded = true;
         } catch (err) {
             googleAuthError = err?.message || (authenticated ? "Google sign-out failed." : "Google sign-in failed.");
             console.error(authenticated ? "[google-auth] sign-out failed" : "[google-auth] sign-in failed", err);
+        }
+
+        if (authSucceeded) {
+            try {
+                await refreshCalendarData();
+            } catch (err) {
+                googleAuthError = err?.message || "Calendar refresh failed after Google authentication.";
+                console.error("[google-auth] calendar refresh failed", err);
+            }
         }
         updateGoogleAuthUi();
     });

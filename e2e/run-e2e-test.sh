@@ -73,7 +73,6 @@ trap cleanup EXIT INT TERM
 log()  { echo "  $*"; }
 pass() { echo "  [PASS] $*"; }
 fail() { echo "  [FAIL] $*" >&2; EXIT_CODE=1; }
-warn() { echo "  [WARN] $*"; }
 
 check_prereq() {
     if ! command -v "$1" &>/dev/null; then
@@ -332,7 +331,7 @@ CALENDARS_LINE=$(grep -m1 "\[ThunderbirdCalendarProvider\] calendars found:" "$T
 if [ -n "$CALENDARS_LINE" ]; then
     pass "Calendars loaded: $CALENDARS_LINE"
 else
-    warn "No calendar list in log — Thunderbird log may not include extension console output in this environment"
+    fail "No calendar list in log — add-on may not have fetched calendars"
 fi
 
 # Print each per-calendar event count line so CI output shows exactly which
@@ -343,14 +342,14 @@ if [ -n "$CALENDAR_LINES" ]; then
         pass "  $line"
     done
 else
-    warn "No per-calendar event counts in log — Thunderbird log may not include extension console output in this environment"
+    fail "No per-calendar event counts in log — calendar event fetch may have failed"
 fi
 
 EVENTS_DONE_LINE=$(grep -m1 "\[ThunderbirdCalendarProvider\] done" "$TB_LOG" || true)
 if [ -n "$EVENTS_DONE_LINE" ]; then
     pass "Total events logged: $EVENTS_DONE_LINE"
 else
-    warn "No total event count in log — Thunderbird log may not include extension console output in this environment"
+    fail "No total event count in log — add-on may not have completed event fetch"
 fi
 
 # ---------------------------------------------------------------------------

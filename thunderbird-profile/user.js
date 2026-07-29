@@ -41,6 +41,8 @@ user_pref("xpinstall.signatures.required", false);
 user_pref("extensions.autoDisableScopes", 0);
 // Allow experiment APIs (required for the calendar experiment APIs in this add-on)
 user_pref("extensions.experiments.enabled", true);
+// Mirror extension/content console output to stdout/stderr so CI logs include add-on logging.
+user_pref("devtools.console.stdout.content", true);
 // Suppress the extension install notification bar
 user_pref("extensions.ui.lastCategory", "addons://list/extension");
 

@@ -61,6 +61,15 @@ jobs:
           mkdir -p dist
           zip -r dist/calendar-annual-view-media-${GITHUB_REF##*/}.zip media/generated/${GITHUB_REF##*/}
 
+      - name: Upload release artifacts to workflow run
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-files-${{ github.ref_name }}
+          path: |
+            dist/calendar-annual-view-${{ github.ref_name }}.xpi
+            dist/calendar-annual-view-media-${{ github.ref_name }}.zip
+            media/generated/${{ github.ref_name }}/*.png
+
       - name: Upload XPI and media to release
         uses: softprops/action-gh-release@v1
         with:

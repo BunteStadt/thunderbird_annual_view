@@ -1,18 +1,10 @@
-import { CalendarProvider } from "./calendar-provider.js";
+import { CalendarProvider, resolveCalendarAllDayOnly } from "./calendar-provider.js";
 
 const GOOGLE_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 const GOOGLE_GSI_SCRIPT = "https://accounts.google.com/gsi/client";
 const TOKEN_EXPIRY_SKEW_MS = 5000;
 // Fallback duration when Google returns an event without a valid end timestamp.
 const FALLBACK_EVENT_LENGTH_MS = 60 * 60 * 1000;
-
-function resolveCalendarAllDayOnly(calendarId, options = {}) {
-    const { allDayOnly = false, calendarAllDayModes = {} } = options;
-    const mode = calendarAllDayModes?.[calendarId];
-    if (mode === "yes") return true;
-    if (mode === "no") return false;
-    return allDayOnly;
-}
 
 function parseGoogleDate(value, allDay) {
     if (!value) return null;

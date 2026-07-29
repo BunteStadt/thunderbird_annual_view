@@ -14,9 +14,13 @@ const baseScenarios = [
     { mode: "linear", theme: "light" },
     { mode: "day-aligned", theme: "light" },
     { mode: "week-rows", theme: "light" },
+    { mode: "two-week-rows", theme: "light" },
+    { mode: "one-week-rows", theme: "light" },
     { mode: "linear", theme: "dark" },
     { mode: "day-aligned", theme: "dark" },
-    { mode: "week-rows", theme: "dark" }
+    { mode: "week-rows", theme: "dark" },
+    { mode: "two-week-rows", theme: "dark" },
+    { mode: "one-week-rows", theme: "dark" }
 ];
 
 const optionScenarios = [

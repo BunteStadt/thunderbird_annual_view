@@ -130,6 +130,10 @@ export class IcsCalendarProvider extends CalendarProvider {
         }));
     }
 
+    hasCalendars() {
+        return this._calendars.length > 0;
+    }
+
     async fetchCalendars() {
         return this._calendars.map(({ id, name, color }) => ({ id, name, color }));
     }

@@ -121,3 +121,57 @@ test('calendar service selects Google provider when google mode is enabled', asy
     const provider = calendarService.createDefaultCalendarProvider();
     assert.equal(provider?.constructor?.name, 'GoogleCalendarProvider');
 });
+
+test('calendar service prefers uploaded ICS calendars instead of merging them as an overlay', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    t.after(() => {
+        calendarService.setIcsCalendars([]);
+        delete globalThis.ENABLE_DUMMY_CALENDARS;
+    });
+
+    calendarService.setIcsCalendars([
+        {
+            id: 'ics-only',
+            name: 'ICS Only',
+            color: '#ef4444',
+            content: [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'BEGIN:VEVENT',
+                'UID:ics-event-1',
+                'SUMMARY:Imported holiday',
+                'DTSTART;VALUE=DATE:20260101',
+                'DTEND;VALUE=DATE:20260102',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\n')
+        }
+    ]);
+
+    const calendars = await calendarService.fetchCalendars();
+    const events = await calendarService.fetchCalendarEvents(2026);
+
+    assert.deepEqual(calendars.map((calendar) => calendar.id), ['ics-only']);
+    assert.equal(events.length, 1);
+    assert.equal(events[0].calendarId, 'ics-only');
+    assert.equal(events[0].title, 'Imported holiday');
+});
+
+test('calendar service falls back to the default provider when no ICS calendars are uploaded', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    t.after(() => {
+        calendarService.setIcsCalendars([]);
+        delete globalThis.ENABLE_DUMMY_CALENDARS;
+    });
+
+    calendarService.setIcsCalendars([]);
+
+    const calendars = await calendarService.fetchCalendars();
+
+    assert.deepEqual(
+        calendars.map((calendar) => calendar.id),
+        ['dummy-work', 'dummy-personal', 'dummy-project', 'dummy-holidays']
+    );
+});

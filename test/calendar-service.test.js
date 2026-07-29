@@ -121,3 +121,62 @@ test('calendar service selects Google provider when google mode is enabled', asy
     const provider = calendarService.createDefaultCalendarProvider();
     assert.equal(provider?.constructor?.name, 'GoogleCalendarProvider');
 });
+
+test('calendar service merges uploaded ICS calendars alongside the active provider', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    t.after(() => {
+        calendarService.setIcsCalendars([]);
+        delete globalThis.ENABLE_DUMMY_CALENDARS;
+    });
+
+    calendarService.setIcsCalendars([
+        {
+            id: 'ics-imported',
+            name: 'ICS Imported',
+            color: '#ef4444',
+            content: [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'BEGIN:VEVENT',
+                'UID:ics-event-1',
+                'SUMMARY:Imported holiday',
+                'DTSTART;VALUE=DATE:20260101',
+                'DTEND;VALUE=DATE:20260102',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\n')
+        }
+    ]);
+
+    const calendars = await calendarService.fetchCalendars();
+    const events = await calendarService.fetchCalendarEvents(2026);
+
+    // ICS calendar appears alongside dummy provider calendars
+    const calendarIds = calendars.map((c) => c.id);
+    assert.ok(calendarIds.includes('ics-imported'), 'ICS calendar present in list');
+    assert.ok(calendarIds.includes('dummy-work'), 'main provider calendars still present');
+
+    // ICS event is included in the merged event list
+    const icsEvent = events.find((e) => e.calendarId === 'ics-imported');
+    assert.ok(icsEvent, 'ICS event present in merged events');
+    assert.equal(icsEvent.title, 'Imported holiday');
+});
+
+test('calendar service falls back to the default provider when no ICS calendars are uploaded', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    t.after(() => {
+        calendarService.setIcsCalendars([]);
+        delete globalThis.ENABLE_DUMMY_CALENDARS;
+    });
+
+    calendarService.setIcsCalendars([]);
+
+    const calendars = await calendarService.fetchCalendars();
+
+    assert.deepEqual(
+        calendars.map((calendar) => calendar.id),
+        ['dummy-work', 'dummy-personal', 'dummy-project', 'dummy-holidays']
+    );
+});

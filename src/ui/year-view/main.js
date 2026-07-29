@@ -2,6 +2,7 @@ import { createDefaultCalendarProvider, fetchCalendars, getCalendarProvider, set
 import { EventStore } from "./event-store.js";
 import { GridView } from "./grid-view.js";
 import { setupGoogleStandaloneAuth } from "./google-standalone-auth.js";
+import { setupIcsCalendarIntegration } from "./ics-calendar-integration.js";
 import {
     loadPersistedSelection,
     persistSelection,
@@ -139,6 +140,7 @@ const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
 const viewModeSelect = document.getElementById("viewMode");
 const yearButtons = document.querySelectorAll("[data-year-step]");
 const providerAuthMount = document.getElementById("providerAuthMount");
+const providerSidebarMount = document.getElementById("providerSidebarMount");
 
 const YEAR_MIN = Number(yearInput.min) || 1900;
 const YEAR_MAX = Number(yearInput.max) || 2999;
@@ -167,6 +169,7 @@ let grayPastDaysEnabled = false;
 let highlightCurrentDayEnabled = false;
 let viewMode = "linear";
 let providerAuthController = null;
+let icsRemoveCalendar = null;
 
 const eventStore = new EventStore();
 const gridView = new GridView({
@@ -423,14 +426,30 @@ function createDurationControl(cal) {
     return durationControl;
 }
 
+function createRemoveButton(cal) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn calendar-remove-btn";
+    btn.dataset.size = "compact";
+    btn.textContent = "✕";
+    btn.title = `Remove ${cal.name || "(unnamed)"}`;
+    btn.setAttribute("aria-label", `Remove calendar ${cal.name || "(unnamed)"}`);
+    btn.addEventListener("click", () => icsRemoveCalendar?.(cal.id));
+    return btn;
+}
+
 function renderCalendarList(calendars) {
     calendarList.innerHTML = "";
     calendars.forEach((cal) => {
         const row = document.createElement("div");
-        row.className = "calendar-row";
+        const isIcs = cal.id.startsWith("ics-");
+        row.className = `calendar-row${isIcs ? " calendar-row-ics" : ""}`;
         row.appendChild(createCalendarChip(cal));
         row.appendChild(createAllDayModeButton(cal));
         row.appendChild(createDurationControl(cal));
+        if (isIcs) {
+            row.appendChild(createRemoveButton(cal));
+        }
         calendarList.appendChild(row);
     });
     updateDurationFilterControlsState();
@@ -582,6 +601,15 @@ async function init() {
         getProvider: () => getCalendarProvider(),
         refreshCalendars: refreshCalendarData
     });
+    const icsCalendarIntegration = setupIcsCalendarIntegration({
+        mount: providerSidebarMount,
+        onCalendarsChanged: async () => {
+            eventStore.invalidate();
+            await loadCalendars();
+            applyFilterChange();
+        }
+    });
+    icsRemoveCalendar = (id) => icsCalendarIntegration.removeCalendar(id);
 
     if (minDurationInput) {
         minDurationInput.value = String(await loadMinDurationPreference());
@@ -601,6 +629,7 @@ async function init() {
     highlightCurrentDayEnabled = await loadHighlightCurrentDay();
     if (grayPastDaysInput) grayPastDaysInput.checked = grayPastDaysEnabled;
     if (highlightCurrentDayInput) highlightCurrentDayInput.checked = highlightCurrentDayEnabled;
+    await icsCalendarIntegration.initialize();
 
     await loadCalendars();
 

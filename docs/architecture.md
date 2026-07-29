@@ -41,10 +41,14 @@ The current implementation is organized into three practical layers:
   - initializes DOM references and state
   - wires filters, navigation, loading, refresh, and rendering updates
   - owns Google connect/log-out header control wiring for standalone web mode
+  - attaches provider-specific sidebar integrations through a generic mount
   - coordinates the event store and grid view
 
 - [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
-  - resolves the active calendar provider (dummy, Thunderbird, or Google web)
+  - resolves the primary calendar provider (dummy, Thunderbird, Google web, or empty)
+  - keeps uploaded `.ics` calendars in a dedicated `IcsCalendarProvider` instance
+  - merges `IcsCalendarProvider` calendars/events with the active provider output in `fetchCalendars()` and `fetchCalendarEvents()`
+  - exports `IcsCalendarProvider`, `GoogleCalendarProvider`, `ThunderbirdCalendarProvider`, `DummyCalendarProvider`, and `EmptyCalendarProvider`
   - keeps provider selection out of the renderer
 
 - [src/ui/year-view/google-calendar-provider.js](../src/ui/year-view/google-calendar-provider.js)
@@ -54,6 +58,19 @@ The current implementation is organized into three practical layers:
 
 - [src/ui/year-view/google-client-id.js](../src/ui/year-view/google-client-id.js)
   - stores the Google OAuth web client ID used by standalone Google mode
+
+- [src/ui/year-view/ics-calendar-provider.js](../src/ui/year-view/ics-calendar-provider.js)
+  - platform-agnostic provider that reads events from in-memory ICS (iCalendar) content
+  - accepts an array of `{ id, name, color, content }` descriptors; the caller supplies the raw ICS text
+  - handles iCalendar line unfolding, `VALUE=DATE` and `TZID`-qualified `DTSTART`/`DTEND`, and UTC timestamps
+  - supports `calendarIds`, `allDayOnly`, and `calendarAllDayModes` filter options
+  - can be selected by calendar-service as the active provider, and can be constructed directly in tests
+
+- [src/ui/year-view/ics-calendar-integration.js](../src/ui/year-view/ics-calendar-integration.js)
+  - owns the manual ICS upload button shown below the calendar list
+  - loads and persists uploaded ICS descriptors in browser storage
+  - supports removing individual uploaded ICS calendars from the sidebar list
+  - updates the active ICS provider without adding provider-specific state to `main.js`
 
 - [src/ui/year-view/event-store.js](../src/ui/year-view/event-store.js)
   - caches events by year
@@ -139,6 +156,7 @@ The user can change:
 - Must degrade gracefully when calendar APIs are unavailable or incomplete.
 - Must support local development without requiring a full Thunderbird runtime.
 - Must preserve a lightweight and dependency-free implementation style for now.
+- `IcsCalendarProvider` must be platform-agnostic and work in both the add-on and future web contexts.
 
 ## 6. Target shared architecture for the monorepo
 

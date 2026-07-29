@@ -1,15 +1,18 @@
 import { CalendarProvider, EmptyCalendarProvider } from "./calendar-provider.js";
 import { DummyCalendarProvider } from "./dummy-calendar-provider.js";
 import { GoogleCalendarProvider } from "./google-calendar-provider.js";
+import { IcsCalendarProvider } from "./ics-calendar-provider.js";
 import { ThunderbirdCalendarProvider } from "./thunderbird-calendar-provider.js";
 
 let activeCalendarProvider = null;
+let activeIcsProvider = new IcsCalendarProvider([]);
 
 export {
     CalendarProvider,
     DummyCalendarProvider,
     EmptyCalendarProvider,
     GoogleCalendarProvider,
+    IcsCalendarProvider,
     ThunderbirdCalendarProvider
 };
 
@@ -19,6 +22,10 @@ export function setCalendarProvider(provider) {
 
 export function getCalendarProvider() {
     return activeCalendarProvider || createDefaultCalendarProvider();
+}
+
+export function setIcsCalendars(calendars) {
+    activeIcsProvider = new IcsCalendarProvider(calendars);
 }
 
 export function createDefaultCalendarProvider() {
@@ -38,9 +45,17 @@ export function createDefaultCalendarProvider() {
 }
 
 export async function fetchCalendars() {
-    return getCalendarProvider().fetchCalendars();
+    const [mainCalendars, icsCalendars] = await Promise.all([
+        getCalendarProvider().fetchCalendars(),
+        activeIcsProvider.fetchCalendars()
+    ]);
+    return [...mainCalendars, ...icsCalendars];
 }
 
 export async function fetchCalendarEvents(year, options = {}) {
-    return getCalendarProvider().fetchCalendarEvents(year, options);
+    const [mainEvents, icsEvents] = await Promise.all([
+        getCalendarProvider().fetchCalendarEvents(year, options),
+        activeIcsProvider.fetchCalendarEvents(year, options)
+    ]);
+    return [...mainEvents, ...icsEvents];
 }

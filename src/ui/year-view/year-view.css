@@ -342,6 +342,26 @@ input[type="number"] {
   gap: 0.35rem;
 }
 
+.calendar-row-ics {
+  grid-template-columns: auto 2.8rem 4.3rem 1.6rem;
+}
+
+.calendar-remove-btn {
+  --btn-padding-y: 0.12rem;
+  --btn-padding-x: 0.28rem;
+  --btn-radius: 8px;
+  --btn-font-size: 0.7rem;
+  min-width: 1.45rem;
+  width: 1.45rem;
+  padding-inline: 0;
+  justify-content: center;
+  opacity: 0.55;
+}
+
+.calendar-remove-btn:hover {
+  opacity: 1;
+}
+
 .calendar-duration-control {
   display: inline-grid;
   grid-template-columns: 2rem 1.3rem 1rem;

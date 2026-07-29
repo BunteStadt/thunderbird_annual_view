@@ -109,9 +109,27 @@ Use a seperate Thunderbird profile.
 Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
 Or use the commented out code in main.js.
 
+### Google Calendar Data
+
+Run the year-view page as a local website with Google Calendar integration:
+
+1. Start a local web server from the repository root (for example `python -m http.server 4173`).
+2. Open `http://localhost:4173/src/ui/year-view/year-view.html?google=1`.
+3. Set your OAuth client ID in `src/ui/year-view/google-client-id.js`.
+4. Click `Connect to Google` and complete the Google login/consent flow.
+5. The button switches to `Log out` when connected.
+6. The year view then loads your Google calendars and events.
+
+Google setup requirements:
+
+- In Google Cloud Console, create an OAuth Web Client.
+- Add your local origin (for example `http://localhost:4173`) to **Authorized JavaScript origins**.
+- Use scope `https://www.googleapis.com/auth/calendar.readonly`.
+- This integration is read-only.
+
 ### Build standalone html
 
-Work wihtout Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
+Work without Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
 
 1. Install `Live Server (Five Server)` extension in Visual Studio Code.
 2. Right click `/src/ui/year-view/year-view.html` and select `Open with Live Server`.
@@ -138,7 +156,7 @@ git config core.hooksPath .githooks
 [`just`](https://github.com/casey/just) is a command runner. Available recipes:
 
 | Command | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `just sync-experiments` | Copies experiment APIs from `submodules/calendar/experiments/calendar/` to `experiments/` for development |
 | `just build-xpi` | Builds the `.xpi` release package into `dist/` |
 | `just tag` | Creates a Git tag from the version in `manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |

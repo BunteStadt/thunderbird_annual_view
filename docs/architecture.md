@@ -40,12 +40,21 @@ The current implementation is organized into three practical layers:
 - [src/ui/year-view/main.js](../src/ui/year-view/main.js)
   - initializes DOM references and state
   - wires filters, navigation, loading, refresh, and rendering updates
+  - owns Google connect/log-out header control wiring for standalone web mode
   - coordinates the event store and grid view
 
 - [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
-  - fetches calendars and events through the active provider
-  - exports `IcsCalendarProvider`, `ThunderbirdCalendarProvider`, `DummyCalendarProvider`, and `EmptyCalendarProvider`
-  - contains the dummy-data fallback used in standalone development
+  - resolves the active calendar provider (dummy, Thunderbird, Google web, or ICS)
+  - exports `IcsCalendarProvider`, `GoogleCalendarProvider`, `ThunderbirdCalendarProvider`, `DummyCalendarProvider`, and `EmptyCalendarProvider`
+  - keeps provider selection out of the renderer
+
+- [src/ui/year-view/google-calendar-provider.js](../src/ui/year-view/google-calendar-provider.js)
+  - handles Google OAuth token flow (Google Identity Services)
+  - queries Google Calendar list/events endpoints in read-only mode
+  - maps Google payloads into the shared event shape
+
+- [src/ui/year-view/google-client-id.js](../src/ui/year-view/google-client-id.js)
+  - stores the Google OAuth web client ID used by standalone Google mode
 
 - [src/ui/year-view/ics-calendar-provider.js](../src/ui/year-view/ics-calendar-provider.js)
   - platform-agnostic provider that reads events from in-memory ICS (iCalendar) content
@@ -116,10 +125,11 @@ The user can change:
 ## 4. Current data flow
 
 1. The UI initializes and loads persisted preferences.
-2. The event store requests events for the needed year range.
-3. The store caches normalized events and filters them according to current settings.
-4. The grid view renders visible rows and overlays event bars.
-5. User actions change filter or view state and trigger a refresh of the rendered grid.
+2. The UI chooses a provider (Thunderbird APIs, Google web APIs, or dummy data).
+3. The event store requests events for the needed year range.
+4. The store caches normalized events and filters them according to current settings.
+5. The grid view renders visible rows and overlays event bars.
+6. User actions change filter or view state and trigger a refresh of the rendered grid.
 
 ## 5. Constraints and requirements
 

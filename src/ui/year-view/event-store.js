@@ -9,6 +9,7 @@
 
 import { fetchCalendarEvents } from "./calendar-service.js";
 import { normalizeEvents, eventDurationMs } from "./date-utils.js";
+import { resolveCalendarAllDayOnly } from "./calendar-provider.js";
 
 const PREFETCH_MARGIN_YEARS = 1;
 
@@ -90,16 +91,11 @@ export class EventStore {
         const raw = await this.getRawEvents(firstYear, lastYear);
         const wanted = new Set(calendarIds);
 
-        const resolveAllDayOnly = (calendarId) => {
-            const mode = calendarAllDayModes[calendarId];
-            if (mode === "yes") return true;
-            if (mode === "no") return false;
-            return allDayOnly;
-        };
+        const allDayOptions = { allDayOnly, calendarAllDayModes };
 
         const candidates = raw.filter((ev) => wanted.has(ev.calendarId));
         const events = candidates.filter((ev) => {
-            if (resolveAllDayOnly(ev.calendarId) && !ev.isAllDay) return false;
+            if (resolveCalendarAllDayOnly(ev.calendarId, allDayOptions) && !ev.isAllDay) return false;
             return eventDurationMs(ev) >= getMinDurationMs(ev.calendarId);
         });
 

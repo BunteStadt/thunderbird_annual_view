@@ -14,6 +14,7 @@ The add-on currently provides:
 - a read-only annual calendar grid with month and week-row layouts
 - event loading from Thunderbird calendar APIs
 - event loading from `.ics` (iCalendar) files via `IcsCalendarProvider`
+- optional local-website loading from Google Calendar APIs through OAuth sign-in (client ID configured in source)
 - calendar filtering, all-day filtering, minimum-duration filtering, and theme preferences
 - a standalone HTML debug surface for local development via dummy data
 
@@ -31,6 +32,7 @@ The add-on currently provides:
 
 - Keep the calendar domain logic platform-agnostic.
 - Keep Thunderbird-specific integration code isolated behind adapters.
+- Keep Google web integration isolated behind provider/adapters so the renderer stays host-agnostic.
 - Preserve the current user experience and compatibility with Thunderbird versions supported by the add-on.
 - Prefer small, testable modules over large UI files.
 - Design the view layer so the same renderer can be used in both the addon and web app.

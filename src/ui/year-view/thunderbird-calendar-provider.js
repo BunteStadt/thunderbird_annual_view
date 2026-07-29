@@ -1,4 +1,4 @@
-import { CalendarProvider } from "./calendar-provider.js";
+import { CalendarProvider, resolveCalendarAllDayOnly } from "./calendar-provider.js";
 
 function hasThunderbirdCalendarApi() {
     return !!globalThis.browser?.calendar?.calendars?.query && !!globalThis.browser?.calendar?.items?.query;
@@ -21,14 +21,6 @@ function formatRangeBound(year, month, day) {
     const mm = String(month).padStart(2, "0");
     const dd = String(day).padStart(2, "0");
     return `${yyyy}${mm}${dd}`;
-}
-
-function resolveCalendarAllDayOnly(calendarId, options = {}) {
-    const { allDayOnly = false, calendarAllDayModes = {} } = options;
-    const mode = calendarAllDayModes?.[calendarId];
-    if (mode === "yes") return true;
-    if (mode === "no") return false;
-    return allDayOnly;
 }
 
 export class ThunderbirdCalendarProvider extends CalendarProvider {

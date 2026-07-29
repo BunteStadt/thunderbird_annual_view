@@ -35,6 +35,7 @@ import { applyTheme, detectSystemMode } from "./theme.js";
 
 
 
+// Shared URL flags for standalone modes (?dummy=1, ?google=1, ?googleClientId=...).
 const queryParams = new URLSearchParams(globalThis.location?.search || "");
 const GOOGLE_CLIENT_ID_STORAGE_KEY = "annualView.googleClientId";
 
@@ -50,7 +51,7 @@ function ensureBrowserStorageBridge() {
     browserRoot.storage.local = {
         async get(key) {
             if (!localStorageApi) {
-                return typeof key === "string" ? {} : {};
+                return {};
             }
             if (typeof key === "string") {
                 const raw = localStorageApi.getItem(`annualView.storage.${key}`);

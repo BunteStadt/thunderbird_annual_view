@@ -128,7 +128,7 @@ Open the standalone page with `?google=1` (for example `src/ui/year-view/year-vi
 
 ### Build standalone html
 
-Work wihtout Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
+Work without Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
 
 1. Install `Live Server (Five Server)` extension in Visual Studio Code.
 2. Right click `/src/ui/year-view/year-view.html` and select `Open with Live Server`.

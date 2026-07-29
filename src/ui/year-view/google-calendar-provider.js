@@ -3,6 +3,7 @@ import { CalendarProvider } from "./calendar-provider.js";
 const GOOGLE_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 const GOOGLE_GSI_SCRIPT = "https://accounts.google.com/gsi/client";
 const TOKEN_EXPIRY_SKEW_MS = 5000;
+// Fallback duration when Google returns an event without a valid end timestamp.
 const FALLBACK_EVENT_LENGTH_MS = 60 * 60 * 1000;
 
 function resolveCalendarAllDayOnly(calendarId, options = {}) {
@@ -190,7 +191,7 @@ function mapEvent(item, calendar) {
         end = new Date(start.getTime() + (allDay ? 24 * 60 * 60 * 1000 : FALLBACK_EVENT_LENGTH_MS));
     }
     if (end.getTime() <= start.getTime()) {
-        end = new Date(start.getTime() + FALLBACK_EVENT_LENGTH_MS);
+        end = new Date(start.getTime() + (allDay ? 24 * 60 * 60 * 1000 : FALLBACK_EVENT_LENGTH_MS));
     }
 
     return {

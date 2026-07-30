@@ -28,8 +28,11 @@ RUN \
     wget -O /tmp/thunderbird.tar.xz \
         "https://download.mozilla.org/?product=thunderbird-latest&os=linux64&lang=en-US" \
     && mkdir -p /opt/thunderbird \
-    && tar -xJf /tmp/thunderbird.tar.xz -C /opt \
-    && ln -s /opt/thunderbird/thunderbird /usr/local/bin/thunderbird \
+    && tar -xJf /tmp/thunderbird.tar.xz -C /opt/thunderbird --strip-components=1 \
+    && TB_BIN="$(find /opt/thunderbird -type f \( -name thunderbird -o -name thunderbird-bin \) -perm /111 | head -n 1)" \
+    && [ -n "$TB_BIN" ] \
+    && ln -sf "$TB_BIN" /usr/local/bin/thunderbird \
+    && chmod 755 "$TB_BIN" \
     && rm /tmp/thunderbird.tar.xz
 
 # Install extra packages.

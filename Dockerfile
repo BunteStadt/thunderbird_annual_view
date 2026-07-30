@@ -18,6 +18,8 @@ RUN apt-get update \
         git \
         procps \
         python3 \
+        zip \
+        unzip \
         ca-certificates \
         dbus-x11 \
     && rm -rf /var/lib/apt/lists/*

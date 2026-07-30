@@ -30,7 +30,7 @@ The add-on currently provides:
 - [test](test) contains integration and unit-style checks for the current calendar behavior.
 - [thunderbird-profile](thunderbird-profile) is a pre-configured Thunderbird profile for real-Thunderbird integration testing via Docker or a local installation.
 - [e2e](e2e) contains the real-Thunderbird end-to-end test that installs the add-on from source, captures a screenshot, and validates the Thunderbird log.
-- [Dockerfile](Dockerfile) and [docker-compose.yml](docker-compose.yml) define a slim sandbox container for local development and e2e execution; it mounts the working tree into `/workspace` and installs Thunderbird, Xvfb, and the test tooling needed to run the add-on in a headless environment.
+- [Dockerfile](Dockerfile) and [docker-compose.yml](docker-compose.yml) define a slim sandbox container for local development and e2e execution; it mounts the working tree into `/workspace`, installs Thunderbird, and exposes a noVNC-based Thunderbird GUI for interactive testing.
 
 ## Architecture principles
 

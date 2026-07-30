@@ -21,4 +21,8 @@ if [ $# -gt 0 ]; then
     exec "$@"
 fi
 
+if [ -x /startapp.sh ]; then
+    exec /startapp.sh
+fi
+
 exec bash

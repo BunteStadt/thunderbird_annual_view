@@ -10,7 +10,7 @@ services:
       DISPLAY: :99
       HOME: /root
     volumes:
-      - .:/workspace
+      - .:/workspace:cached
     command: ["bash"]
 
   gui:
@@ -24,7 +24,7 @@ services:
       DISPLAY: :99
       HOME: /root
     volumes:
-      - .:/workspace
+      - .:/workspace:cached
     ports:
       - "6080:6080"
       - "5900:5900"

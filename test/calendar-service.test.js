@@ -122,6 +122,26 @@ test('calendar service selects Google provider when google mode is enabled', asy
     assert.equal(provider?.constructor?.name, 'GoogleCalendarProvider');
 });
 
+test('calendar service selects Thunderbird provider when browser calendar APIs are available', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    globalThis.ENABLE_DUMMY_CALENDARS = false;
+    globalThis.ENABLE_GOOGLE_CALENDARS = false;
+    globalThis.browser = {
+        calendar: {
+            calendars: { query: () => [] },
+            items: { query: () => [] }
+        }
+    };
+    t.after(() => {
+        delete globalThis.browser;
+        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        delete globalThis.ENABLE_GOOGLE_CALENDARS;
+    });
+
+    const provider = calendarService.createDefaultCalendarProvider();
+    assert.equal(provider?.constructor?.name, 'ThunderbirdCalendarProvider');
+});
+
 test('calendar service merges uploaded ICS calendars alongside the active provider', async (t) => {
     const calendarService = await loadCalendarServiceModule();
     globalThis.ENABLE_DUMMY_CALENDARS = true;

@@ -103,7 +103,7 @@ Use a seperate Thunderbird profile.
 
 ### Docker-based sandboxed development
 
-A slim container is available for local development and automated e2e testing. It mounts the repository into `/workspace`, installs Thunderbird, Xvfb, and the required test utilities, and is intended for agent-friendly sandboxed shell work.
+A slim container is available for local development and automated e2e testing. It mounts the repository into `/workspace`, installs Thunderbird 153 from Mozilla's package repository, provisions Xvfb, and provides a browser-accessible desktop for interactive GUI testing.
 
 The container entrypoint automatically initializes the experiment submodule from the mounted working tree before each command, so a fresh checkout works without extra setup.
 
@@ -113,6 +113,14 @@ docker compose run --rm dev bash
 docker compose run --rm dev ./e2e/run-e2e-test.sh
 docker compose run --rm dev node --test
 ```
+
+For interactive Thunderbird testing, start the desktop service and open `http://127.0.0.1:6080/vnc.html` in a browser:
+
+```bash
+docker compose up gui
+```
+
+The GUI service starts Xvfb, x11vnc, and noVNC, and launches Thunderbird automatically inside the virtual display.
 
 If you need to initialize the submodule manually (for example after a host-side checkout), run:
 

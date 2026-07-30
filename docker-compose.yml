@@ -12,3 +12,20 @@ services:
     volumes:
       - .:/workspace
     command: ["bash"]
+
+  gui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    environment:
+      DISPLAY: :99
+      HOME: /root
+    volumes:
+      - .:/workspace
+    ports:
+      - "6080:6080"
+      - "5900:5900"
+    command: ["/usr/local/bin/start-gui.sh", "/usr/bin/thunderbird"]

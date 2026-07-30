@@ -106,18 +106,28 @@ The test exits with code `0` on PASS and `1` on FAIL and is safe to run
 inside an agent's terminal loop.  See [e2e/README.md](../e2e/README.md)
 for full details.
 
-### Manual / Docker GUI
+### Container-based sandboxed development
 
-A pre-configured Thunderbird profile lives in `thunderbird-profile/`.  It
-installs the add-on from source via an extension proxy file and pre-registers
-the NRW ICS calendars.  Use it for interactive end-to-end verification:
+A slim container now provides the full Thunderbird/Xvfb/Node runtime needed to
+run the add-on and the real-Thunderbird e2e test without relying on the host
+installation.  It mounts the repository into `/workspace` so local edits are
+visible immediately and cloud agents can work inside the sandboxed shell.
 
 ```sh
-docker compose up      # opens GUI at http://localhost:5800
+docker compose build
+docker compose run --rm dev bash
+docker compose run --rm dev ./e2e/run-e2e-test.sh
+docker compose run --rm dev node --test
+```
+
+If the submodule is not present inside the container yet, initialize it once:
+
+```sh
+docker compose run --rm dev bash -lc 'git submodule update --init --recursive'
 ```
 
 See [thunderbird-profile/README.md](../thunderbird-profile/README.md)
-for full instructions.
+for full instructions about the pre-configured profile used by the e2e test.
 
 ### When adding tests
 

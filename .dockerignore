@@ -1,0 +1,9 @@
+.git
+.github
+.gitmodules
+.vscode
+node_modules
+dist
+test-results
+*.log
+.DS_Store

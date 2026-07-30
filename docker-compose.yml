@@ -1,19 +1,14 @@
-# https://github.com/jlesage/docker-thunderbird/tree/master
 services:
   dev:
     build:
       context: .
-    container_name: test1
-    hostname: thunderbird-dev
+      dockerfile: Dockerfile
+    working_dir: /workspace
     stdin_open: true
     tty: true
-
+    environment:
+      DISPLAY: :99
+      HOME: /root
     volumes:
-      # Mount the project source code (also used by the extension proxy and ICS calendars)
-      - .:/workspace:cached
-      # Mount the pre-configured test profile so Thunderbird starts with the
-      # add-on installed from source and the NRW ICS calendars pre-registered.
-      - ./thunderbird-profile:/config/profile:cached
-
-    ports:
-      - "5800:5800"
+      - .:/workspace
+    command: ["bash"]

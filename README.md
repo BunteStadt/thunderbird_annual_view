@@ -101,6 +101,23 @@ The view mode can be changed directly in the annual view header: select between 
 
 Use a seperate Thunderbird profile.
 
+### Docker-based sandboxed development
+
+A slim container is available for local development and automated e2e testing. It mounts the repository into `/workspace`, installs Thunderbird, Xvfb, and the required test utilities, and is intended for agent-friendly sandboxed shell work.
+
+```bash
+docker compose build
+docker compose run --rm dev bash
+docker compose run --rm dev ./e2e/run-e2e-test.sh
+docker compose run --rm dev node --test
+```
+
+If the submodule is not already checked out inside the container, initialize it once from the mounted repo before running the tests:
+
+```bash
+docker compose run --rm dev bash -lc 'git submodule update --init --recursive'
+```
+
 1. Close Thunderbird.
 2. Start the profile selecter and use a test profile.
 

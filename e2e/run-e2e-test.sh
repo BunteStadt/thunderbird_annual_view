@@ -40,7 +40,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RESULTS_DIR="$REPO_ROOT/test-results"
 PROFILE_TEMPLATE="$REPO_ROOT/thunderbird-profile"
 PROFILE_TMP=""
-TB_BINARY=""
+TB_BINARY="${TB_BINARY:-}"
 TB_VERSION=""
 DISPLAY_NUM=99
 XVFB_PID=""
@@ -90,13 +90,20 @@ echo "=== Pre-flight checks ==="
 check_prereq Xvfb     "sudo apt install xvfb"
 check_prereq scrot    "sudo apt install scrot"
 check_prereq xdotool  "sudo apt install xdotool"
+check_prereq python3  "sudo apt install python3"
 
 # Find Thunderbird 153 binary
-TB_CANDIDATES=(
+TB_CANDIDATES=()
+if [ -n "$TB_BINARY" ]; then
+    TB_CANDIDATES+=("$TB_BINARY")
+fi
+TB_CANDIDATES+=(
+    "/usr/bin/thunderbird"
     "/snap/thunderbird/current/usr/lib/thunderbird/thunderbird"
     "$(command -v thunderbird 2>/dev/null || true)"
 )
 for candidate in "${TB_CANDIDATES[@]}"; do
+    [ -n "$candidate" ] || continue
     if [ -x "$candidate" ]; then
         # Verify it actually runs and reports a version
         TB_FOUND_VERSION=$("$candidate" --version 2>/dev/null | grep -oP '\d+\.\d+' | head -1 || true)

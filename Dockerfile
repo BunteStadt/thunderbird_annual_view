@@ -1,62 +1,29 @@
-# https://github.com/jlesage/docker-thunderbird/tree/master
-# thunderbird Dockerfile
-#
-# https://github.com/jlesage/docker-thunderbird
-#
+# syntax=docker/dockerfile:1.7
 
-# Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.24-v4.12.6
+FROM node:20-bookworm-slim
 
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    DISPLAY=:99
 
-#my stuff:  install bash, node, npm, git
+WORKDIR /workspace
 
-RUN apk add --no-cache bash 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        thunderbird \
+        xvfb \
+        scrot \
+        xdotool \
+        git \
+        procps \
+        python3 \
+        ca-certificates \
+        dbus-x11 \
+    && rm -rf /var/lib/apt/lists/*
 
+COPY . /workspace
 
-# Docker image version is provided via build arg.
-ARG DOCKER_IMAGE_VERSION=unknown
+RUN git config --global --add safe.directory /workspace
 
-# Define software versions.
-ARG THUNDERBIRD_VERSION=151.0.1-r0
-# Define software download URLs.
-
-# Define working directory.
-WORKDIR /tmp
-
-# Install Thunderbird.
-RUN \
-    add-pkg thunderbird=${THUNDERBIRD_VERSION}
-
-# Install extra packages.
-RUN \
-    add-pkg \
-        # Icons used by folder/file selection window (when saving as).
-        adwaita-icon-theme \
-        # A font is needed.
-        font-dejavu
-
-# Generate and install favicons.
-RUN \
-    APP_ICON_URL=https://github.com/jlesage/docker-templates/raw/master/jlesage/images/thunderbird-icon.png && \
-    install_app_icon.sh "$APP_ICON_URL"
-
-# Add files.
-COPY rootfs/ /
-
-# Set internal environment variables.
-RUN \
-    set-cont-env APP_NAME "Thunderbird" && \
-    set-cont-env APP_VERSION "$THUNDERBIRD_VERSION" && \
-    set-cont-env DOCKER_IMAGE_VERSION "$DOCKER_IMAGE_VERSION" && \
-    true
-
-# Define mountable directories.
-VOLUME ["/config"]
-
-# Metadata.
-LABEL \
-      org.label-schema.name="thunderbird" \
-      org.label-schema.description="Docker container for Thunderbird" \
-      org.label-schema.version="${DOCKER_IMAGE_VERSION:-unknown}" \
-      org.label-schema.vcs-url="https://github.com/jlesage/docker-thunderbird" \
-      org.label-schema.schema-version="1.0"
+CMD ["bash"]

@@ -78,7 +78,16 @@ reads on every startup but never overwrites.
 
 ## Docker alternative
 
-A Docker-based GUI environment is also available via `docker compose up`
-(opens at <http://localhost:5800>).  That approach is primarily useful for
-manual exploration.  The script above is preferred for automated testing
-because it does not require Docker and runs directly in the agent's terminal.
+A slim container-based workflow is now available via `docker compose` and is
+recommended for sandboxed local development and agent execution.  The container
+mounts the repository into `/workspace`, installs Thunderbird, Xvfb, and the
+required tooling, and can run the e2e script directly:
+
+```sh
+docker compose build
+docker compose run --rm dev ./e2e/run-e2e-test.sh
+```
+
+The script above remains the default path for automated testing from the host
+terminal, but the container is the preferred option when you want the test to
+run in an isolated environment with the working tree mounted in place.

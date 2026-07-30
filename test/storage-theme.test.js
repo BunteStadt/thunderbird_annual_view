@@ -115,6 +115,34 @@ test('storage module load/persist helpers use browser.storage.local correctly', 
     await storage.persistTheme('dark');
     const persistedTheme = await storage.loadThemePreference();
     assert.equal(persistedTheme, 'dark');
+
+    const initialPanelState = await storage.loadPanelState();
+    assert.equal(initialPanelState, false);
+
+    await storage.persistPanelState(true);
+    const persistedPanelState = await storage.loadPanelState();
+    assert.equal(persistedPanelState, true);
+
+    const initialGrayPastDays = await storage.loadGrayPastDays();
+    assert.equal(initialGrayPastDays, false);
+
+    await storage.persistGrayPastDays(true);
+    const persistedGrayPastDays = await storage.loadGrayPastDays();
+    assert.equal(persistedGrayPastDays, true);
+
+    const initialHighlightCurrentDay = await storage.loadHighlightCurrentDay();
+    assert.equal(initialHighlightCurrentDay, false);
+
+    await storage.persistHighlightCurrentDay(true);
+    const persistedHighlightCurrentDay = await storage.loadHighlightCurrentDay();
+    assert.equal(persistedHighlightCurrentDay, true);
+
+    const initialRefreshSettings = await storage.loadRefreshSettings();
+    assert.deepEqual(initialRefreshSettings, { autoRefreshEnabled: true, autoRefreshInterval: 300000 });
+
+    await storage.persistRefreshSettings({ autoRefreshEnabled: false, autoRefreshInterval: 120000 });
+    const persistedRefreshSettings = await storage.loadRefreshSettings();
+    assert.deepEqual(persistedRefreshSettings, { autoRefreshEnabled: false, autoRefreshInterval: 120000 });
 });
 
 test('theme module applies dark class and detects system mode', async (t) => {

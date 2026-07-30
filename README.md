@@ -142,6 +142,25 @@ Work without Thunderbird - see the thunderbird tab in the browser - faster for d
 
 1. Install extension in Thunderbird as debugg mode.
 
+### Docker GUI workflow
+
+A Docker-based GUI environment is also available for manual exploration and add-on testing.
+
+1. Build and start the container:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+2. Open <http://localhost:5800> in your browser.
+3. The container boots with the repository profile prepared and the add-on proxy configured. It stays idle until you launch Thunderbird from inside the container:
+
+   ```bash
+   docker compose exec dev /usr/local/bin/launch-thunderbird-annual-view.sh
+   ```
+
+   That command starts Thunderbird with the add-on installed and the annual view space opened automatically.
+
 ### Development Tooling
 
 #### Git Hooks

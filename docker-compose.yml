@@ -7,6 +7,11 @@ services:
     hostname: thunderbird-dev
     stdin_open: true
     tty: true
+    working_dir: /workspace
+    environment:
+      DISPLAY: :1
+      PROFILE_DIR: /config/profile
+      REPO_ROOT: /workspace
 
     volumes:
       # Mount the project source code (also used by the extension proxy and ICS calendars)

@@ -10,22 +10,27 @@ FROM jlesage/baseimage-gui:alpine-3.24-v4.12.6
 
 #my stuff:  install bash, node, npm, git
 
-RUN apk add --no-cache bash 
-
+RUN apk add --no-cache \
+        bash \
+        ca-certificates \
+        tar \
+        wget \
+        xz
 
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=unknown
-
-# Define software versions.
-ARG THUNDERBIRD_VERSION=151.0.1-r0
-# Define software download URLs.
 
 # Define working directory.
 WORKDIR /tmp
 
 # Install Thunderbird.
 RUN \
-    add-pkg thunderbird=${THUNDERBIRD_VERSION}
+    wget -O /tmp/thunderbird.tar.xz \
+        "https://download.mozilla.org/?product=thunderbird-latest&os=linux64&lang=en-US" \
+    && mkdir -p /opt/thunderbird \
+    && tar -xJf /tmp/thunderbird.tar.xz -C /opt \
+    && ln -s /opt/thunderbird/thunderbird /usr/local/bin/thunderbird \
+    && rm /tmp/thunderbird.tar.xz
 
 # Install extra packages.
 RUN \
@@ -42,11 +47,13 @@ RUN \
 
 # Add files.
 COPY rootfs/ /
+COPY . /workspace
 
 # Set internal environment variables.
 RUN \
+    chmod 755 /usr/local/bin/prepare-thunderbird-profile.sh /usr/local/bin/launch-thunderbird-annual-view.sh && \
     set-cont-env APP_NAME "Thunderbird" && \
-    set-cont-env APP_VERSION "$THUNDERBIRD_VERSION" && \
+    set-cont-env APP_VERSION "latest" && \
     set-cont-env DOCKER_IMAGE_VERSION "$DOCKER_IMAGE_VERSION" && \
     true
 

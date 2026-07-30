@@ -90,4 +90,7 @@ docker compose run --rm dev ./e2e/run-e2e-test.sh
 
 The script above remains the default path for automated testing from the host
 terminal, but the container is the preferred option when you want the test to
-run in an isolated environment with the working tree mounted in place.
+run in an isolated environment with the working tree mounted in place. The
+container entrypoint automatically initializes the experiment submodule from the
+mounted repository before the e2e script runs, so the workflow also works from
+a fresh checkout.

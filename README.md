@@ -105,6 +105,8 @@ Use a seperate Thunderbird profile.
 
 A slim container is available for local development and automated e2e testing. It mounts the repository into `/workspace`, installs Thunderbird, Xvfb, and the required test utilities, and is intended for agent-friendly sandboxed shell work.
 
+The container entrypoint automatically initializes the experiment submodule from the mounted working tree before each command, so a fresh checkout works without extra setup.
+
 ```bash
 docker compose build
 docker compose run --rm dev bash
@@ -112,7 +114,7 @@ docker compose run --rm dev ./e2e/run-e2e-test.sh
 docker compose run --rm dev node --test
 ```
 
-If the submodule is not already checked out inside the container, initialize it once from the mounted repo before running the tests:
+If you need to initialize the submodule manually (for example after a host-side checkout), run:
 
 ```bash
 docker compose run --rm dev bash -lc 'git submodule update --init --recursive'

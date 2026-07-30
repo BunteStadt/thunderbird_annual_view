@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+workspace_dir="${WORKSPACE_DIR:-/workspace}"
+
+if [ -d "$workspace_dir/.git" ] && [ -f "$workspace_dir/.gitmodules" ]; then
+    if [ ! -d "$workspace_dir/submodules" ] || [ -z "$(find "$workspace_dir/submodules" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+        echo "Initializing submodules in $workspace_dir" >&2
+        if ! git -C "$workspace_dir" submodule update --init --recursive >/dev/null 2>&1; then
+            echo "Submodule initialization failed; run 'git submodule update --init --recursive' manually if needed." >&2
+        fi
+    fi
+fi
+
+if [ $# -gt 0 ]; then
+    exec "$@"
+fi
+
+exec bash

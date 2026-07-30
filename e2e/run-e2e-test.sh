@@ -46,6 +46,10 @@ DISPLAY_NUM=99
 XVFB_PID=""
 TB_PID=""
 EXIT_CODE=0
+CONTAINER_RUNTIME=false
+if [ -f "/.dockerenv" ] || [ -n "${IN_CONTAINER:-}" ]; then
+    CONTAINER_RUNTIME=true
+fi
 
 # ---------------------------------------------------------------------------
 # Cleanup
@@ -82,6 +86,23 @@ check_prereq() {
     fi
 }
 
+resolve_thunderbird_binary() {
+    local requested="$1"
+    if [ -n "$requested" ]; then
+        if [ -x "$requested" ]; then
+            printf '%s\n' "$requested"
+            return 0
+        fi
+        local resolved
+        resolved="$(command -v "$requested" 2>/dev/null || true)"
+        if [ -n "$resolved" ]; then
+            printf '%s\n' "$resolved"
+            return 0
+        fi
+    fi
+    return 1
+}
+
 # ---------------------------------------------------------------------------
 # Step 0: Pre-flight checks
 # ---------------------------------------------------------------------------
@@ -93,14 +114,20 @@ check_prereq scrot    "sudo apt install scrot"
 check_prereq xdotool  "sudo apt install xdotool"
 check_prereq python3  "sudo apt install python3"
 
-# Find Thunderbird 153 binary
+# Find Thunderbird binary (including container locations)
 TB_CANDIDATES=()
 if [ -n "$TB_BINARY" ]; then
-    TB_CANDIDATES+=("$TB_BINARY")
+    resolved_binary="$(resolve_thunderbird_binary "$TB_BINARY" || true)"
+    if [ -n "$resolved_binary" ]; then
+        TB_CANDIDATES+=("$resolved_binary")
+    fi
 fi
 TB_CANDIDATES+=(
     "/usr/bin/thunderbird"
+    "/usr/lib/thunderbird/thunderbird"
+    "/usr/lib/thunderbird/thunderbird-bin"
     "/snap/thunderbird/current/usr/lib/thunderbird/thunderbird"
+    "/snap/bin/thunderbird"
     "$(command -v thunderbird 2>/dev/null || true)"
 )
 for candidate in "${TB_CANDIDATES[@]}"; do
@@ -125,7 +152,11 @@ fi
 log "Thunderbird $TB_VERSION at $TB_BINARY"
 
 if [[ "$TB_VERSION" != "153"* ]]; then
-    echo "WARNING: Expected Thunderbird 153.x but found $TB_VERSION — test continues."
+    if [ "$CONTAINER_RUNTIME" = true ]; then
+        warn "Expected Thunderbird 153.x in the containerized workflow but found $TB_VERSION — the test continues."
+    else
+        echo "WARNING: Expected Thunderbird 153.x but found $TB_VERSION — test continues."
+    fi
 fi
 
 # ---------------------------------------------------------------------------
@@ -338,6 +369,8 @@ echo "=== Verifying calendar and event loading output ==="
 CALENDARS_LINE=$(grep -m1 "\[ThunderbirdCalendarProvider\] calendars found:" "$TB_LOG" || true)
 if [ -n "$CALENDARS_LINE" ]; then
     pass "Calendars loaded: $CALENDARS_LINE"
+elif [ "$CONTAINER_RUNTIME" = true ]; then
+    warn "No calendar list in log; this is common in the containerized Thunderbird run"
 else
     warn "No calendar list in log; this can happen in the containerized test environment"
 fi
@@ -349,15 +382,19 @@ if [ -n "$CALENDAR_LINES" ]; then
     echo "$CALENDAR_LINES" | while IFS= read -r line; do
         pass "  $line"
     done
-else
+elif [ "$CONTAINER_RUNTIME" = true ]; then
     warn "No per-calendar event counts in log; the containerized Thunderbird run did not emit them"
+else
+    warn "No per-calendar event counts in log"
 fi
 
 EVENTS_DONE_LINE=$(grep -m1 "\[ThunderbirdCalendarProvider\] done" "$TB_LOG" || true)
 if [ -n "$EVENTS_DONE_LINE" ]; then
     pass "Total events logged: $EVENTS_DONE_LINE"
-else
+elif [ "$CONTAINER_RUNTIME" = true ]; then
     warn "No total event count in log; the containerized Thunderbird run did not emit it"
+else
+    warn "No total event count in log"
 fi
 
 # ---------------------------------------------------------------------------

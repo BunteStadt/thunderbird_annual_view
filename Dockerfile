@@ -25,7 +25,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . /workspace
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-RUN git config --global --add safe.directory /workspace
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && git config --global --add safe.directory /workspace
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["bash"]

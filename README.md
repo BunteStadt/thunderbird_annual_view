@@ -103,7 +103,9 @@ Use a seperate Thunderbird profile.
 
 ### Docker-based sandboxed development
 
-A slim container is available for local development and automated e2e testing. It mounts the repository into `/workspace`, installs Thunderbird 153 from Mozilla's package repository, provisions Xvfb, and provides a browser-accessible desktop for interactive GUI testing.
+A slim container is available for local development and automated e2e testing. It mounts the repository into `/workspace`, tries to install Thunderbird 153 from Mozilla's package repository, provisions Xvfb, and provides a browser-accessible desktop for interactive GUI testing.
+
+If you need to force a newer package than the distro default, build the image with `THUNDERBIRD_DEB_URL` pointing at a Thunderbird `.deb` artifact. The Dockerfile will download and install that package when the current Thunderbird version is below 153.
 
 The container entrypoint automatically initializes the experiment submodule from the mounted working tree before each command, so a fresh checkout works without extra setup.
 

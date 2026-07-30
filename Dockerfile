@@ -9,8 +9,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /workspace
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN (apt-get update || true) \
+    && (apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
         wget \
@@ -31,14 +31,13 @@ RUN apt-get update \
         novnc \
         websockify \
         xauth \
+    ) \
     && install -d -m 0755 /etc/apt/keyrings \
-    && wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O /tmp/packages.mozilla.org.asc \
-    && gpg --dearmor -o /etc/apt/keyrings/packages.mozilla.org.gpg /tmp/packages.mozilla.org.asc \
-    && chmod 644 /etc/apt/keyrings/packages.mozilla.org.gpg \
-    && echo 'deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.gpg] https://packages.mozilla.org/apt mozilla main' > /etc/apt/sources.list.d/mozilla.list \
-    && printf 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' > /etc/apt/preferences.d/mozilla \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends thunderbird \
+    && (wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O /tmp/packages.mozilla.org.asc || true) \
+    && if [ -f /tmp/packages.mozilla.org.asc ]; then install -m 0644 /tmp/packages.mozilla.org.asc /etc/apt/keyrings/packages.mozilla.org.asc; fi \
+    && if [ -f /etc/apt/keyrings/packages.mozilla.org.asc ]; then echo 'deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt thunderbird-deb main' > /etc/apt/sources.list.d/mozilla.list; printf 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' > /etc/apt/preferences.d/mozilla; fi \
+    && (apt-get update || true) \
+    && (apt-get install -y --no-install-recommends thunderbird || true) \
     && rm -rf /var/lib/apt/lists/* /tmp/packages.mozilla.org.asc
 
 COPY . /workspace

@@ -16,7 +16,7 @@
     ],
     "background": {
         "scripts": [
-            "src/background/background.js"
+            "src/hosts/thunderbird/background.js"
         ]
     },
     "icons": {

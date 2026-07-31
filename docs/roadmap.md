@@ -1,5 +1,82 @@
 # Core + hosts roadmap
 
+## Status summary (as of 2026-07-31)
+
+### What was completed
+
+All four phases were worked through in two agent sessions. The overall
+`src/core/` + `src/hosts/` target architecture is **fully in place**:
+
+**Phase A — Ports and UI slots** ✅ complete
+- A1: `StoragePort` introduced; `storage.js` and `ics-calendar-integration.js`
+  no longer call `browser.storage.local` directly; both
+  `createWebExtensionStorageAdapter()` and `createWebStorageAdapter()` exist in
+  `src/core/storage-port.js`; `ensureBrowserStorageBridge()` deleted.
+- A2: Provider selection extracted from `calendar-service.js`; global flags
+  (`ENABLE_DUMMY_CALENDARS`, `ENABLE_GOOGLE_CALENDARS`) removed; explicit
+  `createCalendarProvider(kind)` factory used by each host bootstrap.
+- A3: `main.js` split into `src/core/app.js` (orchestration, `initApp(config)`)
+  and thin host bootstraps.
+- A4: Named UI slots (`data-ui-slot`) introduced; Google auth and ICS upload
+  UI are mounted through the slot mechanism; `app.js` has no host imports.
+
+**Phase B — Reorganize into `src/core/` + `src/hosts/`** ✅ complete
+- B1: All platform-neutral files moved to `src/core/domain/`, `src/core/providers/`,
+  `src/core/ui/`, `src/core/`.
+- B2: Host shells created: `src/hosts/thunderbird/` (background, main, HTML,
+  Thunderbird provider) and `src/hosts/web/` (main, HTML, web storage adapter,
+  deep links, UI modules).
+- B3: `test/core/core-boundaries.test.js` asserts no `browser.*` or `hosts/`
+  imports in `src/core/`; runs in CI.
+- B4: Test suite split into `test/core/` and `test/hosts/thunderbird/` and
+  `test/hosts/web/`.
+
+**Phase C — Web shell as a product** ✅ complete
+- C1: `src/hosts/web/index.html` is the dedicated web entry page.
+- C2: `src/hosts/web/web-storage-adapter.js` — composite adapter routing the
+  ICS descriptor key to IndexedDB, all other keys to `localStorage`.
+- C3: Google connect always available in the web header (no `?google=1` needed);
+  `src/hosts/web/ui/empty-state.js` guides users to connect or upload.
+- C4: `src/hosts/web/deep-links.js` handles `#/<year>` deep links.
+- C5: `src/hosts/web/ui/clear-data.js` "Clear all local data" action;
+  privacy paragraph added to the landing page `index.html`.
+- C6: `.github/workflows/deploy-pages.yml` deploys landing page + web app to
+  GitHub Pages on every push to `main`.
+
+**Phase D — Decoupled builds and releases** ⚠️ partially complete
+- D1: `justfile` and `.github/workflows/build.yml` updated to package only
+  `src/core/` + `src/hosts/thunderbird/` + `experiments/` + `icons/` in the
+  XPI — `src/hosts/web/` is excluded. ✅
+- D2: Browser-based web E2E (Playwright, `e2e/web/`) **not done**.
+- D3: Feature matrix (`docs/feature-matrix.md`) **not done**.
+- D4: Release documentation update in `README.md` and `docs/contributor-workflow.md`
+  for both release paths (add-on tag → XPI; merge to `main` → Pages) **not done**
+  (old `src/ui/year-view/` paths may still appear in docs).
+
+### What is still open
+
+1. **D2 — Web E2E smoke test** (see `migration-plan.md` Task D2)
+   Add a Playwright test under `e2e/web/` that opens the web shell in dummy mode
+   and asserts the grid renders, the year input is correct, and view-mode switching
+   works.  Add the CI job to `.github/workflows/ci-tests.yml`.
+
+2. **D3 — Feature matrix** (see `migration-plan.md` Task D3)
+   Create `docs/feature-matrix.md` listing which features are core vs.
+   Thunderbird-host-specific vs. web-host-specific.
+
+3. **D4 — Release documentation update** (see `migration-plan.md` Task D4)
+   Update `README.md` and `docs/contributor-workflow.md` to document both release
+   paths and remove all stale `src/ui/year-view/` path references:
+   `grep -rn "ui/year-view" README.md docs/ AGENT.md index.html`
+
+4. **Manual verification**
+   The add-on has not been manually verified in Thunderbird since the
+   reorganization.  The existing Thunderbird E2E in
+   `.github/workflows/ci-tests.yml` should be run (or the add-on tested manually)
+   to confirm the new host layout works end-to-end.
+
+---
+
 > This roadmap supersedes the earlier monorepo (`apps/` + `packages/`) proposal.
 > The decided target is a single lightweight repository with `src/core/` + `src/hosts/`
 > as described in [architecture.md](architecture.md) section 6.

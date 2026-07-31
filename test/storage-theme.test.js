@@ -10,30 +10,36 @@ async function loadModule(relativePath) {
     return import(moduleUrl);
 }
 
-test('storage module load/persist helpers use browser.storage.local correctly', async (t) => {
-    const storageData = {};
-    globalThis.browser = {
-        storage: {
-            local: {
-                async get(key) {
-                    if (typeof key === 'string') {
-                        return Object.prototype.hasOwnProperty.call(storageData, key)
-                            ? { [key]: storageData[key] }
-                            : {};
-                    }
-                    return { ...storageData };
-                },
-                async set(values) {
-                    Object.assign(storageData, values);
-                }
-            }
+async function importFileModule(relativePath) {
+    const modulePath = path.resolve(__dirname, '..', relativePath);
+    return import(`file://${modulePath.replace(/\\/g, '/')}`);
+}
+
+function createFakeAdapter() {
+    const data = new Map();
+    return {
+        data,
+        async get(key) {
+            return data.has(key) ? data.get(key) : undefined;
+        },
+        async set(key, value) {
+            data.set(key, value);
+        },
+        async remove(key) {
+            data.delete(key);
         }
     };
+}
+
+test('storage module load/persist helpers use the storage adapter correctly', async (t) => {
+    const storagePort = await importFileModule('src/ui/year-view/storage-port.js');
+    const fakeAdapter = createFakeAdapter();
+    storagePort.setStorageAdapter(fakeAdapter);
     t.after(() => {
-        delete globalThis.browser;
+        storagePort.setStorageAdapter(null);
     });
 
-    const storage = await loadModule('src/ui/year-view/storage.js');
+    const storage = await importFileModule('src/ui/year-view/storage.js');
 
     const initialSelection = await storage.loadPersistedSelection();
     assert.equal(initialSelection.found, false);
@@ -153,4 +159,66 @@ test('theme module applies dark class and detects system mode', async (t) => {
     assert.equal(classSet.has('theme-dark'), false);
 
     assert.equal(theme.detectSystemMode(), 'dark');
+});
+
+test('storage port throws without an adapter and adapters behave correctly', async (t) => {
+    const storagePort = await importFileModule('src/ui/year-view/storage-port.js');
+    storagePort.setStorageAdapter(null);
+    assert.throws(() => storagePort.getStorageAdapter(), /No storage adapter set/);
+
+    // WebExtension adapter unwraps the { key: value } shape.
+    const stored = {};
+    globalThis.browser = {
+        storage: {
+            local: {
+                async get(key) {
+                    return Object.prototype.hasOwnProperty.call(stored, key) ? { [key]: stored[key] } : {};
+                },
+                async set(values) {
+                    Object.assign(stored, values);
+                },
+                async remove(key) {
+                    delete stored[key];
+                }
+            }
+        }
+    };
+    t.after(() => {
+        delete globalThis.browser;
+        delete globalThis.localStorage;
+        storagePort.setStorageAdapter(null);
+    });
+
+    const webExtAdapter = storagePort.createWebExtensionStorageAdapter();
+    assert.equal(await webExtAdapter.get('missing'), undefined);
+    await webExtAdapter.set('answer', 42);
+    assert.equal(await webExtAdapter.get('answer'), 42);
+    await webExtAdapter.remove('answer');
+    assert.equal(await webExtAdapter.get('answer'), undefined);
+
+    // Web adapter round-trips JSON with the annualView.storage. prefix.
+    const localData = new Map();
+    globalThis.localStorage = {
+        getItem(key) {
+            return localData.has(key) ? localData.get(key) : null;
+        },
+        setItem(key, value) {
+            localData.set(key, String(value));
+        },
+        removeItem(key) {
+            localData.delete(key);
+        }
+    };
+
+    const webAdapter = storagePort.createWebStorageAdapter();
+    assert.equal(await webAdapter.get('missing'), undefined);
+    await webAdapter.set('viewMode', 'linear');
+    assert.equal(localData.get('annualView.storage.viewMode'), JSON.stringify('linear'));
+    assert.equal(await webAdapter.get('viewMode'), 'linear');
+    await webAdapter.remove('viewMode');
+    assert.equal(await webAdapter.get('viewMode'), undefined);
+
+    // Corrupted JSON is survived (returns undefined, logs an error).
+    localData.set('annualView.storage.broken', '{not json');
+    assert.equal(await webAdapter.get('broken'), undefined);
 });

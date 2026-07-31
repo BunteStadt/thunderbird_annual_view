@@ -3,6 +3,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
+async function loadStoragePortModule() {
+    const modulePath = path.resolve(__dirname, '../src/ui/year-view/storage-port.js');
+    return import(`file://${modulePath.replace(/\\/g, '/')}`);
+}
+
 async function loadIntegrationModule() {
     const modulePath = path.resolve(__dirname, '../src/ui/year-view/ics-calendar-integration.js');
     await fs.access(modulePath);
@@ -92,9 +97,13 @@ test('ICS calendar integration loads stored calendars and renders upload control
         }
     };
 
+    const storagePort = await loadStoragePortModule();
+    storagePort.setStorageAdapter(storagePort.createWebExtensionStorageAdapter());
+
     t.after(() => {
         delete globalThis.browser;
         delete globalThis.document;
+        storagePort.setStorageAdapter(null);
     });
 
     const { setupIcsCalendarIntegration } = await loadIntegrationModule();
@@ -177,9 +186,13 @@ test('ICS calendar integration persists uploaded files and triggers refresh call
         }
     };
 
+    const storagePort = await loadStoragePortModule();
+    storagePort.setStorageAdapter(storagePort.createWebExtensionStorageAdapter());
+
     t.after(() => {
         delete globalThis.browser;
         delete globalThis.document;
+        storagePort.setStorageAdapter(null);
     });
 
     const { setupIcsCalendarIntegration } = await loadIntegrationModule();
@@ -256,9 +269,13 @@ test('ICS calendar integration removeCalendar removes calendar and triggers refr
         }
     };
 
+    const storagePort = await loadStoragePortModule();
+    storagePort.setStorageAdapter(storagePort.createWebExtensionStorageAdapter());
+
     t.after(() => {
         delete globalThis.browser;
         delete globalThis.document;
+        storagePort.setStorageAdapter(null);
     });
 
     const { setupIcsCalendarIntegration, setIcsCalendars: _setIcs } = await loadIntegrationModule();

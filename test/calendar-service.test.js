@@ -11,9 +11,9 @@ async function loadCalendarServiceModule() {
 
 test('fetchCalendars returns dummy calendars when enabled', async (t) => {
     const calendarService = await loadCalendarServiceModule();
-    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    calendarService.setCalendarProvider(calendarService.createCalendarProvider('dummy'));
     t.after(() => {
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        calendarService.setCalendarProvider(null);
     });
 
     const calendars = await calendarService.fetchCalendars();
@@ -27,9 +27,9 @@ test('fetchCalendars returns dummy calendars when enabled', async (t) => {
 
 test('fetchCalendarEvents applies calendar and all-day filters in dummy mode', async (t) => {
     const calendarService = await loadCalendarServiceModule();
-    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    calendarService.setCalendarProvider(calendarService.createCalendarProvider('dummy'));
     t.after(() => {
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        calendarService.setCalendarProvider(null);
     });
 
     const events = await calendarService.fetchCalendarEvents(2026, {
@@ -44,9 +44,9 @@ test('fetchCalendarEvents applies calendar and all-day filters in dummy mode', a
 
 test('fetchCalendarEvents resolves per-calendar all-day modes against the global setting', async (t) => {
     const calendarService = await loadCalendarServiceModule();
-    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    calendarService.setCalendarProvider(calendarService.createCalendarProvider('dummy'));
     t.after(() => {
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        calendarService.setCalendarProvider(null);
     });
 
     const events = await calendarService.fetchCalendarEvents(2026, {
@@ -91,14 +91,9 @@ test('calendar service delegates to an injected provider', async (t) => {
     assert.equal((await calendarService.fetchCalendarEvents(2026))[0].title, 'Custom event');
 });
 
-test('calendar service returns empty arrays when calendar API is unavailable', async (t) => {
+test('calendar service returns empty arrays when no provider is configured', async (t) => {
     const calendarService = await loadCalendarServiceModule();
-    globalThis.ENABLE_DUMMY_CALENDARS = false;
-    globalThis.browser = {};
-    t.after(() => {
-        delete globalThis.browser;
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
-    });
+    calendarService.setCalendarProvider(null);
 
     const calendars = await calendarService.fetchCalendars();
     const events = await calendarService.fetchCalendarEvents(2026, { calendarIds: [], allDayOnly: false });
@@ -107,27 +102,22 @@ test('calendar service returns empty arrays when calendar API is unavailable', a
     assert.deepEqual(events, []);
 });
 
-test('calendar service selects Google provider when google mode is enabled', async (t) => {
+test('createCalendarProvider maps each kind to the matching provider class', async () => {
     const calendarService = await loadCalendarServiceModule();
-    globalThis.ENABLE_DUMMY_CALENDARS = false;
-    globalThis.ENABLE_GOOGLE_CALENDARS = true;
-    globalThis.browser = {};
-    t.after(() => {
-        delete globalThis.browser;
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
-        delete globalThis.ENABLE_GOOGLE_CALENDARS;
-    });
 
-    const provider = calendarService.createDefaultCalendarProvider();
-    assert.equal(provider?.constructor?.name, 'GoogleCalendarProvider');
+    assert.equal(calendarService.createCalendarProvider('dummy')?.constructor?.name, 'DummyCalendarProvider');
+    assert.equal(calendarService.createCalendarProvider('google')?.constructor?.name, 'GoogleCalendarProvider');
+    assert.equal(calendarService.createCalendarProvider('thunderbird')?.constructor?.name, 'ThunderbirdCalendarProvider');
+    assert.equal(calendarService.createCalendarProvider('empty')?.constructor?.name, 'EmptyCalendarProvider');
+    assert.equal(calendarService.createCalendarProvider('unknown-kind')?.constructor?.name, 'EmptyCalendarProvider');
 });
 
 test('calendar service merges uploaded ICS calendars alongside the active provider', async (t) => {
     const calendarService = await loadCalendarServiceModule();
-    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    calendarService.setCalendarProvider(calendarService.createCalendarProvider('dummy'));
     t.after(() => {
         calendarService.setIcsCalendars([]);
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        calendarService.setCalendarProvider(null);
     });
 
     calendarService.setIcsCalendars([
@@ -165,10 +155,10 @@ test('calendar service merges uploaded ICS calendars alongside the active provid
 
 test('calendar service falls back to the default provider when no ICS calendars are uploaded', async (t) => {
     const calendarService = await loadCalendarServiceModule();
-    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    calendarService.setCalendarProvider(calendarService.createCalendarProvider('dummy'));
     t.after(() => {
         calendarService.setIcsCalendars([]);
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        calendarService.setCalendarProvider(null);
     });
 
     calendarService.setIcsCalendars([]);

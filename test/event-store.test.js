@@ -12,9 +12,11 @@ async function loadEventStoreModule() {
 }
 
 test('EventStore caches years and applies filters without refetching', async (t) => {
-    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    const calendarServicePath = path.resolve(__dirname, '../src/ui/year-view/calendar-service.js');
+    const calendarService = await import(`file://${calendarServicePath.replace(/\\/g, '/')}`);
+    calendarService.setCalendarProvider(calendarService.createCalendarProvider('dummy'));
     t.after(() => {
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        calendarService.setCalendarProvider(null);
     });
 
     const { EventStore } = await loadEventStoreModule();

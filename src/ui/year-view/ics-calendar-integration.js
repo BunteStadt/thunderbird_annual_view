@@ -1,10 +1,7 @@
 import { setIcsCalendars } from "./calendar-service.js";
+import { getStorageAdapter } from "./storage-port.js";
 
 const ICS_STORAGE_KEY = "icsCalendars";
-
-function getStorageArea() {
-    return globalThis.browser?.storage?.local ?? null;
-}
 
 function sanitizeCalendarDescriptors(value) {
     if (!Array.isArray(value)) {
@@ -14,17 +11,12 @@ function sanitizeCalendarDescriptors(value) {
 }
 
 async function loadStoredIcsCalendars() {
-    const storageArea = getStorageArea();
-    if (!storageArea) {
-        return [];
-    }
-
     try {
-        const stored = await storageArea.get(ICS_STORAGE_KEY);
-        if (!Object.prototype.hasOwnProperty.call(stored, ICS_STORAGE_KEY)) {
+        const stored = await getStorageAdapter().get(ICS_STORAGE_KEY);
+        if (stored === undefined) {
             return [];
         }
-        return sanitizeCalendarDescriptors(stored[ICS_STORAGE_KEY]);
+        return sanitizeCalendarDescriptors(stored);
     } catch (err) {
         console.error("[ics-upload] load stored calendars failed", err);
         return [];
@@ -32,13 +24,8 @@ async function loadStoredIcsCalendars() {
 }
 
 async function persistStoredIcsCalendars(calendars) {
-    const storageArea = getStorageArea();
-    if (!storageArea) {
-        return;
-    }
-
     try {
-        await storageArea.set({ [ICS_STORAGE_KEY]: sanitizeCalendarDescriptors(calendars) });
+        await getStorageAdapter().set(ICS_STORAGE_KEY, sanitizeCalendarDescriptors(calendars));
     } catch (err) {
         console.error("[ics-upload] save stored calendars failed", err);
     }

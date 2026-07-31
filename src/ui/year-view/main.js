@@ -1,8 +1,9 @@
-import { createDefaultCalendarProvider, fetchCalendars, getCalendarProvider, setCalendarProvider } from "./calendar-service.js";
+import { createCalendarProvider, fetchCalendars, getCalendarProvider, setCalendarProvider } from "./calendar-service.js";
 import { EventStore } from "./event-store.js";
 import { GridView } from "./grid-view.js";
 import { setupGoogleStandaloneAuth } from "./google-standalone-auth.js";
 import { setupIcsCalendarIntegration } from "./ics-calendar-integration.js";
+import { createWebExtensionStorageAdapter, createWebStorageAdapter, setStorageAdapter } from "./storage-port.js";
 import {
     loadPersistedSelection,
     persistSelection,
@@ -31,84 +32,35 @@ import {
 import { applyTheme, detectSystemMode } from "./theme.js";
 
 
-// hardcoded dummy for dev
-// globalThis.ENABLE_DUMMY_CALENDARS = true;
-
-
-
-
 // Shared URL flags for standalone modes (?dummy=1, ?google=1).
 const queryParams = new URLSearchParams(globalThis.location?.search || "");
-
-function ensureBrowserStorageBridge() {
-    if (globalThis.browser?.storage?.local) {
-        return;
-    }
-
-    const browserRoot = globalThis.browser && typeof globalThis.browser === "object" ? globalThis.browser : {};
-    const localStorageApi = globalThis.localStorage;
-
-    browserRoot.storage = browserRoot.storage || {};
-    browserRoot.storage.local = {
-        async get(key) {
-            if (!localStorageApi) {
-                return {};
-            }
-            if (typeof key === "string") {
-                const raw = localStorageApi.getItem(`annualView.storage.${key}`);
-                if (raw == null) return {};
-                try {
-                    return { [key]: JSON.parse(raw) };
-                } catch (err) {
-                    console.error("[storage-bridge] parse failed", err);
-                    return {};
-                }
-            }
-
-            const out = {};
-            const prefix = "annualView.storage.";
-            for (let i = 0; i < localStorageApi.length; i += 1) {
-                const storageKey = localStorageApi.key(i);
-                if (!storageKey?.startsWith(prefix)) continue;
-                const logicalKey = storageKey.slice(prefix.length);
-                const raw = localStorageApi.getItem(storageKey);
-                if (raw == null) continue;
-                try {
-                    out[logicalKey] = JSON.parse(raw);
-                } catch (err) {
-                    console.error("[storage-bridge] parse failed", err);
-                }
-            }
-            return out;
-        },
-        async set(values) {
-            if (!localStorageApi) return;
-            for (const [key, value] of Object.entries(values || {})) {
-                localStorageApi.setItem(`annualView.storage.${key}`, JSON.stringify(value));
-            }
-        }
-    };
-
-    globalThis.browser = browserRoot;
-}
 
 function isTruthyQueryFlag(value) {
     return value === "" || value === "1" || value === "true";
 }
 
-// Enable dummy data only when explicitly requested via ?dummy=1 (or when a
-// test harness pre-set the flag before this module loaded).
-if (typeof globalThis.ENABLE_DUMMY_CALENDARS !== "boolean") {
-    globalThis.ENABLE_DUMMY_CALENDARS = isTruthyQueryFlag(queryParams.get("dummy"));
+// Host bootstrap: pick the storage adapter and the calendar provider kind.
+if (globalThis.browser?.storage?.local) {
+    setStorageAdapter(createWebExtensionStorageAdapter());
+} else {
+    setStorageAdapter(createWebStorageAdapter());
 }
 
-if (typeof globalThis.ENABLE_GOOGLE_CALENDARS !== "boolean") {
-    globalThis.ENABLE_GOOGLE_CALENDARS = isTruthyQueryFlag(queryParams.get("google"));
+function detectProviderKind() {
+    // ?dummy=1 (or a test harness pre-setting the flag) selects the dummy provider.
+    if (globalThis.ENABLE_DUMMY_CALENDARS === true || isTruthyQueryFlag(queryParams.get("dummy"))) {
+        return "dummy";
+    }
+    if (isTruthyQueryFlag(queryParams.get("google"))) {
+        return "google";
+    }
+    if (globalThis.browser?.calendar?.calendars?.query && globalThis.browser?.calendar?.items?.query) {
+        return "thunderbird";
+    }
+    return "empty";
 }
 
-ensureBrowserStorageBridge();
-
-setCalendarProvider(createDefaultCalendarProvider());
+setCalendarProvider(createCalendarProvider(detectProviderKind()));
 
 // ---------------------------------------------------------------------------
 // DOM references

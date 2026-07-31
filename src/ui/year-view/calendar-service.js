@@ -21,27 +21,24 @@ export function setCalendarProvider(provider) {
 }
 
 export function getCalendarProvider() {
-    return activeCalendarProvider || createDefaultCalendarProvider();
+    return activeCalendarProvider || new EmptyCalendarProvider();
 }
 
 export function setIcsCalendars(calendars) {
     activeIcsProvider = new IcsCalendarProvider(calendars);
 }
 
-export function createDefaultCalendarProvider() {
-    if (globalThis.ENABLE_DUMMY_CALENDARS) {
-        return new DummyCalendarProvider();
+export function createCalendarProvider(kind) {
+    switch (kind) {
+        case "dummy":
+            return new DummyCalendarProvider();
+        case "google":
+            return new GoogleCalendarProvider();
+        case "thunderbird":
+            return new ThunderbirdCalendarProvider();
+        default:
+            return new EmptyCalendarProvider();
     }
-
-    if (globalThis.ENABLE_GOOGLE_CALENDARS) {
-        return new GoogleCalendarProvider();
-    }
-
-    if (globalThis.browser?.calendar?.calendars?.query && globalThis.browser?.calendar?.items?.query) {
-        return new ThunderbirdCalendarProvider();
-    }
-
-    return new EmptyCalendarProvider();
 }
 
 export async function fetchCalendars() {

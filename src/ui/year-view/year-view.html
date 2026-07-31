@@ -30,7 +30,7 @@
         <div id="selectedSummary" class="selected-summary" aria-live="polite"></div>
         <button id="refreshButton" class="btn" data-size="compact" type="button" title="Refresh calendar data">⟳ Refresh</button>
         <button id="themeToggle" class="btn" data-size="compact" type="button">Toggle theme</button>
-        <div id="providerAuthMount" hidden></div>
+        <div id="providerAuthMount" data-ui-slot="header-actions" hidden></div>
       </div>
     </header>
 
@@ -80,7 +80,7 @@
           <span>Min event length</span>
         </div>
         <div class="cal-list" id="calendarList" aria-label="Calendars"></div>
-        <div id="providerSidebarMount"></div>
+        <div id="providerSidebarMount" data-ui-slot="sidebar-sections"></div>
       </aside>
 
       <main class="main-panel">

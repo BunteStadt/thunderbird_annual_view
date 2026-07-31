@@ -6,10 +6,14 @@ sync-experiments:
 	mkdir -p experiments/calendar
 	cp -R submodules/calendar/experiments/calendar/* experiments/calendar/
 
-# Builds the XPI package for release
+# Builds the XPI package for release (core + Thunderbird host only, no web host)
 build-xpi:
-	mkdir -p dist/package
-	cp -R manifest.json src experiments icons dist/package/
+	rm -rf dist/package
+	mkdir -p dist/package/src/hosts
+	cp manifest.json dist/package/
+	cp -R icons experiments dist/package/
+	cp -R src/core dist/package/src/core
+	cp -R src/hosts/thunderbird dist/package/src/hosts/thunderbird
 	cd dist/package && zip -r ../calendar-annual-view.xpi manifest.json src experiments icons
 # Creates a tag from the manifest.json version and pushes it to origin
 # Only runs on the main branch when it is in sync with origin/main.

@@ -178,7 +178,7 @@ See [roadmap.md](roadmap.md) for the phased plan and [migration-plan.md](migrati
   - storage adapter backed by `browser.storage.local`
   - Thunderbird-only UI modules mounted into core slots
 
-- `src/hosts/web/` — the website shell (static hosting on GitHub Pages, **no backend, no database**):
+- `src/hosts/web/` — the website shell (static hosting on GitHub Pages, **no backend, no database**) - should work on firefox and chrome.:
   - web entry point (HTML page deployed to Pages)
   - storage adapter backed by client-side storage (`localStorage` for preferences, IndexedDB for uploaded ICS content)
   - Google auth setup (`google-standalone-auth.js`, client ID configuration) — calendars are fetched directly from Google APIs in the browser; OAuth tokens never leave the client

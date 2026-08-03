@@ -158,39 +158,70 @@ The user can change:
 - Must preserve a lightweight and dependency-free implementation style for now.
 - `IcsCalendarProvider` must be platform-agnostic and work in both the add-on and future web contexts.
 
-## 6. Target shared architecture for the monorepo
+## 6. Target architecture: core + hosts
 
-The monorepo should split responsibilities so the same calendar engine can be reused in multiple products without platform-specific coupling.
+The repository stays a single lightweight codebase (no npm workspaces, no bundler). Responsibilities are split so the same calendar engine can be reused by two thin host shells without platform-specific coupling.
 
-### 6.1 Shared package boundaries
+See [roadmap.md](roadmap.md) for the phased plan and [migration-plan.md](migration-plan.md) for detailed, task-level instructions.
 
-Proposed boundaries:
+### 6.1 Target directory layout
 
-- Shared calendar domain package
-  - date handling
-  - event normalization
-  - filter rules and preference models
-  - business rules for layout decisions
+- `src/core/` — platform-neutral. No `browser.*`/`messenger.*` calls, no direct access to host storage, no host detection.
+  - `core/domain/` — `date-utils`, `event-store`, filter rules, event/calendar schema
+  - `core/providers/` — provider base class, `ics-`, `google-`, `dummy-`, `empty-provider`, and `calendar-service` (merge logic only, no auto-detection)
+  - `core/ui/` — `grid-view`, `theme`, header/sidebar scaffolding, shared CSS
+  - `core/app.js` — the orchestration currently living in `main.js`, initialized with injected ports
 
-- Shared UI package
-  - view-mode engine
-  - event placement logic
-  - reusable rendering primitives
-  - accessible components for the annual calendar surface
+- `src/hosts/thunderbird/` — the add-on shell:
+  - `background.js`, manifest wiring, experiment submodule concerns
+  - `ThunderbirdCalendarProvider` (the only provider that depends on the experiment APIs)
+  - storage adapter backed by `browser.storage.local`
+  - Thunderbird-only UI modules mounted into core slots
 
-- Thunderbird addon shell
-  - manifest, permissions, action wiring, and Thunderbird-specific APIs
+- `src/hosts/web/` — the website shell (static hosting on GitHub Pages, **no backend, no database**) - should work on firefox and chrome.:
+  - web entry point (HTML page deployed to Pages)
+  - storage adapter backed by client-side storage (`localStorage` for preferences, IndexedDB for uploaded ICS content)
+  - Google auth setup (`google-standalone-auth.js`, client ID configuration) — calendars are fetched directly from Google APIs in the browser; OAuth tokens never leave the client
+  - web-only UI modules mounted into core slots
 
-- Web app shell
-  - hosting, page layout, routing, and browser environment integration
+### 6.2 Ports (host-provided interfaces)
 
-### 6.2 Architectural rule
+Each host shell supplies these ports to `core/app.js` at startup:
 
-Any code that depends on Thunderbird APIs, browser extension APIs, or the web runtime should remain behind adapter interfaces. Shared logic should work with plain data objects and generic input/output contracts.
+- **StoragePort** — async `get(key)` / `set(key, value)` / `remove(key)` for preferences and uploaded ICS data. Replaces the direct `browser.storage.local` coupling in `storage.js` and the `ensureBrowserStorageBridge()` workaround in `main.js`.
+- **CalendarSourcePort** — the host decides which provider is the default (Thunderbird provider, Google provider, dummy, or empty). The core never feature-detects the platform.
+- **HostPort** — theme detection hooks, refresh triggers, and navigation behavior where hosts differ.
 
-### 6.3 Suggested data contracts
+### 6.3 UI extension points (host-specific UI elements)
 
-The shared layer should define stable contracts for:
+The core renders only the shared UI (grid, common header controls, filter sidebar). Host-specific controls live in `src/hosts/<host>/ui/` and are attached through named mount slots:
+
+- The core defines named slots (e.g. `header-actions`, `sidebar-sections`), generalizing the existing `providerAuthMount` / `providerSidebarMount` pattern.
+- Each host passes a list of UI modules `{ slot, mount(container, appApi) }` to `app.init()`. The core calls `mount()` without knowing the content.
+- There are no `if (isThunderbird)` branches in the core: UI that is not mounted simply does not exist in the DOM.
+
+Element assignment:
+
+- **Web only:** Google connect/log-out button, "clear data" action, optional sample calendars (public holidays/school holidays ICS)
+- **Thunderbird only:** Thunderbird calendar refresh/sync behavior, add-on option hints
+- **Both (core):** view-mode selector, year navigation, filter sidebar, theme toggle, ICS upload (works on both hosts through the StoragePort)
+
+### 6.4 Web app constraints
+
+- The website is a purely static deployment. There is no server-side session, token relay, or persistence.
+- Google calendars are read directly from the browser via the Google Calendar API (Google Identity Services, read-only scope).
+- ICS imports and preferences are persisted client-side only. Preferences use `localStorage`; uploaded ICS content uses IndexedDB (size limits make cookies unsuitable, and without a backend cookies would only add request overhead). Both sit behind the same StoragePort so the core does not see the difference.
+- All user data stays in the user's browser. The landing page should state this, and the web options should offer a "clear data" action (wipe client storage, Google logout).
+
+### 6.5 Architectural rules
+
+- `src/core/` must never import from `src/hosts/`.
+- No `browser.*` / `messenger.*` usage inside `src/core/` — such access goes through ports.
+- Any code that depends on Thunderbird APIs, browser extension APIs, or web-runtime specifics stays behind the port/adapter interfaces. Shared logic works with plain data objects and generic input/output contracts.
+
+### 6.6 Data contracts
+
+The core defines stable contracts for:
 
 - calendar list input
 - event list input
@@ -199,13 +230,13 @@ The shared layer should define stable contracts for:
 - view state
 - render output requests
 
-That contract-driven structure will allow both the add-on and website to use the same rendering engine while still customizing their host behavior.
+That contract-driven structure allows both the add-on and website to use the same rendering engine while still customizing their host behavior.
 
 ## 7. Implementation guidance
 
 When extending this project:
 
-- keep DOM and browser-specific code in the shell or adapter layer
-- keep layout rules and filtering rules in shared logic
+- keep DOM host wiring and browser-specific code in the host shell or adapter layer
+- keep layout rules and filtering rules in core logic
 - avoid mixing Thunderbird-specific API semantics into the renderer
-- preserve the current module boundaries until a clear extraction plan exists
+- preserve the current module boundaries until the corresponding migration task in [migration-plan.md](migration-plan.md) moves them

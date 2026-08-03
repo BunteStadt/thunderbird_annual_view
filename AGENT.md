@@ -62,7 +62,8 @@ The shared layer should eventually own the calendar domain, filtering rules, vie
 Use the following documents as the authoritative deeper references:
 
 - [docs/architecture.md](docs/architecture.md) — current architecture, module responsibilities, and the target shared architecture.
-- [docs/monorepo-roadmap.md](docs/monorepo-roadmap.md) — phased plan to evolve the repository into a monorepo.
+- [docs/roadmap.md](docs/roadmap.md) — phased plan to evolve the repository into the core + hosts structure (Thunderbird add-on and website in parallel).
+- [docs/migration-plan.md](docs/migration-plan.md) — detailed, task-level step-by-step instructions for executing the roadmap.
 - [docs/contributor-workflow.md](docs/contributor-workflow.md) — development workflow, testing expectations, and release conventions.
 - [thunderbird-profile/README.md](thunderbird-profile/README.md) — how to use the pre-configured Thunderbird profile for end-to-end manual and Docker-based testing.
 - [e2e/README.md](e2e/README.md) — how to run the real-Thunderbird installation test from the terminal.

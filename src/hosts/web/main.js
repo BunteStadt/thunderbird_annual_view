@@ -2,7 +2,7 @@
 // (localStorage + IndexedDB), the Google provider on demand, and host UI
 // modules for Google login, empty state, and clearing local data.
 import { initApp } from "../../core/app.js";
-import { createCalendarProvider, setCalendarProvider } from "../../core/providers/calendar-service.js";
+import { createCalendarProvider, registerProviderFactory, setCalendarProvider } from "../../core/providers/calendar-service.js";
 import { GoogleCalendarProvider } from "../../core/providers/google-calendar-provider.js";
 import { setStorageAdapter } from "../../core/storage-port.js";
 import { parseYearHash, setupDeepLinks, updateYearHash } from "./deep-links.js";
@@ -26,6 +26,9 @@ setStorageAdapter(createWebHostStorageAdapter());
 // The Google provider instance is created up front so its auth state survives
 // connect/disconnect cycles; it only becomes the active provider on connect.
 const googleProvider = new GoogleCalendarProvider();
+// Register the factory so core can create it on demand; it returns the singleton
+// instance so Google auth state survives connect/disconnect cycles.
+registerProviderFactory("google", () => googleProvider);
 
 setCalendarProvider(dummyMode ? createCalendarProvider("dummy") : createCalendarProvider("empty"));
 
@@ -43,7 +46,7 @@ const uiModules = [
                     if (dummyMode) {
                         return;
                     }
-                    setCalendarProvider(authenticated ? googleProvider : createCalendarProvider("empty"));
+                    setCalendarProvider(authenticated ? createCalendarProvider("google") : createCalendarProvider("empty"));
                 }
             });
             return authController;

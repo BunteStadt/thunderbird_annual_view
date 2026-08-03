@@ -1,6 +1,5 @@
 import { CalendarProvider, EmptyCalendarProvider } from "./calendar-provider.js";
 import { DummyCalendarProvider } from "./dummy-calendar-provider.js";
-import { GoogleCalendarProvider } from "./google-calendar-provider.js";
 import { IcsCalendarProvider } from "./ics-calendar-provider.js";
 
 let activeCalendarProvider = null;
@@ -10,7 +9,6 @@ export {
     CalendarProvider,
     DummyCalendarProvider,
     EmptyCalendarProvider,
-    GoogleCalendarProvider,
     IcsCalendarProvider
 };
 
@@ -42,8 +40,6 @@ export function createCalendarProvider(kind) {
     switch (kind) {
         case "dummy":
             return new DummyCalendarProvider();
-        case "google":
-            return new GoogleCalendarProvider();
         default:
             return new EmptyCalendarProvider();
     }

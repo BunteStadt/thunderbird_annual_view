@@ -106,13 +106,15 @@ test('createCalendarProvider maps each kind to the matching provider class', asy
     const calendarService = await loadCalendarServiceModule();
 
     assert.equal(calendarService.createCalendarProvider('dummy')?.constructor?.name, 'DummyCalendarProvider');
-    assert.equal(calendarService.createCalendarProvider('google')?.constructor?.name, 'GoogleCalendarProvider');
+    assert.equal(calendarService.createCalendarProvider('google')?.constructor?.name, 'EmptyCalendarProvider');
     assert.equal(calendarService.createCalendarProvider('thunderbird')?.constructor?.name, 'EmptyCalendarProvider');
 
     // Hosts can register their own provider factories.
-    class FakeHostProvider {}
+    class FakeHostProvider { }
     calendarService.registerProviderFactory('thunderbird', () => new FakeHostProvider());
+    calendarService.registerProviderFactory('google', () => new FakeHostProvider());
     assert.equal(calendarService.createCalendarProvider('thunderbird')?.constructor?.name, 'FakeHostProvider');
+    assert.equal(calendarService.createCalendarProvider('google')?.constructor?.name, 'FakeHostProvider');
     assert.equal(calendarService.createCalendarProvider('empty')?.constructor?.name, 'EmptyCalendarProvider');
     assert.equal(calendarService.createCalendarProvider('unknown-kind')?.constructor?.name, 'EmptyCalendarProvider');
 });

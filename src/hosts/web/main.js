@@ -5,6 +5,7 @@ import { initApp } from "../../core/app.js";
 import { createCalendarProvider, registerProviderFactory, setCalendarProvider } from "../../core/providers/calendar-service.js";
 import { GoogleCalendarProvider } from "../../core/providers/google-calendar-provider.js";
 import { setStorageAdapter } from "../../core/storage-port.js";
+import { mountViewShell } from "../../core/ui/view-shell.js";
 import { parseYearHash, setupDeepLinks, updateYearHash } from "./deep-links.js";
 import { setupClearData } from "./ui/clear-data.js";
 import { setupEmptyState } from "./ui/empty-state.js";
@@ -20,6 +21,8 @@ function isTruthyQueryFlag(value) {
 }
 
 const dummyMode = globalThis.ENABLE_DUMMY_CALENDARS === true || isTruthyQueryFlag(queryParams.get("dummy"));
+
+mountViewShell();
 
 setStorageAdapter(createWebHostStorageAdapter());
 

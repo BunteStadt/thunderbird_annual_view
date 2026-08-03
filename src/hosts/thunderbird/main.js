@@ -1,10 +1,13 @@
 // Thunderbird host bootstrap for the year view page. Wires the WebExtension
-// storage adapter and the Thunderbird experiment-API calendar provider, then
-// hands control to the core app (app.js).
+// storage adapter and the Thunderbird experiment-API calendar provider, mounts
+// the shared view shell, then hands control to the core app (app.js).
 import { initApp } from "../../core/app.js";
 import { createCalendarProvider, registerProviderFactory, setCalendarProvider } from "../../core/providers/calendar-service.js";
 import { createWebExtensionStorageAdapter, setStorageAdapter } from "../../core/storage-port.js";
+import { mountViewShell } from "../../core/ui/view-shell.js";
 import { ThunderbirdCalendarProvider } from "./thunderbird-calendar-provider.js";
+
+mountViewShell();
 
 setStorageAdapter(createWebExtensionStorageAdapter());
 

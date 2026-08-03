@@ -86,6 +86,10 @@ The current implementation is organized into three practical layers:
 - [src/ui/year-view/theme.js](../src/ui/year-view/theme.js)
   - applies light/dark theme behavior
 
+- [src/core/ui/view-shell.js](../src/core/ui/view-shell.js)
+  - single source of truth for the shared app markup (header, sidebar, grid shell)
+  - host pages are thin wrappers; each bootstrap calls `mountViewShell()` before `initApp()`
+
 ## 3. Core domain concepts
 
 ### 3.1 Calendar

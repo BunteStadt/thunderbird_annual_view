@@ -118,6 +118,19 @@ header {
   display: flex;
 }
 
+.content-empty-state {
+  margin: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed var(--muted);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.content-empty-state[hidden] {
+  display: none;
+}
+
 .controls {
   display: flex;
   align-items: center;

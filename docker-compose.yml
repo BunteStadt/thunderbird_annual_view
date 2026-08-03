@@ -16,9 +16,24 @@ services:
     volumes:
       # Mount the project source code (also used by the extension proxy and ICS calendars)
       - .:/workspace:cached
-      # Mount the pre-configured test profile so Thunderbird starts with the
-      # add-on installed from source and the NRW ICS calendars pre-registered.
-      - ./thunderbird-profile:/config/profile:cached
+      # Mount a writable runtime profile directory so Thunderbird-generated
+      # databases, caches, and session state stay local and out of Git.
+      - ./.thunderbird-profile-runtime:/config/profile:cached
 
     ports:
       - "5800:5800"
+
+  # Interactive shell into the dev container (runs as root).
+  # Usage: docker compose run --rm bash
+  bash:
+    build:
+      context: .
+    working_dir: /workspace
+    environment:
+      DISPLAY: :1
+      PROFILE_DIR: /config/profile
+      REPO_ROOT: /workspace
+    volumes:
+      - .:/workspace:cached
+      - ./.thunderbird-profile-runtime:/config/profile:cached
+    entrypoint: ["/bin/bash"]

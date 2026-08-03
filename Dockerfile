@@ -5,17 +5,27 @@
 #
 
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.24-v4.12.6
+FROM jlesage/baseimage-gui:debian-12-v4.12.6
 
 
 #my stuff:  install bash, node, npm, git
 
-RUN apk add --no-cache \
+RUN rm -f /var/log \
+    && mkdir -p /var/log \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
         bash \
         ca-certificates \
         tar \
         wget \
-        xz
+        xz-utils \
+        libgtk-3-0 \
+        libdbus-glib-1-2 \
+        libdbus-1-3 \
+        libasound2 \
+        libnss3 \
+        libnspr4 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=unknown
@@ -41,7 +51,7 @@ RUN \
         # Icons used by folder/file selection window (when saving as).
         adwaita-icon-theme \
         # A font is needed.
-        font-dejavu
+        fonts-dejavu-core
 
 # Generate and install favicons.
 RUN \
@@ -70,3 +80,4 @@ LABEL \
       org.label-schema.version="${DOCKER_IMAGE_VERSION:-unknown}" \
       org.label-schema.vcs-url="https://github.com/jlesage/docker-thunderbird" \
       org.label-schema.schema-version="1.0"
+

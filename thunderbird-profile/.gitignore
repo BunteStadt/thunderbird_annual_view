@@ -1,0 +1,10 @@
+# Keep only the minimal Thunderbird profile files needed to bootstrap the
+# Docker-based test environment. Runtime-generated state such as databases,
+# caches, and session data is ignored and stays local to the container.
+*
+!.gitignore
+!README.md
+!prefs.js
+!user.js
+!extensions/
+!extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net

@@ -20,8 +20,10 @@ add-on installation from source and the calendar provider integration.
 ### Option A — Docker (recommended)
 
 The `docker-compose.yml` at the repository root mounts the source code at
-`/workspace` inside the container.  The profile is mounted to `/config/profile`
-so Thunderbird uses it on startup.
+`/workspace` inside the container.  Docker uses the ignored runtime directory
+`.thunderbird-profile-runtime/` as the writable `/config/profile` mount, so
+Thunderbird can create its databases and caches locally without polluting the
+tracked profile template under `thunderbird-profile/`.
 
 ```sh
 docker compose up

@@ -1,5 +1,5 @@
 // Keep the annual view easy to reach by reusing a single tab.
-const yearViewUrl = browser.runtime.getURL("src/hosts/thunderbird/year-view.html");
+const yearViewUrl = browser.runtime.getURL("index.html");
 
 browser.action.onClicked.addListener(() => {
     createCustomSpace().catch(console.error);

@@ -69,8 +69,8 @@ The repository root contains a landing page (`index.html`) designed for GitHub P
 It is responsive from mobile to wide desktop layouts, includes animated visual accents, and now embeds an interactive dummy demo directly on the page.
 
 - Landing page: `https://buntestadt.github.io/thunderbird_annual_view/`
-- Dummy demo button target (opens in a new tab): `src/hosts/web/index.html?dummy=1`
-- Embedded demo target (inside an iframe): `src/hosts/web/index.html?dummy=1`
+- Dummy demo button target (opens in a new tab): `web/index.html?dummy=1`
+- Embedded demo target (inside an iframe): `web/index.html?dummy=1`
 
 ## Usage
 
@@ -99,25 +99,36 @@ The view mode can be changed directly in the annual view header: select between 
 
 ## Development
 
-Use a seperate Thunderbird profile.
+Use a separate Thunderbird profile.
+
+Use `just tb` or:
 
 1. Close Thunderbird.
-2. Start the profile selecter and use a test profile.
+2. Start the profile selector  and use a test profile.
 
 ``` cmd
 "C:\Program Files\Mozilla Thunderbird\thunderbird.exe" -P
 ```
 
+### Vite
+Vite is used to merge htmls and build the stuff.
+
+```bash
+npm run dev
+npm run build:web
+npm run build:thunderbird 
+```
+
 ### Dummy Data
-Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/hosts/web/index.html?dummy=1`.
+Run `npm run dev`, then open `http://localhost:5173/?dummy=1` to load the built-in sample calendars and events.
 Or use the commented out code in main.js.
 
 ### Google Calendar Data
 
 Run the year-view page as a local website with Google Calendar integration:
 
-1. Start a local web server from the repository root (for example `python -m http.server 4173`).
-2. Open `http://localhost:4173/src/hosts/web/index.html?google=1`.
+1. Run `npm run dev`.
+2. Open `http://localhost:5173/?google=1`.
 3. Set your OAuth client ID in `src/ui/year-view/google-client-id.js`.
 4. Click `Connect to Google` and complete the Google login/consent flow.
 5. The button switches to `Log out` when connected.
@@ -134,9 +145,9 @@ Google setup requirements:
 
 Work without Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
 
-1. Install `Live Server (Five Server)` extension in Visual Studio Code.
-2. Right click `/src/hosts/web/index.html` and select `Open with Live Server`.
-3. Add `?dummy=1` to the URL to load the built-in sample calendars and events.
+1. Run `npm run build:web`.
+2. Serve `dist/web/` with a static web server.
+3. Open `index.html?dummy=1` to load the built-in sample calendars and events.
 
 ### Run in Thunderbird
 

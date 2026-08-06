@@ -14,8 +14,8 @@ test('background script loads and click handler executes without console errors'
     const browser = {
         runtime: {
             getURL: (urlPath) => `moz-extension://test/${urlPath}`,
-            onInstalled: { addListener() {} },
-            onStartup: { addListener() {} }
+            onInstalled: { addListener() { } },
+            onStartup: { addListener() { } }
         },
         action: {
             onClicked: {
@@ -38,7 +38,7 @@ test('background script loads and click handler executes without console errors'
     };
 
     const availableResources = new Set([
-        'moz-extension://test/src/hosts/thunderbird/year-view.html',
+        'moz-extension://test/index.html',
         'moz-extension://test/assets/icons/annual_view_prefers-color.svg'
     ]);
 
@@ -46,7 +46,7 @@ test('background script loads and click handler executes without console errors'
         browser,
         fetch: async (url) => ({ ok: availableResources.has(url) }),
         console: {
-            log() {},
+            log() { },
             error(...args) {
                 consoleErrors.push(args);
             }

@@ -86,9 +86,9 @@ The current implementation is organized into three practical layers:
 - [src/ui/year-view/theme.js](../src/ui/year-view/theme.js)
   - applies light/dark theme behavior
 
-- [src/core/ui/view-shell.js](../src/core/ui/view-shell.js)
+- [src/core/ui/index.html](../src/core/ui/index.html)
   - single source of truth for the shared app markup (header, sidebar, grid shell)
-  - mounted by each host entry module before it initializes the app
+  - Vite builds it with the selected host entry module
 
 ## 3. Core domain concepts
 

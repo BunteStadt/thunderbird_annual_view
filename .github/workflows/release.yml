@@ -37,6 +37,9 @@ jobs:
           name: calendar-annual-view-xpi
           path: dist/
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Rename XPI with version tag
         run: |
           cp dist/calendar-annual-view.xpi dist/calendar-annual-view-${{ github.ref_name }}.xpi
@@ -49,8 +52,9 @@ jobs:
       - name: Generate sample images
         env:
           RELEASE_TAG: ${{ github.ref_name }}
-          YEAR_VIEW_URL: http://127.0.0.1:8000/src/hosts/web/index.html
+          YEAR_VIEW_URL: http://127.0.0.1:8000/dist/web/index.html
         run: |
+          npm run build:web
           python3 -m http.server 8000 >/tmp/calendar-screenshots-http.log 2>&1 &
           SERVER_PID=$!
           trap "kill $SERVER_PID" EXIT

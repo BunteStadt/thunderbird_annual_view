@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
-const shellSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'view-shell.js'), 'utf8');
+const shellSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'index.html'), 'utf8');
 const appSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'app.js'), 'utf8');
 
 // The view shell in core is the single source of truth for the app markup.
@@ -39,13 +39,14 @@ test('view shell contains every data-ui-slot the host bootstraps mount into', ()
     }
 });
 
-test('host HTML pages are thin wrappers that defer markup to the core shell', () => {
-    for (const htmlPath of ['src/hosts/thunderbird/year-view.html', 'src/hosts/web/index.html']) {
-        const html = fs.readFileSync(path.join(repoRoot, htmlPath), 'utf8');
-        assert.ok(!html.includes('id="gridRows"'), `${htmlPath} must not duplicate core view shell markup`);
-        assert.ok(!html.includes('id="calendarList"'), `${htmlPath} must not duplicate core view shell markup`);
-        assert.match(html, /<script type="module"/, `${htmlPath} must load its host entry module`);
-        assert.match(html, /<body/, `${htmlPath} must keep a <body> for the shell`);
-    }
+test('Vite builds the one core HTML page with a host selected at compile time', () => {
+    const entrySource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'entry.js'), 'utf8');
+    const viteConfig = fs.readFileSync(path.join(repoRoot, 'vite.config.mjs'), 'utf8');
+
+    assert.match(entrySource, /from "@calendar-host"/);
+    assert.match(viteConfig, /src\/hosts\/thunderbird\/main\.js/);
+    assert.match(viteConfig, /src\/hosts\/web\/main\.js/);
+    assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'year-view.html')));
+    assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'web', 'index.html')));
     assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'host-bootstrap.js')));
 });

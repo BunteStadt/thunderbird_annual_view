@@ -2,7 +2,6 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const os = require('node:os');
 const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..', '..');
@@ -50,35 +49,11 @@ test('manifest references existing addon files', () => {
     }
 });
 
-test('addon package can be built and validated as a zip archive', (t) => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'calendar-annual-view-ci-'));
-    const packageDir = path.join(tempDir, 'package');
-    const xpiPath = path.join(tempDir, 'addon.xpi');
-    t.after(() => {
-        if (fs.existsSync(xpiPath)) {
-            fs.unlinkSync(xpiPath);
-        }
-        fs.rmSync(tempDir, { recursive: true, force: true });
-    });
+test('addon package builds from the Vite Thunderbird output', () => {
+    const build = spawnSync('bash', ['assets/scripts/build-xpi.sh'], { cwd: repoRoot, encoding: 'utf8' });
+    assert.equal(build.status, 0, `XPI build failed: ${build.stderr || build.stdout}`);
 
-    fs.mkdirSync(path.join(packageDir, 'experiments', 'calendar'), { recursive: true });
-    fs.cpSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'manifest.json'), path.join(packageDir, 'manifest.json'));
-    fs.cpSync(path.join(repoRoot, 'src', 'core'), path.join(packageDir, 'src', 'core'), { recursive: true });
-    fs.cpSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird'), path.join(packageDir, 'src', 'hosts', 'thunderbird'), { recursive: true });
-    fs.cpSync(path.join(repoRoot, 'assets'), path.join(packageDir, 'assets'), { recursive: true });
-    fs.cpSync(
-        path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'submodules', 'calendar', 'experiments', 'calendar'),
-        path.join(packageDir, 'experiments', 'calendar'),
-        { recursive: true }
-    );
-
-    const build = spawnSync(
-        'zip',
-        ['-r', xpiPath, 'manifest.json', 'src', 'assets/icons', 'experiments'],
-        { cwd: packageDir, encoding: 'utf8' }
-    );
-    assert.equal(build.status, 0, `zip command failed: ${build.stderr || build.stdout}`);
-
+    const xpiPath = path.join(repoRoot, 'dist', 'calendar-annual-view.xpi');
     const verify = spawnSync('unzip', ['-t', xpiPath], { encoding: 'utf8' });
     assert.equal(verify.status, 0, `unzip validation failed: ${verify.stderr || verify.stdout}`);
     assert.match(verify.stdout, /No errors detected in compressed data/);
@@ -87,7 +62,7 @@ test('addon package can be built and validated as a zip archive', (t) => {
     assert.equal(list.status, 0, `Unable to list archive entries: ${list.stderr || list.stdout}`);
     assert.match(list.stdout, /manifest\.json/);
     assert.match(list.stdout, /src\/hosts\/thunderbird\/background\.js/);
-    assert.match(list.stdout, /src\/hosts\/thunderbird\/year-view\.html/);
-    assert.match(list.stdout, /src\/core\/ui\/view-shell\.js/);
+    assert.match(list.stdout, /index\.html/);
+    assert.match(list.stdout, /assets\/index\.js/);
     assert.match(list.stdout, /experiments\/calendar\/ext-calendar-utils\.sys\.mjs/);
 });

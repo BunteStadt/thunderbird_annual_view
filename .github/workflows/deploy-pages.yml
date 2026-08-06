@@ -28,13 +28,13 @@
 
 #       - name: Assemble site
 #         run: |
+#           npm ci
+#           npm run build:web
 #           mkdir -p _site/src
 #           cp index.html _site/
 #           cp assets/feiertage_nrw.ics assets/ferien_nrw.ics _site/
 #           cp -R icons _site/
-#           cp -R src/core _site/src/core
-#           mkdir -p _site/src/hosts
-#           cp -R src/hosts/web _site/src/hosts/web
+#           cp -R dist/web _site/web
 
 #       - name: Setup Pages
 #         uses: actions/configure-pages@v5

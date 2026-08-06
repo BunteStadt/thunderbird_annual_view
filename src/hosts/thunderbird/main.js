@@ -4,16 +4,11 @@
 import { initApp } from "../../core/app.js";
 import { createCalendarProvider, registerProviderFactory, setCalendarProvider } from "../../core/providers/calendar-service.js";
 import { createWebExtensionStorageAdapter, setStorageAdapter } from "../../core/storage-port.js";
-import { mountViewShell } from "../../core/ui/view-shell.js";
 import { ThunderbirdCalendarProvider } from "./thunderbird-calendar-provider.js";
 
-mountViewShell();
-
-setStorageAdapter(createWebExtensionStorageAdapter());
-
-registerProviderFactory("thunderbird", () => new ThunderbirdCalendarProvider());
-setCalendarProvider(createCalendarProvider("thunderbird"));
-
-document.addEventListener("DOMContentLoaded", () => {
+export function start() {
+    setStorageAdapter(createWebExtensionStorageAdapter());
+    registerProviderFactory("thunderbird", () => new ThunderbirdCalendarProvider());
+    setCalendarProvider(createCalendarProvider("thunderbird"));
     initApp({ uiModules: [] }).catch((err) => console.error("[main] init failed", err));
-});
+}

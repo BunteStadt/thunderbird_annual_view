@@ -88,5 +88,6 @@ test('addon package can be built and validated as a zip archive', (t) => {
     assert.match(list.stdout, /manifest\.json/);
     assert.match(list.stdout, /src\/hosts\/thunderbird\/background\.js/);
     assert.match(list.stdout, /src\/hosts\/thunderbird\/year-view\.html/);
+    assert.match(list.stdout, /src\/core\/ui\/view-shell\.js/);
     assert.match(list.stdout, /experiments\/calendar\/ext-calendar-utils\.sys\.mjs/);
 });

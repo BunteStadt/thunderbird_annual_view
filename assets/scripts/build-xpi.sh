@@ -10,8 +10,9 @@ mkdir -p "$PACKAGE_DIR/src/hosts/thunderbird" "$PACKAGE_DIR/assets" "$PACKAGE_DI
 cp "$ROOT_DIR/src/hosts/thunderbird/manifest.json" "$PACKAGE_DIR/manifest.json"
 cp -R "$ROOT_DIR/assets/icons" "$PACKAGE_DIR/assets/"
 cp -R "$ROOT_DIR/src/core" "$PACKAGE_DIR/src/core"
-cp -R "$ROOT_DIR/src/hosts/thunderbird/"*.js "$ROOT_DIR/src/hosts/thunderbird/"*.html \
+cp -R "$ROOT_DIR/src/hosts/thunderbird/"*.js \
     "$PACKAGE_DIR/src/hosts/thunderbird/"
+cp "$ROOT_DIR/src/hosts/thunderbird/year-view.html" "$PACKAGE_DIR/src/hosts/thunderbird/"
 cp -R "$ROOT_DIR/src/hosts/thunderbird/submodules/calendar/experiments/calendar" \
     "$PACKAGE_DIR/experiments/"
 

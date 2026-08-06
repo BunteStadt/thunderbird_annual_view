@@ -88,7 +88,7 @@ The current implementation is organized into three practical layers:
 
 - [src/core/ui/view-shell.js](../src/core/ui/view-shell.js)
   - single source of truth for the shared app markup (header, sidebar, grid shell)
-  - host pages are thin wrappers; each bootstrap calls `mountViewShell()` before `initApp()`
+  - mounted by each host entry module before it initializes the app
 
 ## 3. Core domain concepts
 

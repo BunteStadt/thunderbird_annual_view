@@ -69,8 +69,8 @@ The repository root contains a landing page (`index.html`) designed for GitHub P
 It is responsive from mobile to wide desktop layouts, includes animated visual accents, and now embeds an interactive dummy demo directly on the page.
 
 - Landing page: `https://buntestadt.github.io/thunderbird_annual_view/`
-- Dummy demo button target (opens in a new tab): `src/ui/year-view/year-view.html?dummy=1`
-- Embedded demo target (inside an iframe): `src/ui/year-view/year-view.html?dummy=1`
+- Dummy demo button target (opens in a new tab): `src/hosts/web/index.html?dummy=1`
+- Embedded demo target (inside an iframe): `src/hosts/web/index.html?dummy=1`
 
 ## Usage
 
@@ -109,7 +109,7 @@ Use a seperate Thunderbird profile.
 ```
 
 ### Dummy Data
-Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
+Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/hosts/web/index.html?dummy=1`.
 Or use the commented out code in main.js.
 
 ### Google Calendar Data
@@ -117,7 +117,7 @@ Or use the commented out code in main.js.
 Run the year-view page as a local website with Google Calendar integration:
 
 1. Start a local web server from the repository root (for example `python -m http.server 4173`).
-2. Open `http://localhost:4173/src/ui/year-view/year-view.html?google=1`.
+2. Open `http://localhost:4173/src/hosts/web/index.html?google=1`.
 3. Set your OAuth client ID in `src/ui/year-view/google-client-id.js`.
 4. Click `Connect to Google` and complete the Google login/consent flow.
 5. The button switches to `Log out` when connected.
@@ -135,7 +135,7 @@ Google setup requirements:
 Work without Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
 
 1. Install `Live Server (Five Server)` extension in Visual Studio Code.
-2. Right click `/src/ui/year-view/year-view.html` and select `Open with Live Server`.
+2. Right click `/src/hosts/web/index.html` and select `Open with Live Server`.
 3. Add `?dummy=1` to the URL to load the built-in sample calendars and events.
 
 ### Run in Thunderbird

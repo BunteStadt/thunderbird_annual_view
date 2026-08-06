@@ -25,9 +25,9 @@ All four phases were worked through in two agent sessions. The overall
 
 - B1: All platform-neutral files moved to `src/core/domain/`, `src/core/providers/`,
   `src/core/ui/`, `src/core/`.
-- B2: Host shells created: `src/hosts/thunderbird/` (background, main, HTML,
-  Thunderbird provider) and `src/hosts/web/` (main, HTML, web storage adapter,
-  deep links, UI modules).
+- B2: Host shells created: `src/hosts/thunderbird/` (background, main,
+  Thunderbird provider) and `src/hosts/web/` (main, web storage adapter, deep
+  links, UI modules). Both host documents mount the shared `src/core/ui/view-shell.js`.
 - B3: `test/core/core-boundaries.test.js` asserts no `browser.*` or `hosts/`
   imports in `src/core/`; runs in CI.
 - B4: Test suite split into `test/core/` and `test/hosts/thunderbird/` and
@@ -35,7 +35,7 @@ All four phases were worked through in two agent sessions. The overall
 
 **Phase C — Web shell as a product** ✅ complete
 
-- C1: `src/hosts/web/index.html` is the dedicated web entry page.
+- C1: `src/core/ui/view-shell.js` provides the shared calendar markup for web and Thunderbird host pages.
 - C2: `src/hosts/web/web-storage-adapter.js` — composite adapter routing the
   ICS descriptor key to IndexedDB, all other keys to `localStorage`.
 - C3: Google connect always available in the web header (no `?google=1` needed);

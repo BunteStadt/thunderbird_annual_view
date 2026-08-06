@@ -42,15 +42,10 @@ test('view shell contains every data-ui-slot the host bootstraps mount into', ()
 test('host HTML pages are thin wrappers that defer markup to the core shell', () => {
     for (const htmlPath of ['src/hosts/thunderbird/year-view.html', 'src/hosts/web/index.html']) {
         const html = fs.readFileSync(path.join(repoRoot, htmlPath), 'utf8');
-        assert.ok(
-            !html.includes('id="gridRows"'),
-            `${htmlPath} must not duplicate core view shell markup`
-        );
-        assert.ok(
-            !html.includes('id="calendarList"'),
-            `${htmlPath} must not duplicate core view shell markup`
-        );
-        assert.match(html, /<script type="module"/, `${htmlPath} must load its bootstrap script`);
+        assert.ok(!html.includes('id="gridRows"'), `${htmlPath} must not duplicate core view shell markup`);
+        assert.ok(!html.includes('id="calendarList"'), `${htmlPath} must not duplicate core view shell markup`);
+        assert.match(html, /<script type="module"/, `${htmlPath} must load its host entry module`);
         assert.match(html, /<body/, `${htmlPath} must keep a <body> for the shell`);
     }
+    assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'host-bootstrap.js')));
 });

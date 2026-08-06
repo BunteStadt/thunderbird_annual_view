@@ -21,15 +21,15 @@ The add-on currently provides:
 
 ## Repository shape
 
-- [manifest.json](manifest.json) defines the Thunderbird add-on entry point and experiment APIs.
-- [src/background/background.js](src/background/background.js) creates the custom Thunderbird space entry point.
-- [src/ui/year-view](src/ui/year-view) contains the calendar UI, event-store logic, grid rendering, storage, theming, and HTML shell.
-- [src/ui/year-view/ics-calendar-provider.js](src/ui/year-view/ics-calendar-provider.js) is a platform-agnostic provider that parses `.ics` (iCalendar) file content passed as strings.
-- [experiments/calendar](experiments/calendar) holds Thunderbird-specific experimental calendar APIs used by the add-on.
-- [apps](apps) is the starting point for the future monorepo split into addon, web, and backend surfaces.
+- [src/hosts/thunderbird/manifest.json](src/hosts/thunderbird/manifest.json) defines the Thunderbird add-on entry point and experiment APIs.
+- [src/hosts/thunderbird/background.js](src/hosts/thunderbird/background.js) creates the custom Thunderbird space entry point.
+- [src/core](src/core) contains the platform-neutral calendar domain, providers, UI, storage ports, and shared HTML shell.
+- [src/core/providers/ics-calendar-provider.js](src/core/providers/ics-calendar-provider.js) is a platform-agnostic provider that parses `.ics` (iCalendar) file content passed as strings.
+- [src/hosts/thunderbird/submodules/calendar/experiments/calendar](src/hosts/thunderbird/submodules/calendar/experiments/calendar) provides the Thunderbird-specific experimental calendar APIs that the build copies into the add-on package.
+- [src/hosts](src/hosts) contains the thin Thunderbird and web bootstraps and their host-specific integrations.
 - [test](test) contains integration and unit-style checks for the current calendar behavior.
-- [thunderbird-profile](thunderbird-profile) is a pre-configured Thunderbird profile for real-Thunderbird integration testing via Docker or a local installation.
-- [e2e](e2e) contains the real-Thunderbird end-to-end test that installs the add-on from source, captures a screenshot, and validates the Thunderbird log.
+- [test/.thunderbird-profile](test/.thunderbird-profile) is a pre-configured Thunderbird profile for real-Thunderbird integration testing via Docker or a local installation.
+- [test/e2e](test/e2e) contains the real-Thunderbird end-to-end test that installs the add-on from source, captures a screenshot, and validates the Thunderbird log.
 
 ## Architecture principles
 
@@ -45,9 +45,9 @@ The add-on currently provides:
 - The project is a Thunderbird WebExtension add-on built with plain JavaScript, HTML, and CSS, with Manifest v3 and Thunderbird-specific experiment APIs.
 - The current compatibility target is Thunderbird 147.0 through 154.0, and the code should continue to use the browser namespace rather than chrome-specific APIs.
 - Keep the add-on behavior read-only and preserve the existing light/dark theme support.
-- The release path is still manual and tag-driven: update the version in manifest.json, create a release tag, and let the GitHub workflows build and publish the XPI.
+- The release path is still manual and tag-driven: update the version in src/hosts/thunderbird/manifest.json, create a release tag, and let the GitHub workflows build and publish the XPI.
 - Avoid changing protected files such as LICENSE, .git internals, and documentation assets unless the change is intentionally related to the update.
-- The add-on uses SVG assets from the icons directory for the extension action and the custom space. Keep icon paths in manifest.json and background wiring valid when changing or replacing assets.
+- The add-on uses SVG assets from the assets/icons directory for the extension action and the custom space. Keep icon paths in manifest.json and background wiring valid when changing or replacing assets.
 
 ## Monorepo target direction
 
@@ -62,11 +62,9 @@ The shared layer should eventually own the calendar domain, filtering rules, vie
 Use the following documents as the authoritative deeper references:
 
 - [docs/architecture.md](docs/architecture.md) — current architecture, module responsibilities, and the target shared architecture.
-- [docs/roadmap.md](docs/roadmap.md) — phased plan to evolve the repository into the core + hosts structure (Thunderbird add-on and website in parallel).
-- [docs/migration-plan.md](docs/migration-plan.md) — detailed, task-level step-by-step instructions for executing the roadmap.
 - [docs/contributor-workflow.md](docs/contributor-workflow.md) — development workflow, testing expectations, and release conventions.
-- [thunderbird-profile/README.md](thunderbird-profile/README.md) — how to use the pre-configured Thunderbird profile for end-to-end manual and Docker-based testing.
-- [e2e/README.md](e2e/README.md) — how to run the real-Thunderbird installation test from the terminal.
+- [test/.thunderbird-profile/README.md](test/.thunderbird-profile/README.md) — how to use the pre-configured Thunderbird profile for end-to-end manual and Docker-based testing.
+- [test/e2e/README.md](test/e2e/README.md) — how to run the real-Thunderbird installation test from the terminal.
 
 ## Working rules for contributors
 

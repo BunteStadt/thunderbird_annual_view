@@ -1,13 +1,13 @@
 name: Build and Release Thunderbird XPI
 
 permissions:
-  contents: write  # needed to create releases and upload files
+  contents: write # needed to create releases and upload files
 
 on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*'   # Run on version tags, e.g., v1.0.0
+      - "v*" # Run on version tags, e.g., v1.0.0
 
 jobs:
   # Reuse the shared build workflow
@@ -37,6 +37,9 @@ jobs:
           name: calendar-annual-view-xpi
           path: dist/
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Rename XPI with version tag
         run: |
           cp dist/calendar-annual-view.xpi dist/calendar-annual-view-${{ github.ref_name }}.xpi
@@ -49,12 +52,13 @@ jobs:
       - name: Generate sample images
         env:
           RELEASE_TAG: ${{ github.ref_name }}
-          YEAR_VIEW_URL: http://127.0.0.1:8000/src/ui/year-view/year-view.html
+          YEAR_VIEW_URL: http://127.0.0.1:8000/dist/web/index.html
         run: |
+          npm run build:web
           python3 -m http.server 8000 >/tmp/calendar-screenshots-http.log 2>&1 &
           SERVER_PID=$!
           trap "kill $SERVER_PID" EXIT
-          node scripts/generate-sample-images.mjs
+          node assets/scripts/generate-sample-images.mjs
 
       - name: Archive sample images
         run: |

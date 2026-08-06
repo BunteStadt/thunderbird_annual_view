@@ -30,12 +30,13 @@ jobs:
       - name: Install zip
         run: sudo apt-get update && sudo apt-get install -y zip
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build XPI
         id: build-xpi
         run: |
-          mkdir -p dist
-          zip -r dist/calendar-annual-view.xpi \
-            manifest.json src experiments icons
+          assets/scripts/build-xpi.sh
           echo "xpi-path=dist/calendar-annual-view.xpi" >> "$GITHUB_OUTPUT"
 
       - name: Upload XPI artifact

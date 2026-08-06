@@ -63,14 +63,21 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 
 Alternatively, install directly from the [Thunderbird Add-ons site](https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/) using the ID: `GlamorousPotato.calendar-annual-view@addons.thunderbird.net`.
 
-## GitHub Pages Demo
+## Web Demo
 
-The repository root contains a landing page (`index.html`) designed for GitHub Pages.
-It is responsive from mobile to wide desktop layouts, includes animated visual accents, and now embeds an interactive dummy demo directly on the page.
+The repository root contains a landing page (`index.html`). Build the web shell
+first with `npm run build:web`; the landing page links to the generated
+`dist/web/index.html` demo. The GitHub Pages workflow is present but currently
+disabled, so Pages deployment remains open work.
 
 - Landing page: `https://buntestadt.github.io/thunderbird_annual_view/`
-- Dummy demo button target (opens in a new tab): `src/ui/year-view/year-view.html?dummy=1`
-- Embedded demo target (inside an iframe): `src/ui/year-view/year-view.html?dummy=1`
+- Dummy demo button target after a build (opens in a new tab): `dist/web/index.html?dummy=1`
+- Embedded demo target after a build (inside an iframe): `dist/web/index.html?dummy=1`
+
+The web app is a static client-side deployment. It has no backend or database:
+Google calendars are read directly in the browser, while uploaded ICS content
+and preferences stay in local browser storage. Use the web app's clear-data
+control to remove local data and sign out of Google.
 
 ## Usage
 
@@ -99,26 +106,37 @@ The view mode can be changed directly in the annual view header: select between 
 
 ## Development
 
-Use a seperate Thunderbird profile.
+Use a separate Thunderbird profile.
+
+Use `just tb` or:
 
 1. Close Thunderbird.
-2. Start the profile selecter and use a test profile.
+2. Start the profile selector  and use a test profile.
 
 ``` cmd
 "C:\Program Files\Mozilla Thunderbird\thunderbird.exe" -P
 ```
 
+### Vite
+Vite is used to merge htmls and build the stuff.
+
+```bash
+npm run dev
+npm run build:web
+npm run build:thunderbird 
+```
+
 ### Dummy Data
-Open the standalone page with `?dummy=1` or `?dummy=true` to load the built-in sample calendars and events, for example `src/ui/year-view/year-view.html?dummy=1`.
+Run `npm run dev`, then open `http://localhost:5173/?dummy=1` to load the built-in sample calendars and events.
 Or use the commented out code in main.js.
 
 ### Google Calendar Data
 
 Run the year-view page as a local website with Google Calendar integration:
 
-1. Start a local web server from the repository root (for example `python -m http.server 4173`).
-2. Open `http://localhost:4173/src/ui/year-view/year-view.html?google=1`.
-3. Set your OAuth client ID in `src/ui/year-view/google-client-id.js`.
+1. Run `npm run dev`.
+2. Open `http://localhost:5173/?google=1`.
+3. Set your OAuth client ID in `src/hosts/web/google-client-id.js`.
 4. Click `Connect to Google` and complete the Google login/consent flow.
 5. The button switches to `Log out` when connected.
 6. The year view then loads your Google calendars and events.
@@ -134,9 +152,9 @@ Google setup requirements:
 
 Work without Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
 
-1. Install `Live Server (Five Server)` extension in Visual Studio Code.
-2. Right click `/src/ui/year-view/year-view.html` and select `Open with Live Server`.
-3. Add `?dummy=1` to the URL to load the built-in sample calendars and events.
+1. Run `npm run build:web`.
+2. Serve `dist/web/` with a static web server.
+3. Open `index.html?dummy=1` to load the built-in sample calendars and events.
 
 ### Run in Thunderbird
 
@@ -144,42 +162,25 @@ Work without Thunderbird - see the thunderbird tab in the browser - faster for d
 
 ### Development Tooling
 
-#### Git Hooks
-
-The repository ships with custom Git hooks in `.githooks/`. To enable them, run once:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-- **`pre-commit`** — Checks that the submodule has no unpulled commits and that `experiments/` is in sync with `submodules/calendar/experiments/calendar/`. If they differ, run `just sync-experiments` to sync them before committing.
-
 #### Just Commands
 
 [`just`](https://github.com/casey/just) is a command runner. Available recipes:
 
 | Command | Description |
 | --------- | ------------- |
-| `just sync-experiments` | Copies experiment APIs from `submodules/calendar/experiments/calendar/` to `experiments/` for development |
 | `just build-xpi` | Builds the `.xpi` release package into `dist/` |
-| `just tag` | Creates a Git tag from the version in `manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |
+| `just tag` | Creates a Git tag from the version in `src/hosts/thunderbird/manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |
 
-#### Syncing the Experiment Submodule
+#### Building the Experiment Package
 
-The experimental calendar APIs live in `submodules/calendar/experiments/calendar/` (a Git submodule). For the add-on to work, they must also be present at `experiments/calendar/`. To sync manually:
-
-```bash
-just sync-experiments
-```
-
-This copies all files from the submodule source to the target directory. The `pre-commit` hook will warn you if they drift out of sync.
+The experimental calendar APIs live in `src/hosts/thunderbird/submodules/calendar/experiments/calendar/` (a Git submodule). The build script copies them to `dist/package/experiments/calendar/` when assembling the add-on.
 
 ## Deployments
 
-When development is finished, merge to main. Make sure the ci-test is successful.
-In a new commit, update the version number in `manifest.json`.
-In vscode: select the last commit, right click and select `Create Tag`. Follow the versioning scheme. - or use the `just tag` command.
-The tag needs to be pushed to the remote repo seperatly. The GitHub Actions workflow will automatically create a new release and upload the `.xpi` file.
+When development is finished, merge to `main` after CI passes. The planned
+Pages deployment is not active yet. The add-on release remains tag-driven: update the version in
+`src/hosts/thunderbird/manifest.json`, create and push a tag (or use
+`just tag`), and the release workflow builds and uploads the XPI.
 
 ### Prerequisites
 
@@ -188,17 +189,21 @@ The tag needs to be pushed to the remote repo seperatly. The GitHub Actions work
 To create an `.xpi` file manually:
 
 1. Clone or download the repository.
-2. Stage the package layout so `submodules/calendar/experiments/calendar/` is also available as `experiments/calendar/` at the archive root.
-3. Zip the staged contents (excluding the `.git` folder).
-4. Rename the zip file extension to `.xpi`.
+2. Run `just build-xpi` (or `assets/scripts/build-xpi.sh`) to assemble `dist/package/` and create the XPI.
 
-### Releasing a New Version
+### Releasing the Add-on
 
 1. Create branches and commits as needed during development.
 2. When ready for release, create a Git tag on the desired commit.
 3. Push the tag to the repository (separate from pushing commits).
 4. The GitHub Actions workflow will automatically create a new *draft* release and upload the `.xpi` file.
 5. Check the release, test the `.xpi` file, and publish the release when ready.
+
+### Releasing the Web App
+
+Web release automation is still open: enable and verify
+`.github/workflows/deploy-pages.yml`, then deploy the landing page and the
+`dist/web` build from `main`.
 
 ## License
 

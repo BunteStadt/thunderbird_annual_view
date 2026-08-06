@@ -1,0 +1,27 @@
+{
+  "name": "yearview",
+  "version": "1.1.3",
+  "description": "Calender Year View",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "build:web": "vite build --mode web",
+    "build:thunderbird": "vite build --mode thunderbird",
+    "dev": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BunteStadt/thunderbird_annual_view.git"
+  },
+  "author": "Richard Pergens",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BunteStadt/thunderbird_annual_view/issues"
+  },
+  "homepage": "https://github.com/BunteStadt/thunderbird_annual_view#readme",
+  "devDependencies": {
+    "vite": "^8.2.1"
+  }
+}

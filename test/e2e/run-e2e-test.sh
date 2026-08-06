@@ -144,9 +144,9 @@ log "Extension proxy → $REPO_ROOT"
 
 # Patch the ICS calendar URIs in user.js to use the actual repo paths
 # (the template uses /workspace which is only correct inside Docker)
-sed -i "s|file:///workspace/feiertage_nrw.ics|file://${REPO_ROOT}/feiertage_nrw.ics|g" \
+sed -i "s|file:///workspace/assets/feiertage_nrw.ics|file://${REPO_ROOT}/assets/feiertage_nrw.ics|g" \
     "$PROFILE_TMP/user.js"
-sed -i "s|file:///workspace/ferien_nrw.ics|file://${REPO_ROOT}/ferien_nrw.ics|g" \
+sed -i "s|file:///workspace/assets/ferien_nrw.ics|file://${REPO_ROOT}/assets/ferien_nrw.ics|g" \
     "$PROFILE_TMP/user.js"
 log "ICS URIs patched to $REPO_ROOT"
 

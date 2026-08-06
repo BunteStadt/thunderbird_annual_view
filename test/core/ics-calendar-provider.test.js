@@ -20,7 +20,7 @@ async function readFixture(name) {
 test('IcsCalendarProvider parses feiertage_nrw.ics without errors', async () => {
     const { IcsCalendarProvider } = await loadIcsProviderModule();
     const content = await fs.readFile(
-        path.resolve(__dirname, '../../feiertage_nrw.ics'),
+        path.resolve(__dirname, '../../assets/feiertage_nrw.ics'),
         'utf8'
     );
 
@@ -45,7 +45,7 @@ test('IcsCalendarProvider parses feiertage_nrw.ics without errors', async () => 
 test('IcsCalendarProvider parses ferien_nrw.ics without errors', async () => {
     const { IcsCalendarProvider } = await loadIcsProviderModule();
     const content = await fs.readFile(
-        path.resolve(__dirname, '../../ferien_nrw.ics'),
+        path.resolve(__dirname, '../../assets/ferien_nrw.ics'),
         'utf8'
     );
 
@@ -68,7 +68,7 @@ test('IcsCalendarProvider parses ferien_nrw.ics without errors', async () => {
 test('IcsCalendarProvider returns only events overlapping the requested year', async () => {
     const { IcsCalendarProvider } = await loadIcsProviderModule();
     const content = await fs.readFile(
-        path.resolve(__dirname, '../../ferien_nrw.ics'),
+        path.resolve(__dirname, '../../assets/ferien_nrw.ics'),
         'utf8'
     );
 

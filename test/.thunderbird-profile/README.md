@@ -8,8 +8,8 @@ add-on installation from source and the calendar provider integration.
 | Item | Details |
 | --- | --- |
 | Add-on (unpacked) | `extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net` — proxy file pointing to `/workspace` (Docker) |
-| Calendar 1 | NRW Feiertage from `feiertage_nrw.ics` (ICS type, red) |
-| Calendar 2 | NRW Schulferien from `ferien_nrw.ics` (ICS type, blue) |
+| Calendar 1 | NRW Feiertage from `assets/feiertage_nrw.ics` (ICS type, red) |
+| Calendar 2 | NRW Schulferien from `assets/ferien_nrw.ics` (ICS type, blue) |
 | Signature check | Disabled (`xpinstall.signatures.required = false`) |
 | First-run wizard | Suppressed |
 | Auto-updates | Disabled |
@@ -34,7 +34,7 @@ The add-on is loaded automatically because the extensions proxy file
 points to `/workspace`, which is the mounted source directory.
 
 The two ICS calendars are registered and will appear in the Calendar tab once
-Thunderbird fetches the files from `file:///workspace/`.
+Thunderbird fetches the files from `file:///workspace/assets/`.
 
 ### Option B — Local Thunderbird installation
 
@@ -48,7 +48,7 @@ Thunderbird fetches the files from `file:///workspace/`.
 
    ```js
    user_pref("calendar.registry.e1a2b3c4-....uri",
-             "file:///your/path/to/thunderbird_annual_view/feiertage_nrw.ics");
+             "file:///your/path/to/thunderbird_annual_view/assets/feiertage_nrw.ics");
    ```
 
 3. Update the extension proxy file content to match your local path:
@@ -84,7 +84,7 @@ After Thunderbird starts:
 
 The Node.js integration test `test/thunderbird-provider.test.js` covers the
 same calendar provider path without requiring a running Thunderbird instance.
-It mocks `browser.calendar.*` with data from `feiertage_nrw.ics` and verifies
+It mocks `browser.calendar.*` with data from `assets/feiertage_nrw.ics` and verifies
 that `ThunderbirdCalendarProvider` correctly parses and returns all events.
 
 Run it with:

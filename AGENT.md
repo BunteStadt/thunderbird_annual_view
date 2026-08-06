@@ -47,7 +47,7 @@ The add-on currently provides:
 - Keep the add-on behavior read-only and preserve the existing light/dark theme support.
 - The release path is still manual and tag-driven: update the version in manifest.json, create a release tag, and let the GitHub workflows build and publish the XPI.
 - Avoid changing protected files such as LICENSE, .git internals, and documentation assets unless the change is intentionally related to the update.
-- The add-on uses SVG assets from the icons directory for the extension action and the custom space. Keep icon paths in manifest.json and background wiring valid when changing or replacing assets.
+- The add-on uses SVG assets from the assets/icons directory for the extension action and the custom space. Keep icon paths in manifest.json and background wiring valid when changing or replacing assets.
 
 ## Monorepo target direction
 

@@ -353,7 +353,7 @@ add `browser.storage.local.get("x")` to `src/core/domain/date-utils.js` (verify,
    markup (grid, header, sidebar, `data-ui-slot` containers), loading
    `src/hosts/web/main.js` and the core CSS.
 2. Remove add-on-only markup if any; add a `<noscript>` note and page metadata
-   (title "Annual Calendar View", description, favicon from `icons/`).
+   (title "Annual Calendar View", description, favicon from `assets/icons/`).
 3. Update the repository landing page `index.html` (root): demo button and iframe point
    to the new web page with `?dummy=1` for the demo.
 4. Keep `?dummy=1` supported in the web bootstrap for the demo/dev harness.
@@ -472,8 +472,8 @@ keys and the page loads in its fresh empty state.
 1. Workflow triggers: `push` to `main` and `workflow_dispatch`. Permissions:
    `contents: read`, `pages: write`, `id-token: write`.
 2. Build step assembles a `_site/` directory containing only:
-   root `index.html`, `icons/`, `src/core/`, `src/hosts/web/`,
-   `feiertage_nrw.ics`, `ferien_nrw.ics` (sample calendars). Exclude
+   root `index.html`, `assets/icons/`, `src/core/`, `src/hosts/web/`,
+   `assets/feiertage_nrw.ics`, `assets/ferien_nrw.ics` (sample calendars). Exclude
    `manifest.json`, `experiments/`, `src/hosts/thunderbird/`, tests, docs.
 3. Use `actions/upload-pages-artifact` + `actions/deploy-pages`.
 4. Verify all paths referenced from the deployed pages resolve within `_site/`
@@ -495,7 +495,7 @@ landing page and a working app page (dummy mode demo functional).
 
 **Steps:**
 
-1. Edit `justfile` `build-xpi`: copy `manifest.json`, `icons/`, `experiments/`,
+1. Edit `justfile` `build-xpi`: copy `manifest.json`, `assets/icons/`, `experiments/`,
    `src/core/`, `src/hosts/thunderbird/` into `dist/package` (not all of `src`,
    and not `src/hosts/web/`).
 2. Verify every path referenced by `manifest.json` and by

@@ -22,7 +22,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..', '..', '..');
-const icsFilePath = path.join(repoRoot, 'feiertage_nrw.ics');
+const icsFilePath = path.join(repoRoot, 'assets', 'feiertage_nrw.ics');
 
 // ---------------------------------------------------------------------------
 // Helpers

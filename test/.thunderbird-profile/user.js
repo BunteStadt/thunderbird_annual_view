@@ -84,9 +84,9 @@ user_pref("toolkit.startup.max_resumed_crashes", -1);
 //
 // The URI uses a placeholder path. The e2e test script substitutes the
 // actual repository root path before starting Thunderbird.
-// For manual Docker use the path resolves to /workspace/feiertage_nrw.ics.
+// For manual Docker use the path resolves to /workspace/assets/feiertage_nrw.ics.
 // ------------------------------------------------------------------
-user_pref("calendar.registry.e1a2b3c4-d5e6-7890-abcd-ef1234567890.uri", "file:///workspace/feiertage_nrw.ics");
+user_pref("calendar.registry.e1a2b3c4-d5e6-7890-abcd-ef1234567890.uri", "file:///workspace/assets/feiertage_nrw.ics");
 user_pref("calendar.registry.e1a2b3c4-d5e6-7890-abcd-ef1234567890.type", "ics");
 user_pref("calendar.registry.e1a2b3c4-d5e6-7890-abcd-ef1234567890.name", "NRW Feiertage (Test)");
 user_pref("calendar.registry.e1a2b3c4-d5e6-7890-abcd-ef1234567890.color", "#FF0000");
@@ -95,7 +95,7 @@ user_pref("calendar.registry.e1a2b3c4-d5e6-7890-abcd-ef1234567890.calendar-main-
 // ------------------------------------------------------------------
 // Pre-registered ICS calendar: NRW Schulferien
 // ------------------------------------------------------------------
-user_pref("calendar.registry.f2b3c4d5-e6f7-8901-bcde-f12345678901.uri", "file:///workspace/ferien_nrw.ics");
+user_pref("calendar.registry.f2b3c4d5-e6f7-8901-bcde-f12345678901.uri", "file:///workspace/assets/ferien_nrw.ics");
 user_pref("calendar.registry.f2b3c4d5-e6f7-8901-bcde-f12345678901.type", "ics");
 user_pref("calendar.registry.f2b3c4d5-e6f7-8901-bcde-f12345678901.name", "NRW Schulferien (Test)");
 user_pref("calendar.registry.f2b3c4d5-e6f7-8901-bcde-f12345678901.color", "#0000FF");

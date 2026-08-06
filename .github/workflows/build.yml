@@ -35,11 +35,12 @@ jobs:
         run: |
           mkdir -p dist/package/src/hosts
           cp manifest.json dist/package/
-          cp -R icons experiments dist/package/
+          mkdir -p dist/package/assets
+          cp -R assets/icons dist/package/assets/
           cp -R src/core dist/package/src/core
           cp -R src/hosts/thunderbird dist/package/src/hosts/thunderbird
           (cd dist/package && zip -r ../calendar-annual-view.xpi \
-            manifest.json src experiments icons)
+            manifest.json src experiments assets/icons)
           echo "xpi-path=dist/calendar-annual-view.xpi" >> "$GITHUB_OUTPUT"
 
       - name: Upload XPI artifact

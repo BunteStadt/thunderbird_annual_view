@@ -11,11 +11,11 @@ build-xpi:
 	rm -rf dist/package
 	mkdir -p dist/package/src/hosts
 	cp manifest.json dist/package/
-	cp -R icons experiments dist/package/
+	cp -R assets/icons experiments dist/package/
 	cp -R src/core dist/package/src/core
 	cp -R src/hosts/thunderbird dist/package/src/hosts/thunderbird
-	cd dist/package && zip -r ../calendar-annual-view.xpi manifest.json src experiments icons
+	cd dist/package && zip -r ../calendar-annual-view.xpi manifest.json src experiments assets/icons
 # Creates a tag from the manifest.json version and pushes it to origin
 # Only runs on the main branch when it is in sync with origin/main.
 tag:
-	pwsh -NoProfile scripts/tag-release.ps1
+	pwsh -NoProfile assets/scripts/tag-release.ps1

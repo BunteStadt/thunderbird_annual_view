@@ -67,7 +67,7 @@ GitHub Actions.  The test suite covers:
 | `test/addon-integration.test.js` | Manifest integrity and XPI build |
 | `test/background-runtime.test.js` | Background script click handler |
 | `test/calendar-service.test.js` | Calendar service with dummy and injected providers |
-| `test/thunderbird-provider.test.js` | `ThunderbirdCalendarProvider` end-to-end with mocked `browser.calendar.*` API fed from `feiertage_nrw.ics` |
+| `test/thunderbird-provider.test.js` | `ThunderbirdCalendarProvider` end-to-end with mocked `browser.calendar.*` API fed from `assets/feiertage_nrw.ics` |
 | `test/date-utils.test.js` | Date utility functions |
 | `test/event-store.test.js` | Event store filtering and caching |
 | `test/storage-theme.test.js` | Storage and theme helpers |

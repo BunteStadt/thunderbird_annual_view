@@ -49,7 +49,7 @@ All four phases were worked through in two agent sessions. The overall
 **Phase D — Decoupled builds and releases** ⚠️ partially complete
 
 - D1: `justfile` and `.github/workflows/build.yml` updated to package only
-  `src/core/` + `src/hosts/thunderbird/` + `experiments/` + `icons/` in the
+  `src/core/` + `src/hosts/thunderbird/` + `experiments/` + `assets/icons/` in the
   XPI — `src/hosts/web/` is excluded. ✅
 - D2: Browser-based web E2E (Playwright, `test/e2e/web/`) **not done**.
 - D3: Feature matrix (`docs/feature-matrix.md`) **not done**.

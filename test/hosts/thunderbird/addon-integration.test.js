@@ -52,7 +52,7 @@ test('addon package can be built and validated as a zip archive', (t) => {
     });
 
     fs.mkdirSync(path.join(packageDir, 'experiments', 'calendar'), { recursive: true });
-    for (const entry of ['manifest.json', 'src', 'submodules', 'icons']) {
+    for (const entry of ['manifest.json', 'src', 'submodules', 'assets']) {
         fs.cpSync(path.join(repoRoot, entry), path.join(packageDir, entry), { recursive: true });
     }
     fs.cpSync(
@@ -63,7 +63,7 @@ test('addon package can be built and validated as a zip archive', (t) => {
 
     const build = spawnSync(
         'zip',
-        ['-r', xpiPath, 'manifest.json', 'src', 'submodules', 'icons', 'experiments'],
+        ['-r', xpiPath, 'manifest.json', 'src', 'submodules', 'assets/icons', 'experiments'],
         { cwd: packageDir, encoding: 'utf8' }
     );
     assert.equal(build.status, 0, `zip command failed: ${build.stderr || build.stdout}`);

@@ -144,16 +144,6 @@ Work without Thunderbird - see the thunderbird tab in the browser - faster for d
 
 ### Development Tooling
 
-#### Git Hooks
-
-The repository ships with custom Git hooks in `.githooks/`. To enable them, run once:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-- **`pre-commit`** — Checks that the submodule has no unpulled commits.
-
 #### Just Commands
 
 [`just`](https://github.com/casey/just) is a command runner. Available recipes:

@@ -9,6 +9,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  submodule:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Check submodule is up to date
+        run: |
+          submodule_path="src/hosts/thunderbird/submodules"
+          git -C "$submodule_path" fetch --quiet origin main
+          unpulled=$(git -C "$submodule_path" rev-list HEAD..origin/main --count)
+
+          if [ "$unpulled" -gt 0 ]; then
+            echo "The submodule has $unpulled unpulled commit(s):"
+            git -C "$submodule_path" log --oneline --no-decorate HEAD..origin/main
+            exit 1
+          fi
+
+          echo "Submodule is up to date."
+
   tests:
     runs-on: ubuntu-latest
 

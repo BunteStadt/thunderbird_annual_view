@@ -12,8 +12,8 @@ const appSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'app.js'), 
 // host HTML pages to drift away from it.
 
 test('view shell contains every element id initApp reads from the DOM', () => {
-    const ids = [...appSource.matchAll(/getElementById\("([^"]+)"\)/g)].map((m) => m[1]);
-    assert.ok(ids.length > 0, 'expected getElementById ids in app.js');
+    const ids = [...appSource.matchAll(/(?:getElementById|findById)\("([^"]+)"\)/g)].map((m) => m[1]);
+    assert.ok(ids.length > 0, 'expected scoped element ids in app.js');
     for (const id of ids) {
         assert.ok(
             shellSource.includes(`id="${id}"`),

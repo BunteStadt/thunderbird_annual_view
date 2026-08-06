@@ -1,5 +1,4 @@
-export function applyTheme(theme) {
-    const root = document.body;
+export function applyTheme(theme, root = document.body) {
     if (!root) return;
     if (theme === "light" || theme === "dark") {
         root.classList.remove("theme-dark");

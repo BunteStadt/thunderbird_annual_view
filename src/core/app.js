@@ -59,41 +59,45 @@ export function mountUiModules(modules, slots, appApi) {
 // Core application entry point. The host bootstrap builds the config
 // (storage adapter, calendar provider, host UI modules) and calls initApp.
 export async function initApp(config = {}) {
+    const root = config.root ?? document;
+    const findById = (id) => root.querySelector?.(`#${id}`) ?? null;
+    const lifecycle = new AbortController();
+    const listenerOptions = { signal: lifecycle.signal };
     // ---------------------------------------------------------------------------
     // DOM references
     // ---------------------------------------------------------------------------
 
-    const yearInput = document.getElementById("yearInput");
-    const gridViewport = document.getElementById("gridViewport");
-    const gridHeader = document.getElementById("gridHeader");
-    const gridRows = document.getElementById("gridRows");
-    const calendarList = document.getElementById("calendarList");
-    const calendarFilters = document.getElementById("calendarFilters");
-    const yearLayout = document.getElementById("yearLayout");
-    const allDayOnlyInput = document.getElementById("allDayOnly");
-    const showWeekNumbersInput = document.getElementById("showWeekNumbers");
-    const minDurationInput = document.getElementById("minDurationHours");
-    const minDurationDownBtn = document.getElementById("minDurationDown");
-    const minDurationUpBtn = document.getElementById("minDurationUp");
-    const durationFilterToggleBtn = document.getElementById("durationFilterToggle");
-    const durationFiltersNotice = document.getElementById("durationFiltersNotice");
-    const selectAllBtn = document.getElementById("selectAllCals");
-    const deselectAllBtn = document.getElementById("deselectAllCals");
-    const toggleCalendarsBtn = document.getElementById("toggleCalendars");
-    const selectedSummary = document.getElementById("selectedSummary");
-    const themeToggleBtn = document.getElementById("themeToggle");
-    const refreshButton = document.getElementById("refreshButton");
-    const todayButton = document.getElementById("todayButton");
-    const grayPastDaysInput = document.getElementById("grayPastDays");
-    const highlightCurrentDayInput = document.getElementById("highlightCurrentDay");
-    const viewModeSelect = document.getElementById("viewMode");
-    const yearButtons = document.querySelectorAll("[data-year-step]");
+    const yearInput = findById("yearInput");
+    const gridViewport = findById("gridViewport");
+    const gridHeader = findById("gridHeader");
+    const gridRows = findById("gridRows");
+    const calendarList = findById("calendarList");
+    const calendarFilters = findById("calendarFilters");
+    const yearLayout = findById("yearLayout");
+    const allDayOnlyInput = findById("allDayOnly");
+    const showWeekNumbersInput = findById("showWeekNumbers");
+    const minDurationInput = findById("minDurationHours");
+    const minDurationDownBtn = findById("minDurationDown");
+    const minDurationUpBtn = findById("minDurationUp");
+    const durationFilterToggleBtn = findById("durationFilterToggle");
+    const durationFiltersNotice = findById("durationFiltersNotice");
+    const selectAllBtn = findById("selectAllCals");
+    const deselectAllBtn = findById("deselectAllCals");
+    const toggleCalendarsBtn = findById("toggleCalendars");
+    const selectedSummary = findById("selectedSummary");
+    const themeToggleBtn = findById("themeToggle");
+    const refreshButton = findById("refreshButton");
+    const todayButton = findById("todayButton");
+    const grayPastDaysInput = findById("grayPastDays");
+    const highlightCurrentDayInput = findById("highlightCurrentDay");
+    const viewModeSelect = findById("viewMode");
+    const yearButtons = root.querySelectorAll?.("[data-year-step]") ?? [];
 
     const YEAR_MIN = Number(yearInput.min) || 1900;
     const YEAR_MAX = Number(yearInput.max) || 2999;
 
-    const onClick = (el, handler) => el?.addEventListener("click", handler);
-    const onChange = (el, handler) => el?.addEventListener("change", handler);
+    const onClick = (el, handler) => el?.addEventListener("click", handler, listenerOptions);
+    const onChange = (el, handler) => el?.addEventListener("change", handler, listenerOptions);
 
     // ---------------------------------------------------------------------------
     // State
@@ -302,7 +306,7 @@ export async function initApp(config = {}) {
             persistSelection(selectedCalendarIds);
             renderCalendarList(availableCalendars);
             applyFilterChange();
-        });
+        }, listenerOptions);
         return chip;
     }
 
@@ -321,7 +325,7 @@ export async function initApp(config = {}) {
             persistCalendarAllDayModes(calendarAllDayModes);
             renderCalendarList(availableCalendars);
             applyFilterChange();
-        });
+        }, listenerOptions);
         return modeButton;
     }
 
@@ -347,7 +351,7 @@ export async function initApp(config = {}) {
             await persistCalendarMinDurationHours(calendarMinDurationHours);
             applyFilterChange();
         };
-        durationInput.addEventListener("change", applyCalendarDuration);
+        durationInput.addEventListener("change", applyCalendarDuration, listenerOptions);
 
         const makeStepButton = (delta) => {
             const btn = document.createElement("button");
@@ -363,7 +367,7 @@ export async function initApp(config = {}) {
                 const next = Math.max(-1, (Number.isNaN(current) ? -1 : current) + delta);
                 durationInput.value = String(Math.round(next * 100) / 100);
                 await applyCalendarDuration();
-            });
+            }, listenerOptions);
             return btn;
         };
 
@@ -381,7 +385,7 @@ export async function initApp(config = {}) {
         btn.textContent = "✕";
         btn.title = `Remove ${cal.name || "(unnamed)"}`;
         btn.setAttribute("aria-label", `Remove calendar ${cal.name || "(unnamed)"}`);
-        btn.addEventListener("click", () => icsRemoveCalendar?.(cal.id));
+        btn.addEventListener("click", () => icsRemoveCalendar?.(cal.id), listenerOptions);
         return btn;
     }
 
@@ -490,7 +494,7 @@ export async function initApp(config = {}) {
             if (document.visibilityState === "visible") {
                 refreshCalendarData();
             }
-        });
+        }, listenerOptions);
     }
 
     // ---------------------------------------------------------------------------
@@ -505,7 +509,7 @@ export async function initApp(config = {}) {
         }
         if (themeMode === "auto" && window.matchMedia) {
             systemThemeWatcher = window.matchMedia("(prefers-color-scheme: dark)");
-            systemThemeWatcher.addEventListener("change", handleSystemThemeChange);
+            systemThemeWatcher.addEventListener("change", handleSystemThemeChange, listenerOptions);
         }
         applyResolvedTheme();
         persistTheme(themeMode);
@@ -519,7 +523,7 @@ export async function initApp(config = {}) {
 
     function applyResolvedTheme() {
         const resolved = themeMode === "auto" ? detectSystemMode() : themeMode;
-        applyTheme(resolved);
+        applyTheme(resolved, config.themeRoot);
         if (themeToggleBtn) {
             const label = themeMode === "auto" ? `Theme: Auto (${resolved})` : `Theme: ${resolved}`;
             const next = themeMode === "auto" ? "Light" : themeMode === "light" ? "Dark" : "Auto";
@@ -596,7 +600,7 @@ export async function initApp(config = {}) {
             btn.addEventListener("click", () => {
                 const step = Number(btn.dataset.yearStep) || 0;
                 jumpToYear(currentYear + step);
-            });
+            }, listenerOptions);
         });
 
         onClick(todayButton, () => gridView.showToday());
@@ -662,7 +666,8 @@ export async function initApp(config = {}) {
     }
 
 
-    const uiSlots = resolveUiSlots(document);
+    const uiSlots = resolveUiSlots(root);
+    let mountedUiModules = [];
     const appApi = {
         getCalendarProvider,
         refreshCalendars: refreshCalendarData,
@@ -670,9 +675,17 @@ export async function initApp(config = {}) {
         eventStore,
         listCalendars: () => availableCalendars,
         jumpToYear,
-        getCurrentYear: () => currentYear
+        getCurrentYear: () => currentYear,
+        destroy: () => {
+            lifecycle.abort();
+            clearAutoRefresh();
+            if (systemThemeWatcher) {
+                systemThemeWatcher.removeEventListener("change", handleSystemThemeChange);
+            }
+            mountedUiModules.forEach((mounted) => mounted?.destroy?.());
+        }
     };
-    const mountedUiModules = mountUiModules(config.uiModules, uiSlots, appApi);
+    mountedUiModules = mountUiModules(config.uiModules, uiSlots, appApi);
 
     await init();
     mountedUiModules.forEach((mounted) => mounted?.update?.());

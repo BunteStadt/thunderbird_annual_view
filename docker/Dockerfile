@@ -40,8 +40,8 @@ RUN \
     APP_ICON_URL=https://github.com/jlesage/docker-templates/raw/master/jlesage/images/thunderbird-icon.png && \
     install_app_icon.sh "$APP_ICON_URL"
 
-# Add files.
-COPY rootfs/ /
+# Add container startup and window-manager files.
+COPY docker/rootfs/ /
 
 # Set internal environment variables.
 RUN \

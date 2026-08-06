@@ -19,12 +19,12 @@ add-on installation from source and the calendar provider integration.
 
 ### Option A — Docker (recommended)
 
-The `docker-compose.yml` at the repository root mounts the source code at
-`/workspace` inside the container.  The profile is mounted to `/config/profile`
+The `docker/docker-compose.yml` file mounts the source code at `/workspace`
+inside the container.  The profile is mounted to `/config/profile`
 so Thunderbird uses it on startup.
 
 ```sh
-docker compose up
+docker compose -f docker/docker-compose.yml up
 ```
 
 Then open <http://localhost:5800> in a browser to see the Thunderbird GUI.

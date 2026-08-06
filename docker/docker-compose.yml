@@ -2,7 +2,8 @@
 services:
   dev:
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
     container_name: test1
     hostname: thunderbird-dev
     stdin_open: true
@@ -10,10 +11,10 @@ services:
 
     volumes:
       # Mount the project source code (also used by the extension proxy and ICS calendars)
-      - .:/workspace:cached
+      - ..:/workspace:cached
       # Mount the pre-configured test profile so Thunderbird starts with the
       # add-on installed from source and the NRW ICS calendars pre-registered.
-      - ./test/.thunderbird-profile:/config/profile:cached
+      - ../test/.thunderbird-profile:/config/profile:cached
 
     ports:
       - "5800:5800"

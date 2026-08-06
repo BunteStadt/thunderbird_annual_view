@@ -113,7 +113,7 @@ installs the add-on from source via an extension proxy file and pre-registers
 the NRW ICS calendars.  Use it for interactive end-to-end verification:
 
 ```sh
-docker compose up      # opens GUI at http://localhost:5800
+docker compose -f docker/docker-compose.yml up      # opens GUI at http://localhost:5800
 ```
 
 See [test/.thunderbird-profile/README.md](../test/.thunderbird-profile/README.md)

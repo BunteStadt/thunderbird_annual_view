@@ -78,7 +78,8 @@ reads on every startup but never overwrites.
 
 ## Docker alternative
 
-A Docker-based GUI environment is also available via `docker compose up`
+A Docker-based GUI environment is also available via
+`docker compose -f docker/docker-compose.yml up`
 (opens at <http://localhost:5800>).  That approach is primarily useful for
 manual exploration.  The script above is preferred for automated testing
 because it does not require Docker and runs directly in the agent's terminal.

@@ -34,7 +34,7 @@ agent can run it from the terminal and inspect the output inline.
 From the repository root:
 
 ```sh
-./e2e/run-e2e-test.sh
+./test/e2e/run-e2e-test.sh
 ```
 
 The script takes roughly 30 seconds (25 seconds of which is waiting for
@@ -45,7 +45,7 @@ Thunderbird's UI to fully render before taking the screenshot).
 All artifacts are written to `test-results/` (gitignored):
 
 | File | Contents |
-|---|---|
+| --- | --- |
 | `test-results/addon-installed.png` | Screenshot of the running Thunderbird window |
 | `test-results/thunderbird.log` | Full Thunderbird stdout + stderr |
 | `test-results/result.txt` | `PASS` or `FAIL` (exit code also reflects this) |
@@ -53,7 +53,7 @@ All artifacts are written to `test-results/` (gitignored):
 ## What the test checks
 
 | Check | How |
-|---|---|
+| --- | --- |
 | Thunderbird 153 is available | `--version` output |
 | Extension proxy written | `extensions/{ext-id}` file points to repo root |
 | Thunderbird window appears | `xdotool search --class Thunderbird` |
@@ -64,7 +64,7 @@ All artifacts are written to `test-results/` (gitignored):
 
 ## How the extension proxy works
 
-The file `thunderbird-profile/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net`
+The file `test/.thunderbird-profile/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net`
 contains the path to the repository root.  Thunderbird reads this file on
 startup and loads the add-on from source — the same mechanism used by
 the Debug Add-on page.  The profile also sets:
@@ -73,7 +73,7 @@ the Debug Add-on page.  The profile also sets:
 - `extensions.autoDisableScopes = 0` — prevents auto-disable of proxy-loaded extensions
 - `extensions.experiments.enabled = true` — enables Experiment API access
 
-These preferences are in `thunderbird-profile/user.js` which Thunderbird
+These preferences are in `test/.thunderbird-profile/user.js` which Thunderbird
 reads on every startup but never overwrites.
 
 ## Docker alternative

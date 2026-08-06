@@ -6,7 +6,7 @@ add-on installation from source and the calendar provider integration.
 ## What is pre-configured
 
 | Item | Details |
-|---|---|
+| --- | --- |
 | Add-on (unpacked) | `extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net` — proxy file pointing to `/workspace` (Docker) |
 | Calendar 1 | NRW Feiertage from `feiertage_nrw.ics` (ICS type, red) |
 | Calendar 2 | NRW Schulferien from `ferien_nrw.ics` (ICS type, blue) |
@@ -27,7 +27,7 @@ so Thunderbird uses it on startup.
 docker compose up
 ```
 
-Then open http://localhost:5800 in a browser to see the Thunderbird GUI.
+Then open <http://localhost:5800> in a browser to see the Thunderbird GUI.
 
 The add-on is loaded automatically because the extensions proxy file
 (`extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net`)
@@ -41,7 +41,7 @@ Thunderbird fetches the files from `file:///workspace/`.
 1. Copy or symlink this profile to a convenient location:
 
    ```sh
-   cp -r thunderbird-profile /tmp/tb-test-profile
+   cp -r test/.thunderbird-profile /tmp/tb-test-profile
    ```
 
 2. Update the calendar URIs in `user.js` to match your local repository path:
@@ -55,7 +55,7 @@ Thunderbird fetches the files from `file:///workspace/`.
 
    ```sh
    echo "/your/path/to/thunderbird_annual_view" \
-     > thunderbird-profile/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net
+   > test/.thunderbird-profile/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net
    ```
 
 4. Launch Thunderbird with the profile:

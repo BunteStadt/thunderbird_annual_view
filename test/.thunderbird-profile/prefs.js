@@ -1,4 +1,4 @@
-// thunderbird-profile/prefs.js
+// test/.thunderbird-profile/prefs.js
 //
 // NOTE: Thunderbird writes to prefs.js and may overwrite values here.
 // Custom preferences that must survive across sessions belong in user.js,

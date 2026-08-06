@@ -1,4 +1,4 @@
-// thunderbird-profile/user.js
+// test/.thunderbird-profile/user.js
 //
 // User preferences applied at every Thunderbird startup.
 // Thunderbird reads this file on top of prefs.js but never writes to it,

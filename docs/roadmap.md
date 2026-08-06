@@ -8,6 +8,7 @@ All four phases were worked through in two agent sessions. The overall
 `src/core/` + `src/hosts/` target architecture is **fully in place**:
 
 **Phase A — Ports and UI slots** ✅ complete
+
 - A1: `StoragePort` introduced; `storage.js` and `ics-calendar-integration.js`
   no longer call `browser.storage.local` directly; both
   `createWebExtensionStorageAdapter()` and `createWebStorageAdapter()` exist in
@@ -21,6 +22,7 @@ All four phases were worked through in two agent sessions. The overall
   UI are mounted through the slot mechanism; `app.js` has no host imports.
 
 **Phase B — Reorganize into `src/core/` + `src/hosts/`** ✅ complete
+
 - B1: All platform-neutral files moved to `src/core/domain/`, `src/core/providers/`,
   `src/core/ui/`, `src/core/`.
 - B2: Host shells created: `src/hosts/thunderbird/` (background, main, HTML,
@@ -32,6 +34,7 @@ All four phases were worked through in two agent sessions. The overall
   `test/hosts/web/`.
 
 **Phase C — Web shell as a product** ✅ complete
+
 - C1: `src/hosts/web/index.html` is the dedicated web entry page.
 - C2: `src/hosts/web/web-storage-adapter.js` — composite adapter routing the
   ICS descriptor key to IndexedDB, all other keys to `localStorage`.
@@ -44,10 +47,11 @@ All four phases were worked through in two agent sessions. The overall
   GitHub Pages on every push to `main`.
 
 **Phase D — Decoupled builds and releases** ⚠️ partially complete
+
 - D1: `justfile` and `.github/workflows/build.yml` updated to package only
   `src/core/` + `src/hosts/thunderbird/` + `experiments/` + `icons/` in the
   XPI — `src/hosts/web/` is excluded. ✅
-- D2: Browser-based web E2E (Playwright, `e2e/web/`) **not done**.
+- D2: Browser-based web E2E (Playwright, `test/e2e/web/`) **not done**.
 - D3: Feature matrix (`docs/feature-matrix.md`) **not done**.
 - D4: Release documentation update in `README.md` and `docs/contributor-workflow.md`
   for both release paths (add-on tag → XPI; merge to `main` → Pages) **not done**
@@ -56,7 +60,7 @@ All four phases were worked through in two agent sessions. The overall
 ### What is still open
 
 1. **D2 — Web E2E smoke test** (see `migration-plan.md` Task D2)
-   Add a Playwright test under `e2e/web/` that opens the web shell in dummy mode
+  Add a Playwright test under `test/e2e/web/` that opens the web shell in dummy mode
    and asserts the grid renders, the year input is correct, and view-mode switching
    works.  Add the CI job to `.github/workflows/ci-tests.yml`.
 

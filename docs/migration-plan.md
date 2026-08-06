@@ -68,6 +68,7 @@ writes go through an injectable storage adapter, and the `ensureBrowserStorageBr
 workaround in `main.js` is deleted.
 
 **Files:**
+
 - create `src/ui/year-view/storage-port.js`
 - modify `src/ui/year-view/storage.js`
 - modify `src/ui/year-view/main.js`
@@ -75,6 +76,7 @@ workaround in `main.js` is deleted.
 - modify/extend `test/storage-theme.test.js`
 
 **Steps:**
+
 1. Create `src/ui/year-view/storage-port.js` exporting:
    - `createWebExtensionStorageAdapter()` — returns `{ get(key), set(key, value), remove(key) }`
      implemented on top of `browser.storage.local.get/set/remove`. `get` returns the raw
@@ -105,6 +107,7 @@ workaround in `main.js` is deleted.
    the `annualView.storage.` prefix and survives corrupted JSON.
 
 **Acceptance criteria:**
+
 - `grep -rn "browser.storage" src/ui/year-view/` only matches `storage-port.js`.
 - `node --test` passes.
 - `year-view.html?dummy=1` in a plain browser still persists preferences across reload
@@ -117,11 +120,13 @@ workaround in `main.js` is deleted.
 provider to use.
 
 **Files:**
+
 - modify `src/ui/year-view/calendar-service.js`
 - modify `src/ui/year-view/main.js`
 - modify `test/calendar-service.test.js`, `test/addon-integration.test.js` (they set the globals today)
 
 **Steps:**
+
 1. In `calendar-service.js`, change `createDefaultCalendarProvider()` to
    `createCalendarProvider(kind)` where `kind` is one of
    `"dummy" | "google" | "thunderbird" | "empty"`, returning the matching provider
@@ -141,6 +146,7 @@ provider to use.
    an unknown kind returns `EmptyCalendarProvider`.
 
 **Acceptance criteria:**
+
 - `grep -rn "ENABLE_DUMMY_CALENDARS\|ENABLE_GOOGLE_CALENDARS" src/ui/year-view/calendar-service.js` is empty.
 - `node --test` passes; `?dummy=1` and `?google=1` behave as before.
 
@@ -151,11 +157,13 @@ provider to use.
 UI modules) and calls `initApp`.
 
 **Files:**
+
 - create `src/ui/year-view/app.js`
 - modify `src/ui/year-view/main.js`
 - modify `src/ui/year-view/year-view.html` only if script tags need adjusting (keep `main.js` as the module entry)
 
 **Steps:**
+
 1. Create `app.js` and move everything from `main.js` **except**:
    - the query-flag parsing (`queryParams`, `isTruthyQueryFlag`)
    - storage adapter selection (from Task A1)
@@ -172,6 +180,7 @@ UI modules) and calls `initApp`.
 4. Do not change any behavior, DOM IDs, or persistence semantics.
 
 **Acceptance criteria:**
+
 - `main.js` is under ~80 lines and contains no rendering/filter logic.
 - `app.js` contains no query-flag parsing, no `localStorage`, no provider auto-detection.
 - `node --test` passes; dummy mode renders and all header/sidebar controls work.
@@ -182,12 +191,14 @@ UI modules) and calls `initApp`.
 generic slot mechanism instead of being hardwired in the core init.
 
 **Files:**
+
 - modify `src/ui/year-view/app.js`
 - modify `src/ui/year-view/main.js`
 - modify `src/ui/year-view/year-view.html`
 - create `test/ui-slots.test.js`
 
 **Steps:**
+
 1. In `year-view.html`, keep the existing mount elements but give them slot data
    attributes: `providerAuthMount` → `data-ui-slot="header-actions"`,
    `providerSidebarMount` → `data-ui-slot="sidebar-sections"`.
@@ -214,6 +225,7 @@ generic slot mechanism instead of being hardwired in the core init.
    `resolveUiSlots(rootDocument)` and `mountUiModules(modules, slots, appApi)`.)
 
 **Acceptance criteria:**
+
 - `app.js` has no import of `google-standalone-auth.js`.
 - With `?google=1` the connect button appears; without it, the header has no Google UI.
 - `node --test` passes.
@@ -236,6 +248,7 @@ generic slot mechanism instead of being hardwired in the core init.
 | `app.js`, `storage.js`, `storage-port.js`, `ics-calendar-integration.js` | `src/core/` |
 
 **Steps:**
+
 1. Use `git mv` for every file; then update all relative import paths in moved files
    and in their importers (`main.js`, `year-view.html` for the CSS link, tests).
 2. Do not modify any logic. Diffs inside files must only touch import/href paths.
@@ -260,6 +273,7 @@ shows the moves as renames.
 | `src/ui/year-view/year-view.html` | `src/hosts/thunderbird/year-view.html` |
 
 **Steps:**
+
 1. Move the files with `git mv` and fix imports.
 2. Split the bootstrap: the Thunderbird `main.js` sets the WebExtension storage adapter,
    creates the Thunderbird provider (import it from the host directory, not from core),
@@ -282,6 +296,7 @@ shows the moves as renames.
    new paths) and `index.html` demo iframe/button links.
 
 **Acceptance criteria:**
+
 - `node --test` passes.
 - `just build-xpi` produces an XPI; installing it in Thunderbird opens the view
   (manual check, or the existing e2e in `.github/workflows/ci-tests.yml` passes).
@@ -295,6 +310,7 @@ shows the moves as renames.
 **Files:** create `test/core-boundaries.test.js`
 
 **Steps:**
+
 1. Write a `node --test` file that recursively reads every `.js` file under `src/core/`
    and asserts:
    - no occurrence of `browser.` or `messenger.` (allow comments is unnecessary — keep it strict;
@@ -312,6 +328,7 @@ add `browser.storage.local.get("x")` to `src/core/domain/date-utils.js` (verify,
 **Goal:** Tests are grouped `test/core/` vs. `test/hosts/` mirroring the source layout.
 
 **Steps:**
+
 1. `git mv` existing tests: provider/store/date/service/ics tests → `test/core/`;
    `background-runtime.test.js`, `thunderbird-provider.test.js`, `addon-integration.test.js`
    → `test/hosts/thunderbird/`; Google standalone auth tests → `test/hosts/web/`.
@@ -331,6 +348,7 @@ add `browser.storage.local.get("x")` to `src/core/domain/date-utils.js` (verify,
 **Goal:** `src/hosts/web/index.html` is the website app page (separate from the add-on page).
 
 **Steps:**
+
 1. Create `src/hosts/web/index.html` based on the add-on `year-view.html`: same core
    markup (grid, header, sidebar, `data-ui-slot` containers), loading
    `src/hosts/web/main.js` and the core CSS.
@@ -349,11 +367,13 @@ add `browser.storage.local.get("x")` to `src/core/domain/date-utils.js` (verify,
 preferences stay in `localStorage`. No behavior change for the add-on.
 
 **Files:**
+
 - create `src/hosts/web/web-storage-adapter.js`
 - modify `src/hosts/web/main.js`
 - create `test/hosts/web/web-storage-adapter.test.js`
 
 **Steps:**
+
 1. Create a composite adapter `createWebHostStorageAdapter()` implementing the
    StoragePort interface: route the uploaded-ICS descriptor key (find the exact key
    in `src/core/ics-calendar-integration.js`) to an IndexedDB-backed store
@@ -377,6 +397,7 @@ preference keys remain in `localStorage`; add-on behavior unchanged; `node --tes
 needed), and the empty state guides the user to connect Google or upload an ICS file.
 
 **Steps:**
+
 1. In `src/hosts/web/main.js`, always register the Google auth UI module in
    `header-actions`. Connecting switches the active provider to
    `GoogleCalendarProvider` (via `setCalendarProvider`) and triggers a refresh;
@@ -403,6 +424,7 @@ nor empty-state module.
 and updates the hash while scrolling/jumping.
 
 **Steps:**
+
 1. Implement in the web host only (`src/hosts/web/main.js` or a small
    `src/hosts/web/deep-links.js`): on load, parse `location.hash` matching
    `#/\d{4}`; if valid and within the year input min/max (1900–2999), pass it as the
@@ -424,6 +446,7 @@ the hash; back/forward does not create an entry per scroll step; add-on unaffect
 all data stays in the browser.
 
 **Steps:**
+
 1. Create `src/hosts/web/ui/clear-data.js` UI module mounted into `sidebar-sections`:
    a button "Clear all local data" with a `confirm()` dialog that
    - calls Google logout if connected (reuse the auth controller),
@@ -445,6 +468,7 @@ keys and the page loads in its fresh empty state.
 **Files:** create `.github/workflows/deploy-pages.yml`
 
 **Steps:**
+
 1. Workflow triggers: `push` to `main` and `workflow_dispatch`. Permissions:
    `contents: read`, `pages: write`, `id-token: write`.
 2. Build step assembles a `_site/` directory containing only:
@@ -470,6 +494,7 @@ landing page and a working app page (dummy mode demo functional).
 **Goal:** The XPI contains only what the add-on needs.
 
 **Steps:**
+
 1. Edit `justfile` `build-xpi`: copy `manifest.json`, `icons/`, `experiments/`,
    `src/core/`, `src/hosts/thunderbird/` into `dist/package` (not all of `src`,
    and not `src/hosts/web/`).
@@ -487,7 +512,8 @@ no `hosts/web` files; existing linter workflow passes.
 **Goal:** A browser-based E2E validates the web shell in dummy mode in CI.
 
 **Steps:**
-1. Add a Playwright-based script under `e2e/web/` (this is the one allowed new dev
+
+1. Add a Playwright-based script under `test/e2e/web/` (this is the one allowed new dev
    dependency; keep it out of the runtime — no `package.json` dependencies for the
    app itself, use `npx playwright` in CI or a devDependency-only `package.json`).
 2. The test: start a static file server on the repo root, open
@@ -504,6 +530,7 @@ no `hosts/web` files; existing linter workflow passes.
 **Goal:** `docs/feature-matrix.md` lists which features are core vs. host-specific.
 
 **Steps:**
+
 1. Create the file with a table: rows = features (view modes, year navigation, filters,
    week numbers, gray past days, highlight today, theming, ICS upload, Google login,
    Thunderbird calendars, deep links, clear data, auto refresh), columns =
@@ -518,6 +545,7 @@ no `hosts/web` files; existing linter workflow passes.
 **Goal:** `README.md` and `docs/contributor-workflow.md` describe both release paths.
 
 **Steps:**
+
 1. Document: add-on release = version bump in `manifest.json` + tag → release workflow
    builds XPI (unchanged); web release = merge to `main` → Pages deploy (automatic).
 2. Update the development section: how to run the web shell locally, how to run the

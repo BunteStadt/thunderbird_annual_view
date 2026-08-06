@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# e2e/run-e2e-test.sh
+# test/e2e/run-e2e-test.sh
 #
 # End-to-end installation test for the Calendar Annual View Thunderbird add-on.
 #
@@ -18,7 +18,7 @@
 #   9. Reports PASS or FAIL and writes artifacts to test-results/
 #
 # Usage (from the repository root):
-#   ./e2e/run-e2e-test.sh
+#   ./test/e2e/run-e2e-test.sh
 #
 # Requirements on the host:
 #   - Thunderbird 153.x  (snap: sudo snap install thunderbird)
@@ -36,9 +36,9 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RESULTS_DIR="$REPO_ROOT/test-results"
-PROFILE_TEMPLATE="$REPO_ROOT/thunderbird-profile"
+PROFILE_TEMPLATE="$REPO_ROOT/test/.thunderbird-profile"
 PROFILE_TMP=""
 TB_BINARY=""
 TB_VERSION=""

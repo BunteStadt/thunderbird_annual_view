@@ -63,7 +63,7 @@ All tests in `test/` are run with `node --test` and execute on every push via
 GitHub Actions.  The test suite covers:
 
 | File | Coverage |
-|---|---|
+| --- | --- |
 | `test/addon-integration.test.js` | Manifest integrity and XPI build |
 | `test/background-runtime.test.js` | Background script click handler |
 | `test/calendar-service.test.js` | Calendar service with dummy and injected providers |
@@ -79,12 +79,12 @@ normalised event objects.
 
 ### Real-Thunderbird end-to-end test
 
-`e2e/run-e2e-test.sh` installs the add-on on a **real Thunderbird 153**
+`test/e2e/run-e2e-test.sh` installs the add-on on a **real Thunderbird 153**
 instance (the host snap installation), verifies the log is clean, and
 saves a screenshot.  Run it from the repository root:
 
 ```sh
-./e2e/run-e2e-test.sh
+./test/e2e/run-e2e-test.sh
 ```
 
 Prerequisites (once):
@@ -97,18 +97,18 @@ sudo apt install -y xvfb scrot xdotool
 Artifacts are written to `test-results/` (gitignored):
 
 | File | Contents |
-|---|---|
+| --- | --- |
 | `test-results/addon-installed.png` | Screenshot of the Thunderbird window |
 | `test-results/thunderbird.log` | Full Thunderbird log |
 | `test-results/result.txt` | `PASS` or `FAIL` |
 
 The test exits with code `0` on PASS and `1` on FAIL and is safe to run
-inside an agent's terminal loop.  See [e2e/README.md](../e2e/README.md)
+inside an agent's terminal loop.  See [test/e2e/README.md](../test/e2e/README.md)
 for full details.
 
 ### Manual / Docker GUI
 
-A pre-configured Thunderbird profile lives in `thunderbird-profile/`.  It
+A pre-configured Thunderbird profile lives in `test/.thunderbird-profile/`.  It
 installs the add-on from source via an extension proxy file and pre-registers
 the NRW ICS calendars.  Use it for interactive end-to-end verification:
 
@@ -116,7 +116,7 @@ the NRW ICS calendars.  Use it for interactive end-to-end verification:
 docker compose up      # opens GUI at http://localhost:5800
 ```
 
-See [thunderbird-profile/README.md](../thunderbird-profile/README.md)
+See [test/.thunderbird-profile/README.md](../test/.thunderbird-profile/README.md)
 for full instructions.
 
 ### When adding tests

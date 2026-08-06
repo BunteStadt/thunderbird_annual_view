@@ -63,14 +63,21 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 
 Alternatively, install directly from the [Thunderbird Add-ons site](https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/) using the ID: `GlamorousPotato.calendar-annual-view@addons.thunderbird.net`.
 
-## GitHub Pages Demo
+## Web Demo
 
-The repository root contains a landing page (`index.html`) designed for GitHub Pages.
-It is responsive from mobile to wide desktop layouts, includes animated visual accents, and now embeds an interactive dummy demo directly on the page.
+The repository root contains a landing page (`index.html`). Build the web shell
+first with `npm run build:web`; the landing page links to the generated
+`dist/web/index.html` demo. The GitHub Pages workflow is present but currently
+disabled, so Pages deployment remains open work.
 
 - Landing page: `https://buntestadt.github.io/thunderbird_annual_view/`
-- Dummy demo button target (opens in a new tab): `web/index.html?dummy=1`
-- Embedded demo target (inside an iframe): `web/index.html?dummy=1`
+- Dummy demo button target after a build (opens in a new tab): `dist/web/index.html?dummy=1`
+- Embedded demo target after a build (inside an iframe): `dist/web/index.html?dummy=1`
+
+The web app is a static client-side deployment. It has no backend or database:
+Google calendars are read directly in the browser, while uploaded ICS content
+and preferences stay in local browser storage. Use the web app's clear-data
+control to remove local data and sign out of Google.
 
 ## Usage
 
@@ -129,7 +136,7 @@ Run the year-view page as a local website with Google Calendar integration:
 
 1. Run `npm run dev`.
 2. Open `http://localhost:5173/?google=1`.
-3. Set your OAuth client ID in `src/ui/year-view/google-client-id.js`.
+3. Set your OAuth client ID in `src/hosts/web/google-client-id.js`.
 4. Click `Connect to Google` and complete the Google login/consent flow.
 5. The button switches to `Log out` when connected.
 6. The year view then loads your Google calendars and events.
@@ -170,10 +177,10 @@ The experimental calendar APIs live in `src/hosts/thunderbird/submodules/calenda
 
 ## Deployments
 
-When development is finished, merge to main. Make sure the ci-test is successful.
-In a new commit, update the version number in `src/hosts/thunderbird/manifest.json`.
-In vscode: select the last commit, right click and select `Create Tag`. Follow the versioning scheme. - or use the `just tag` command.
-The tag needs to be pushed to the remote repo seperatly. The GitHub Actions workflow will automatically create a new release and upload the `.xpi` file.
+When development is finished, merge to `main` after CI passes. The planned
+Pages deployment is not active yet. The add-on release remains tag-driven: update the version in
+`src/hosts/thunderbird/manifest.json`, create and push a tag (or use
+`just tag`), and the release workflow builds and uploads the XPI.
 
 ### Prerequisites
 
@@ -184,13 +191,19 @@ To create an `.xpi` file manually:
 1. Clone or download the repository.
 2. Run `just build-xpi` (or `assets/scripts/build-xpi.sh`) to assemble `dist/package/` and create the XPI.
 
-### Releasing a New Version
+### Releasing the Add-on
 
 1. Create branches and commits as needed during development.
 2. When ready for release, create a Git tag on the desired commit.
 3. Push the tag to the repository (separate from pushing commits).
 4. The GitHub Actions workflow will automatically create a new *draft* release and upload the `.xpi` file.
 5. Check the release, test the `.xpi` file, and publish the release when ready.
+
+### Releasing the Web App
+
+Web release automation is still open: enable and verify
+`.github/workflows/deploy-pages.yml`, then deploy the landing page and the
+`dist/web` build from `main`.
 
 ## License
 

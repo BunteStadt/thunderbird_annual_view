@@ -27,68 +27,82 @@ The current implementation is organized into three practical layers:
    - header and sidebar controls
    - theme handling and viewport behavior
 
+The implementation of these layers is split between `src/core/` and
+`src/hosts/`. The core is host-neutral; each host supplies storage, a calendar
+provider, and host-specific UI modules through the bootstrap.
+
 ### 2.2 Key modules
 
-- [src/background/background.js](../src/background/background.js)
+- [src/hosts/thunderbird/background.js](../src/hosts/thunderbird/background.js)
   - creates the custom space shown in Thunderbird
   - handles entry point behavior for the add-on
 
-- [icons](../icons)
+- [assets/icons](../assets/icons)
   - stores the SVG assets used by the add-on action and the custom space
   - should remain theme-aware and compatible with the extension manifest references
 
-- [src/ui/year-view/main.js](../src/ui/year-view/main.js)
+- [src/core/app.js](../src/core/app.js)
   - initializes DOM references and state
   - wires filters, navigation, loading, refresh, and rendering updates
-  - owns Google connect/log-out header control wiring for standalone web mode
-  - attaches provider-specific sidebar integrations through a generic mount
+  - mounts host UI modules through named slots
   - coordinates the event store and grid view
 
-- [src/ui/year-view/calendar-service.js](../src/ui/year-view/calendar-service.js)
-  - resolves the primary calendar provider (dummy, Thunderbird, Google web, or empty)
+- [src/hosts/thunderbird/main.js](../src/hosts/thunderbird/main.js) and
+  [src/hosts/web/main.js](../src/hosts/web/main.js)
+  - configure the host storage adapter and calendar provider
+  - register host-specific UI modules before calling `initApp()`
+
+- [src/core/providers/calendar-service.js](../src/core/providers/calendar-service.js)
+  - manages the active calendar provider and merges uploaded `.ics` calendars
+  - creates providers through explicit kinds or registered host factories
   - keeps uploaded `.ics` calendars in a dedicated `IcsCalendarProvider` instance
   - merges `IcsCalendarProvider` calendars/events with the active provider output in `fetchCalendars()` and `fetchCalendarEvents()`
   - exports `IcsCalendarProvider`, `GoogleCalendarProvider`, `ThunderbirdCalendarProvider`, `DummyCalendarProvider`, and `EmptyCalendarProvider`
   - keeps provider selection out of the renderer
 
-- [src/ui/year-view/google-calendar-provider.js](../src/ui/year-view/google-calendar-provider.js)
+- [src/core/providers/google-calendar-provider.js](../src/core/providers/google-calendar-provider.js)
   - handles Google OAuth token flow (Google Identity Services)
   - queries Google Calendar list/events endpoints in read-only mode
   - maps Google payloads into the shared event shape
 
-- [src/ui/year-view/google-client-id.js](../src/ui/year-view/google-client-id.js)
+- [src/hosts/web/google-client-id.js](../src/hosts/web/google-client-id.js)
   - stores the Google OAuth web client ID used by standalone Google mode
 
-- [src/ui/year-view/ics-calendar-provider.js](../src/ui/year-view/ics-calendar-provider.js)
+- [src/core/providers/ics-calendar-provider.js](../src/core/providers/ics-calendar-provider.js)
   - platform-agnostic provider that reads events from in-memory ICS (iCalendar) content
   - accepts an array of `{ id, name, color, content }` descriptors; the caller supplies the raw ICS text
   - handles iCalendar line unfolding, `VALUE=DATE` and `TZID`-qualified `DTSTART`/`DTEND`, and UTC timestamps
   - supports `calendarIds`, `allDayOnly`, and `calendarAllDayModes` filter options
   - can be selected by calendar-service as the active provider, and can be constructed directly in tests
 
-- [src/ui/year-view/ics-calendar-integration.js](../src/ui/year-view/ics-calendar-integration.js)
+- [src/core/ics-calendar-integration.js](../src/core/ics-calendar-integration.js)
   - owns the manual ICS upload button shown below the calendar list
   - loads and persists uploaded ICS descriptors in browser storage
   - supports removing individual uploaded ICS calendars from the sidebar list
   - updates the active ICS provider without adding provider-specific state to `main.js`
 
-- [src/ui/year-view/event-store.js](../src/ui/year-view/event-store.js)
+- [src/core/domain/event-store.js](../src/core/domain/event-store.js)
   - caches events by year
   - applies filtering logic without re-fetching data repeatedly
 
-- [src/ui/year-view/grid-view.js](../src/ui/year-view/grid-view.js)
+- [src/core/ui/grid-view.js](../src/core/ui/grid-view.js)
   - renders the infinite-scrolling annual grid
   - handles viewport virtualization, event bar placement, and layout modes
 
-- [src/ui/year-view/storage.js](../src/ui/year-view/storage.js)
+- [src/core/storage.js](../src/core/storage.js)
   - persists UI and filter state in browser storage
 
-- [src/ui/year-view/theme.js](../src/ui/year-view/theme.js)
+- [src/core/ui/theme.js](../src/core/ui/theme.js)
   - applies light/dark theme behavior
 
 - [src/core/ui/index.html](../src/core/ui/index.html)
   - single source of truth for the shared app markup (header, sidebar, grid shell)
-  - Vite builds it with the selected host entry module
+  - Vite builds it with the selected host entry module through the
+    `@calendar-host` alias
+
+- [src/hosts/web/ui](../src/hosts/web/ui)
+  - contains Google authentication, empty-state, and clear-data UI modules
+  - these modules are mounted only by the web bootstrap
 
 ## 3. Core domain concepts
 
@@ -138,8 +152,9 @@ The user can change:
 
 ## 4. Current data flow
 
-1. The UI initializes and loads persisted preferences.
-2. The UI chooses a provider (Thunderbird APIs, Google web APIs, or dummy data).
+1. The host bootstrap installs a storage adapter and chooses a provider
+  (Thunderbird APIs, Google web APIs, dummy data, or empty).
+2. The core UI initializes and loads persisted preferences.
 3. The event store requests events for the needed year range.
 4. The store caches normalized events and filters them according to current settings.
 5. The grid view renders visible rows and overlays event bars.
@@ -165,8 +180,6 @@ The user can change:
 ## 6. Target architecture: core + hosts
 
 The repository stays a single lightweight codebase (no npm workspaces, no bundler). Responsibilities are split so the same calendar engine can be reused by two thin host shells without platform-specific coupling.
-
-See [roadmap.md](roadmap.md) for the phased plan and [migration-plan.md](migration-plan.md) for detailed, task-level instructions.
 
 ### 6.1 Target directory layout
 
@@ -243,4 +256,4 @@ When extending this project:
 - keep DOM host wiring and browser-specific code in the host shell or adapter layer
 - keep layout rules and filtering rules in core logic
 - avoid mixing Thunderbird-specific API semantics into the renderer
-- preserve the current module boundaries until the corresponding migration task in [migration-plan.md](migration-plan.md) moves them
+- preserve the current module boundaries and keep host-specific behavior behind the host adapters

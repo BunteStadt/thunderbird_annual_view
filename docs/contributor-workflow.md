@@ -18,17 +18,22 @@ Use a dedicated profile and install the add-on from a generated XPI package or f
 
 ### Standalone HTML development
 
-The standalone page can be used for faster iteration and debugging. It supports dummy data via the URL parameter `?dummy=1` and is useful for validating rendering behavior without the Thunderbird environment.
-It also supports Google Calendar integration via `?google=1` using a Google OAuth web client ID configured in `src/ui/year-view/google-client-id.js`.
+The web shell can be used for faster iteration and debugging. Run `npm run dev`
+and open `http://localhost:5173/?dummy=1` for dummy data. Google login is always
+available in the web header; `?google=1` remains a compatibility alias. Configure
+the OAuth client ID in `src/hosts/web/google-client-id.js`.
 
 ## 3. GitHub workflows and CI
 
-The repository uses GitHub Actions for build, test, lint, and release automation:
+The repository uses GitHub Actions for build, test, lint, and add-on release automation:
 
 - [build.yml](../.github/workflows/build.yml) builds the XPI package and uploads it as a workflow artifact.
 - [ci-tests.yml](../.github/workflows/ci-tests.yml) runs the repository test suite with Node.js via `node --test`.
 - [linter.yml](../.github/workflows/linter.yml) builds the XPI, runs the Thunderbird web extension linter, and publishes the report.
 - [release.yml](../.github/workflows/release.yml) builds the XPI, generates sample images, and publishes a draft release when a version tag is pushed.
+
+The Pages workflow is currently commented out. Web deployment is not active
+until that workflow is enabled and its generated `dist/web` paths are verified.
 
 When changing manifest behavior, release packaging, or any shared calendar logic, verify the relevant workflow expectations and, where possible, test locally before pushing.
 
@@ -64,13 +69,15 @@ GitHub Actions.  The test suite covers:
 
 | File | Coverage |
 | --- | --- |
-| `test/addon-integration.test.js` | Manifest integrity and XPI build |
-| `test/background-runtime.test.js` | Background script click handler |
-| `test/calendar-service.test.js` | Calendar service with dummy and injected providers |
-| `test/thunderbird-provider.test.js` | `ThunderbirdCalendarProvider` end-to-end with mocked `browser.calendar.*` API fed from `assets/feiertage_nrw.ics` |
-| `test/date-utils.test.js` | Date utility functions |
-| `test/event-store.test.js` | Event store filtering and caching |
-| `test/storage-theme.test.js` | Storage and theme helpers |
+| `test/hosts/thunderbird/addon-integration.test.js` | Manifest integrity and XPI build |
+| `test/hosts/thunderbird/background-runtime.test.js` | Background script click handler |
+| `test/core/calendar-service.test.js` | Calendar service with dummy and injected providers |
+| `test/hosts/thunderbird/thunderbird-provider.test.js` | `ThunderbirdCalendarProvider` with mocked `browser.calendar.*` APIs and NRW ICS data |
+| `test/core/date-utils.test.js` | Date utility functions |
+| `test/core/event-store.test.js` | Event store filtering and caching |
+| `test/core/storage-theme.test.js` | Storage and theme helpers |
+| `test/core/core-boundaries.test.js` | Core imports and host API boundary |
+| `test/hosts/web/web-storage-adapter.test.js` | Web storage routing and fallback behavior |
 
 The `thunderbird-provider.test.js` file simulates the exact API shape that
 Thunderbird exposes to the add-on background and verifies that
@@ -150,6 +157,10 @@ Release work should follow the existing conventions in the repository:
 - update the version when a user-visible change is ready for release
 - ensure the packaged build remains consistent with the current manifest and source layout
 - test the resulting package manually before publishing
+- add-on releases are created by pushing a version tag; the release workflow
+ builds and uploads the XPI
+- web release automation is still open; do not describe the current repository
+ as having an active Pages deployment
 
 ## 9. Recommended PR checklist
 

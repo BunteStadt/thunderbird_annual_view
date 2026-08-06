@@ -23,10 +23,10 @@ The add-on currently provides:
 
 - [src/hosts/thunderbird/manifest.json](src/hosts/thunderbird/manifest.json) defines the Thunderbird add-on entry point and experiment APIs.
 - [src/hosts/thunderbird/background.js](src/hosts/thunderbird/background.js) creates the custom Thunderbird space entry point.
-- [src/ui/year-view](src/ui/year-view) contains the calendar UI, event-store logic, grid rendering, storage, theming, and HTML shell.
-- [src/ui/year-view/ics-calendar-provider.js](src/ui/year-view/ics-calendar-provider.js) is a platform-agnostic provider that parses `.ics` (iCalendar) file content passed as strings.
+- [src/core](src/core) contains the platform-neutral calendar domain, providers, UI, storage ports, and shared HTML shell.
+- [src/core/providers/ics-calendar-provider.js](src/core/providers/ics-calendar-provider.js) is a platform-agnostic provider that parses `.ics` (iCalendar) file content passed as strings.
 - [src/hosts/thunderbird/submodules/calendar/experiments/calendar](src/hosts/thunderbird/submodules/calendar/experiments/calendar) provides the Thunderbird-specific experimental calendar APIs that the build copies into the add-on package.
-- [apps](apps) is the starting point for the future monorepo split into addon, web, and backend surfaces.
+- [src/hosts](src/hosts) contains the thin Thunderbird and web bootstraps and their host-specific integrations.
 - [test](test) contains integration and unit-style checks for the current calendar behavior.
 - [test/.thunderbird-profile](test/.thunderbird-profile) is a pre-configured Thunderbird profile for real-Thunderbird integration testing via Docker or a local installation.
 - [test/e2e](test/e2e) contains the real-Thunderbird end-to-end test that installs the add-on from source, captures a screenshot, and validates the Thunderbird log.
@@ -62,8 +62,6 @@ The shared layer should eventually own the calendar domain, filtering rules, vie
 Use the following documents as the authoritative deeper references:
 
 - [docs/architecture.md](docs/architecture.md) — current architecture, module responsibilities, and the target shared architecture.
-- [docs/roadmap.md](docs/roadmap.md) — phased plan to evolve the repository into the core + hosts structure (Thunderbird add-on and website in parallel).
-- [docs/migration-plan.md](docs/migration-plan.md) — detailed, task-level step-by-step instructions for executing the roadmap.
 - [docs/contributor-workflow.md](docs/contributor-workflow.md) — development workflow, testing expectations, and release conventions.
 - [test/.thunderbird-profile/README.md](test/.thunderbird-profile/README.md) — how to use the pre-configured Thunderbird profile for end-to-end manual and Docker-based testing.
 - [test/e2e/README.md](test/e2e/README.md) — how to run the real-Thunderbird installation test from the terminal.

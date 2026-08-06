@@ -12,12 +12,22 @@ function assertFileExists(relativePath) {
     assert.equal(fs.existsSync(fullPath), true, `Missing file referenced by manifest: ${relativePath}`);
 }
 
+function resolveHostFile(relativePath) {
+    if (relativePath.startsWith('src/')) {
+        return relativePath;
+    }
+    if (relativePath.startsWith('experiments/')) {
+        return path.join('src', 'hosts', 'thunderbird', 'submodules', 'calendar', relativePath);
+    }
+    return path.join('src', 'hosts', 'thunderbird', relativePath);
+}
+
 test('manifest references existing addon files', () => {
-    const manifestPath = path.join(repoRoot, 'manifest.json');
+    const manifestPath = path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
     for (const script of manifest.background?.scripts || []) {
-        assertFileExists(script);
+        assertFileExists(resolveHostFile(script));
     }
 
     for (const iconPath of Object.values(manifest.action?.default_icon || {})) {
@@ -30,12 +40,12 @@ test('manifest references existing addon files', () => {
     }
 
     for (const apiDef of Object.values(manifest.experiment_apis || {})) {
-        assertFileExists(apiDef.schema);
+        assertFileExists(resolveHostFile(apiDef.schema));
         if (apiDef.parent?.script) {
-            assertFileExists(apiDef.parent.script);
+            assertFileExists(resolveHostFile(apiDef.parent.script));
         }
         if (apiDef.child?.script) {
-            assertFileExists(apiDef.child.script);
+            assertFileExists(resolveHostFile(apiDef.child.script));
         }
     }
 });
@@ -52,18 +62,19 @@ test('addon package can be built and validated as a zip archive', (t) => {
     });
 
     fs.mkdirSync(path.join(packageDir, 'experiments', 'calendar'), { recursive: true });
-    for (const entry of ['manifest.json', 'src', 'submodules', 'assets']) {
-        fs.cpSync(path.join(repoRoot, entry), path.join(packageDir, entry), { recursive: true });
-    }
+    fs.cpSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'manifest.json'), path.join(packageDir, 'manifest.json'));
+    fs.cpSync(path.join(repoRoot, 'src', 'core'), path.join(packageDir, 'src', 'core'), { recursive: true });
+    fs.cpSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird'), path.join(packageDir, 'src', 'hosts', 'thunderbird'), { recursive: true });
+    fs.cpSync(path.join(repoRoot, 'assets'), path.join(packageDir, 'assets'), { recursive: true });
     fs.cpSync(
-        path.join(repoRoot, 'submodules', 'calendar', 'experiments', 'calendar'),
+        path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'submodules', 'calendar', 'experiments', 'calendar'),
         path.join(packageDir, 'experiments', 'calendar'),
         { recursive: true }
     );
 
     const build = spawnSync(
         'zip',
-        ['-r', xpiPath, 'manifest.json', 'src', 'submodules', 'assets/icons', 'experiments'],
+        ['-r', xpiPath, 'manifest.json', 'src', 'assets/icons', 'experiments'],
         { cwd: packageDir, encoding: 'utf8' }
     );
     assert.equal(build.status, 0, `zip command failed: ${build.stderr || build.stdout}`);

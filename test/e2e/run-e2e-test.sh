@@ -135,10 +135,10 @@ if [ ! -f "$PROFILE_TMP/user.js" ] && [ -f "$PROFILE_TMP/prefs.js" ]; then
     cp "$PROFILE_TMP/prefs.js" "$PROFILE_TMP/user.js"
 fi
 
-# Point the extension proxy at the actual repository root so Thunderbird
-# loads the add-on from source — mirroring the "Load Temporary Add-on"
-# workflow in Thunderbird's Debug Add-on page.
-echo "$REPO_ROOT" > \
+# Build the package layout first because manifest resource URLs are relative
+# to the XPI root, not to the source host directory.
+just -f "$REPO_ROOT/justfile" build-xpi >/dev/null
+echo "$REPO_ROOT/dist/package" > \
     "$PROFILE_TMP/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net"
 log "Extension proxy → $REPO_ROOT"
 

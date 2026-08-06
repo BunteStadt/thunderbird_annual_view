@@ -81,9 +81,10 @@ async function loadProvider() {
 // ---------------------------------------------------------------------------
 
 test('manifest.json references all experiment API schema and script files', () => {
-    const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'manifest.json'), 'utf8'));
+    const manifestRoot = path.join(repoRoot, 'src', 'hosts', 'thunderbird');
+    const manifest = JSON.parse(fs.readFileSync(path.join(manifestRoot, 'manifest.json'), 'utf8'));
     for (const [apiName, apiDef] of Object.entries(manifest.experiment_apis ?? {})) {
-        const schemaPath = path.join(repoRoot, apiDef.schema);
+        const schemaPath = path.join(manifestRoot, apiDef.schema);
         assert.ok(
             fs.existsSync(schemaPath),
             `Missing experiment API schema for "${apiName}": ${apiDef.schema}`
@@ -94,13 +95,13 @@ test('manifest.json references all experiment API schema and script files', () =
 
         if (apiDef.parent?.script) {
             assert.ok(
-                fs.existsSync(path.join(repoRoot, apiDef.parent.script)),
+                fs.existsSync(path.join(manifestRoot, apiDef.parent.script)),
                 `Missing parent script for "${apiName}": ${apiDef.parent.script}`
             );
         }
         if (apiDef.child?.script) {
             assert.ok(
-                fs.existsSync(path.join(repoRoot, apiDef.child.script)),
+                fs.existsSync(path.join(manifestRoot, apiDef.child.script)),
                 `Missing child script for "${apiName}": ${apiDef.child.script}`
             );
         }
@@ -108,7 +109,7 @@ test('manifest.json references all experiment API schema and script files', () =
 });
 
 test('manifest.json declares the required gecko browser_specific_settings for Thunderbird', () => {
-    const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'manifest.json'), 'utf8'));
+    const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'manifest.json'), 'utf8'));
     const gecko = manifest.browser_specific_settings?.gecko;
     assert.ok(gecko, 'manifest.json must have browser_specific_settings.gecko');
     assert.ok(gecko.id, 'gecko settings must include an id');

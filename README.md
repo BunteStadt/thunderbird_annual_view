@@ -152,7 +152,7 @@ The repository ships with custom Git hooks in `.githooks/`. To enable them, run 
 git config core.hooksPath .githooks
 ```
 
-- **`pre-commit`** — Checks that the submodule has no unpulled commits and that `experiments/` is in sync with `submodules/calendar/experiments/calendar/`. If they differ, run `just sync-experiments` to sync them before committing.
+- **`pre-commit`** — Checks that the submodule has no unpulled commits.
 
 #### Just Commands
 
@@ -160,24 +160,17 @@ git config core.hooksPath .githooks
 
 | Command | Description |
 | --------- | ------------- |
-| `just sync-experiments` | Copies experiment APIs from `submodules/calendar/experiments/calendar/` to `experiments/` for development |
 | `just build-xpi` | Builds the `.xpi` release package into `dist/` |
-| `just tag` | Creates a Git tag from the version in `manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |
+| `just tag` | Creates a Git tag from the version in `src/hosts/thunderbird/manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |
 
-#### Syncing the Experiment Submodule
+#### Building the Experiment Package
 
-The experimental calendar APIs live in `submodules/calendar/experiments/calendar/` (a Git submodule). For the add-on to work, they must also be present at `experiments/calendar/`. To sync manually:
-
-```bash
-just sync-experiments
-```
-
-This copies all files from the submodule source to the target directory. The `pre-commit` hook will warn you if they drift out of sync.
+The experimental calendar APIs live in `src/hosts/thunderbird/submodules/calendar/experiments/calendar/` (a Git submodule). The build script copies them to `dist/package/experiments/calendar/` when assembling the add-on.
 
 ## Deployments
 
 When development is finished, merge to main. Make sure the ci-test is successful.
-In a new commit, update the version number in `manifest.json`.
+In a new commit, update the version number in `src/hosts/thunderbird/manifest.json`.
 In vscode: select the last commit, right click and select `Create Tag`. Follow the versioning scheme. - or use the `just tag` command.
 The tag needs to be pushed to the remote repo seperatly. The GitHub Actions workflow will automatically create a new release and upload the `.xpi` file.
 
@@ -188,9 +181,7 @@ The tag needs to be pushed to the remote repo seperatly. The GitHub Actions work
 To create an `.xpi` file manually:
 
 1. Clone or download the repository.
-2. Stage the package layout so `submodules/calendar/experiments/calendar/` is also available as `experiments/calendar/` at the archive root.
-3. Zip the staged contents (excluding the `.git` folder).
-4. Rename the zip file extension to `.xpi`.
+2. Run `just build-xpi` (or `assets/scripts/build-xpi.sh`) to assemble `dist/package/` and create the XPI.
 
 ### Releasing a New Version
 

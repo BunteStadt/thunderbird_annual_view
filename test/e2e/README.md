@@ -55,7 +55,7 @@ All artifacts are written to `test-results/` (gitignored):
 | Check | How |
 | --- | --- |
 | Thunderbird 153 is available | `--version` output |
-| Extension proxy written | `extensions/{ext-id}` file points to repo root |
+| Extension proxy written | `extensions/{ext-id}` file points to the assembled `dist/package` root |
 | Thunderbird window appears | `xdotool search --class Thunderbird` |
 | Screenshot is not blank | File size > 20 KB (uniform black PNG compresses to < 5 KB) |
 | No add-on errors in log | `grep` for lines matching both the extension ID and `error/warning` |

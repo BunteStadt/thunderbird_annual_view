@@ -6,7 +6,7 @@
 #>
 $ErrorActionPreference = 'Stop'
 
-$manifest = "manifest.json"
+$manifest = "src/hosts/thunderbird/manifest.json"
 $remote   = "origin"
 $branch   = "main"
 

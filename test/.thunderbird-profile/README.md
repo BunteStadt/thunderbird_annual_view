@@ -7,7 +7,7 @@ add-on installation from source and the calendar provider integration.
 
 | Item | Details |
 | --- | --- |
-| Add-on (unpacked) | `extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net` — proxy file pointing to `/workspace` (Docker) |
+| Add-on (unpacked) | `extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net` — proxy file pointing to `/workspace/dist/package` (Docker) |
 | Calendar 1 | NRW Feiertage from `assets/feiertage_nrw.ics` (ICS type, red) |
 | Calendar 2 | NRW Schulferien from `assets/ferien_nrw.ics` (ICS type, blue) |
 | Signature check | Disabled (`xpinstall.signatures.required = false`) |
@@ -29,9 +29,16 @@ docker compose -f docker/docker-compose.yml up
 
 Then open <http://localhost:5800> in a browser to see the Thunderbird GUI.
 
+Build the package before starting Docker:
+
+```sh
+just build-xpi
+docker compose -f docker/docker-compose.yml up
+```
+
 The add-on is loaded automatically because the extensions proxy file
 (`extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net`)
-points to `/workspace`, which is the mounted source directory.
+points to `/workspace/dist/package`, which contains the XPI-compatible layout.
 
 The two ICS calendars are registered and will appear in the Calendar tab once
 Thunderbird fetches the files from `file:///workspace/assets/`.
@@ -54,7 +61,8 @@ Thunderbird fetches the files from `file:///workspace/assets/`.
 3. Update the extension proxy file content to match your local path:
 
    ```sh
-   echo "/your/path/to/thunderbird_annual_view" \
+   just build-xpi
+   echo "/your/path/to/thunderbird_annual_view/dist/package" \
    > test/.thunderbird-profile/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net
    ```
 

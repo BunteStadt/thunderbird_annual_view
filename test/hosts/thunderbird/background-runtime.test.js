@@ -37,8 +37,14 @@ test('background script loads and click handler executes without console errors'
         }
     };
 
+    const availableResources = new Set([
+        'moz-extension://test/year-view.html',
+        'moz-extension://test/assets/icons/annual_view_prefers-color.svg'
+    ]);
+
     const context = vm.createContext({
         browser,
+        fetch: async (url) => ({ ok: availableResources.has(url) }),
         console: {
             log() {},
             error(...args) {

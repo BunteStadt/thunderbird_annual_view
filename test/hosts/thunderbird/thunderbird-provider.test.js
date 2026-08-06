@@ -24,6 +24,13 @@ const path = require('node:path');
 const repoRoot = path.resolve(__dirname, '..', '..', '..');
 const icsFilePath = path.join(repoRoot, 'assets', 'feiertage_nrw.ics');
 
+function resolveHostFile(manifestRoot, relativePath) {
+    if (relativePath.startsWith('experiments/')) {
+        return path.join(manifestRoot, 'submodules', 'calendar', relativePath);
+    }
+    return path.join(manifestRoot, relativePath);
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -84,7 +91,7 @@ test('manifest.json references all experiment API schema and script files', () =
     const manifestRoot = path.join(repoRoot, 'src', 'hosts', 'thunderbird');
     const manifest = JSON.parse(fs.readFileSync(path.join(manifestRoot, 'manifest.json'), 'utf8'));
     for (const [apiName, apiDef] of Object.entries(manifest.experiment_apis ?? {})) {
-        const schemaPath = path.join(manifestRoot, apiDef.schema);
+        const schemaPath = resolveHostFile(manifestRoot, apiDef.schema);
         assert.ok(
             fs.existsSync(schemaPath),
             `Missing experiment API schema for "${apiName}": ${apiDef.schema}`
@@ -95,13 +102,13 @@ test('manifest.json references all experiment API schema and script files', () =
 
         if (apiDef.parent?.script) {
             assert.ok(
-                fs.existsSync(path.join(manifestRoot, apiDef.parent.script)),
+                fs.existsSync(resolveHostFile(manifestRoot, apiDef.parent.script)),
                 `Missing parent script for "${apiName}": ${apiDef.parent.script}`
             );
         }
         if (apiDef.child?.script) {
             assert.ok(
-                fs.existsSync(path.join(manifestRoot, apiDef.child.script)),
+                fs.existsSync(resolveHostFile(manifestRoot, apiDef.child.script)),
                 `Missing child script for "${apiName}": ${apiDef.child.script}`
             );
         }

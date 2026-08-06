@@ -121,20 +121,20 @@ Use `just tb` or:
 Vite is used to merge htmls and build the stuff.
 
 ```bash
-npm run dev
+npm run dev:web
 npm run build:web
-npm run build:thunderbird 
+npm run build:thunderbird
 ```
 
 ### Dummy Data
-Run `npm run dev`, then open `http://localhost:5173/?dummy=1` to load the built-in sample calendars and events.
+Run `npm run dev:web`, then open `http://localhost:5173/?dummy=1` to load the built-in sample calendars and events.
 Or use the commented out code in main.js.
 
 ### Google Calendar Data
 
 Run the year-view page as a local website with Google Calendar integration:
 
-1. Run `npm run dev`.
+1. Run `npm run dev:web`.
 2. Open `http://localhost:5173/?google=1`.
 3. Set your OAuth client ID in `src/hosts/web/google-client-id.js`.
 4. Click `Connect to Google` and complete the Google login/consent flow.

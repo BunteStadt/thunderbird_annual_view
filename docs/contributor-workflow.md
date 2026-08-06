@@ -18,7 +18,7 @@ Use a dedicated profile and install the add-on from a generated XPI package or f
 
 ### Standalone HTML development
 
-The web shell can be used for faster iteration and debugging. Run `npm run dev`
+The web shell can be used for faster iteration and debugging. Run `npm run dev:web`
 and open `http://localhost:5173/?dummy=1` for dummy data. Google login is always
 available in the web header; `?google=1` remains a compatibility alias. Configure
 the OAuth client ID in `src/hosts/web/google-client-id.js`.

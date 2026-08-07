@@ -47,14 +47,14 @@ async function createCalendarDescriptors(files) {
     );
 }
 
-export function setupIcsCalendarIntegration({ mount, onCalendarsChanged } = {}) {
+export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initialCalendars = null, readOnly = false } = {}) {
     let calendars = [];
 
     const fileInput = globalThis.document?.createElement?.("input") ?? null;
     const uploadButton = globalThis.document?.createElement?.("button") ?? null;
 
     async function syncStoredCalendars() {
-        calendars = await loadStoredIcsCalendars();
+        calendars = initialCalendars === null ? await loadStoredIcsCalendars() : sanitizeCalendarDescriptors(initialCalendars);
         setIcsCalendars(calendars);
     }
 
@@ -109,7 +109,9 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged } = {}) 
     return {
         async initialize() {
             await syncStoredCalendars();
-            render();
+            if (!readOnly) {
+                render();
+            }
         },
 
         async removeCalendar(id) {

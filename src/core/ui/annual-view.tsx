@@ -8,7 +8,7 @@ export type AnnualViewConfig = Record<string, unknown>;
 function AnnualViewShell() {
     return (
         <div className="av-app">
-            <header className="av-toolbar"><div className="controls">
+            <header className="av-toolbar"><div className="controls"><div data-ui-slot="header-leading" hidden />
                 <button id="toggleCalendars" className="btn" data-size="compact" type="button" aria-expanded="false" aria-controls="calendarFilters">Show options</button>
                 <div className="year-nav"><button className="btn" type="button" data-size="compact" data-year-step="-1">-</button><input id="yearInput" className="input" type="number" min="1900" max="2999" step="1" /><button className="btn" type="button" data-size="compact" data-year-step="1">+</button><button id="todayButton" className="btn" data-size="compact" type="button" title="Jump to the current day">Today</button></div>
                 <label htmlFor="viewMode" className="view-mode-label"><span>View:</span><select id="viewMode" className="input input-compact"><option value="linear">compact</option><option value="day-aligned">aligned</option><option value="week-rows">4-week</option><option value="two-week-rows">2-week</option><option value="one-week-rows">1-week</option></select></label>

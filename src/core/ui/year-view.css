@@ -136,6 +136,34 @@ body.annual-view-document {
   font-weight: 600;
 }
 
+[data-ui-slot="header-leading"],
+[data-ui-slot="header-actions"] {
+  align-items: center;
+  gap: 0.45rem;
+}
+
+[data-ui-slot="header-leading"]:not([hidden]),
+[data-ui-slot="header-actions"]:not([hidden]) {
+  display: inline-flex;
+}
+
+[data-ui-slot="header-actions"] {
+  margin-left: auto;
+}
+
+.av-header-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.av-header-action svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
 .input {
   width: 6rem;
   padding: 0.38rem 0.55rem;

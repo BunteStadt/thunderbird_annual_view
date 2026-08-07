@@ -1013,6 +1013,15 @@ a:focus-visible {
     background: var(--av-accent-strong);
 }
 
+.nav-demo-link {
+    color: #fff !important;
+    background: var(--av-accent-strong) !important;
+}
+
+.nav-demo-link:hover {
+    background: var(--av-accent) !important;
+}
+
 .button-inverse {
     color: var(--av-text);
     background: var(--av-panel);

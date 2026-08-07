@@ -94,6 +94,9 @@ function SiteHeader({ navigate, session }: { navigate: Navigate; session: Sessio
                     <button type="button" className="button button-quiet" onClick={() => closeAndNavigate(session ? "/account" : "/login")}>
                         {session ? <CircleUserRound aria-hidden="true" /> : <LogIn aria-hidden="true" />} {session ? "Account" : "Sign in"}
                     </button>
+                    <button type="button" className="button button-primary nav-demo-link" onClick={() => closeAndNavigate(session ? "/app" : "/demo")}>
+                        <Eye aria-hidden="true" /> {session ? "Open YearView" : "Open demo"}
+                    </button>
                 </div>
             </nav>
         </header>
@@ -405,7 +408,7 @@ function ProtectedApp({ session, navigate }: { session: Session; navigate: Navig
     if (subscription?.status !== "active") {
         return <main className="status-page page-width"><h1>An active membership is required.</h1><button className="button button-primary" onClick={() => navigate("/account")}>View membership</button></main>;
     }
-    return <YearView session={session} />;
+    return <YearView session={session} navigate={navigate} />;
 }
 
 const legalContent: Record<string, { title: string; intro: string; sections: Array<[string, string]> }> = {
@@ -472,6 +475,7 @@ function App() {
 
     let page: ReactNode;
     if (path === "/") page = <LandingPage navigate={navigate} />;
+    else if (path === "/demo") page = <YearView navigate={navigate} demo />;
     else if (path === "/pricing") page = <PricingPage navigate={navigate} session={session} />;
     else if (path === "/login") page = <LoginPage navigate={navigate} />;
     else if (path === "/auth/callback") page = <AuthCallback navigate={navigate} />;
@@ -484,7 +488,7 @@ function App() {
     else if (legalContent[path]) page = <LegalPage path={path} />;
     else page = <NotFound navigate={navigate} />;
 
-    return <><SiteHeader navigate={navigate} session={session} />{page}</>;
+    return <>{!(path === "/app" && session) && <SiteHeader navigate={navigate} session={session} />}{page}</>;
 }
 
 createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);

@@ -449,7 +449,9 @@ export async function initApp(config = {}) {
         const { modes } = await loadCalendarAllDayModes();
         const { hours } = await loadCalendarMinDurationHours();
 
-        selectedCalendarIds = found
+        selectedCalendarIds = config.selectAllCalendars
+            ? new Set(availableCalendars.map((calendar) => calendar.id))
+            : found
             ? new Set(availableCalendars.filter((c) => persistedIds.has(c.id)).map((c) => c.id))
             : new Set(availableCalendars.map((c) => c.id));
         calendarAllDayModes = modes;
@@ -487,6 +489,13 @@ export async function initApp(config = {}) {
         }
         if (refreshSettings.autoRefreshEnabled) {
             autoRefreshTimer = setInterval(refreshCalendarData, refreshSettings.autoRefreshInterval);
+        }
+    }
+
+    function clearAutoRefresh() {
+        if (autoRefreshTimer) {
+            clearInterval(autoRefreshTimer);
+            autoRefreshTimer = null;
         }
     }
 
@@ -564,6 +573,8 @@ export async function initApp(config = {}) {
         refreshSettings = await loadRefreshSettings();
         const icsCalendarIntegration = setupIcsCalendarIntegration({
             mount: uiSlots.get("sidebar-sections") ?? null,
+            initialCalendars: config.icsCalendars,
+            readOnly: config.icsReadOnly === true,
             onCalendarsChanged: async () => {
                 eventStore.invalidate();
                 await loadCalendars();

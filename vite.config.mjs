@@ -1,4 +1,6 @@
 import { resolve } from "node:path";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const repositoryRoot = import.meta.dirname;
@@ -11,6 +13,7 @@ export default defineConfig(({ mode }) => {
         root: uiRoot,
         base: "./",
         publicDir: false,
+        plugins: [react(), tailwindcss()],
         resolve: {
             alias: {
                 "@calendar-host": resolve(repositoryRoot, thunderbird ? "src/hosts/thunderbird/main.js" : "src/hosts/web/main.js")

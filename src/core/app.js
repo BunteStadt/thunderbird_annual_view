@@ -136,7 +136,8 @@ export async function initApp(config = {}) {
         onYearChange: (year) => {
             currentYear = year;
             // Don't clobber the input while the user is typing a year.
-            if (document.activeElement !== yearInput) {
+            const activeElement = root.getRootNode?.().activeElement ?? document.activeElement;
+            if (activeElement !== yearInput) {
                 yearInput.value = year;
             }
             updateFilterStats();
@@ -545,6 +546,20 @@ export async function initApp(config = {}) {
     }
 
     async function init() {
+        onChange(yearInput, () => {
+            const nextYear = Number(yearInput.value);
+            if (Number.isFinite(nextYear)) {
+                jumpToYear(nextYear);
+            }
+        });
+        yearButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const step = Number(btn.dataset.yearStep) || 0;
+                jumpToYear(currentYear + step);
+            }, listenerOptions);
+        });
+        onClick(todayButton, () => gridView.showToday());
+
         setThemeMode(await loadThemePreference());
         refreshSettings = await loadRefreshSettings();
         const icsCalendarIntegration = setupIcsCalendarIntegration({
@@ -588,22 +603,6 @@ export async function initApp(config = {}) {
         updateFilterStats();
         setupAutoRefresh();
         setupTabFocusRefresh();
-
-        onChange(yearInput, () => {
-            const nextYear = Number(yearInput.value);
-            if (Number.isFinite(nextYear)) {
-                jumpToYear(nextYear);
-            }
-        });
-
-        yearButtons.forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const step = Number(btn.dataset.yearStep) || 0;
-                jumpToYear(currentYear + step);
-            }, listenerOptions);
-        });
-
-        onClick(todayButton, () => gridView.showToday());
 
         onChange(viewModeSelect, async () => {
             viewMode = viewModeSelect?.value || "linear";
@@ -682,6 +681,7 @@ export async function initApp(config = {}) {
             if (systemThemeWatcher) {
                 systemThemeWatcher.removeEventListener("change", handleSystemThemeChange);
             }
+            gridView.destroy?.();
             mountedUiModules.forEach((mounted) => mounted?.destroy?.());
         }
     };

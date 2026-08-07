@@ -95,10 +95,16 @@ provider, and host-specific UI modules through the bootstrap.
 - [src/core/ui/theme.js](../src/core/ui/theme.js)
   - applies light/dark theme behavior
 
+- [src/core/ui/annual-view.tsx](../src/core/ui/annual-view.tsx)
+  - single React/TypeScript source of truth for the shared app markup
+  - exposes `AnnualView` and `mountAnnualView()` for all hosts
+
 - [src/core/ui/index.html](../src/core/ui/index.html)
-  - single source of truth for the shared app markup (header, sidebar, grid shell)
-  - Vite builds it with the selected host entry module through the
-    `@calendar-host` alias
+  - minimal Vite document containing the React root
+
+- [src/core/ui/year-view.css](../src/core/ui/year-view.css)
+  - shared Tailwind entry and dense annual-grid styles based on the original
+    add-on design
 
 - [src/hosts/web/ui](../src/hosts/web/ui)
   - contains Google authentication, empty-state, and clear-data UI modules
@@ -179,7 +185,9 @@ The user can change:
 
 ## 6. Target architecture: core + hosts
 
-The repository stays a single lightweight codebase (no npm workspaces, no bundler). Responsibilities are split so the same calendar engine can be reused by two thin host shells without platform-specific coupling.
+The repository stays a single lightweight codebase (no npm workspaces). Vite
+compiles the shared React/TypeScript/Tailwind core for each thin host shell
+without platform-specific coupling.
 
 ### 6.1 Target directory layout
 

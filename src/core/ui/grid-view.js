@@ -348,8 +348,16 @@ export class GridView {
         this._reportedYear = null;
         this._scrollPending = false;
 
-        this.viewport.addEventListener("scroll", () => this._scheduleScrollWork());
-        window.addEventListener("resize", () => this._scheduleScrollWork());
+        this._onScroll = () => this._scheduleScrollWork();
+        this._onResize = () => this._scheduleScrollWork();
+        this.viewport.addEventListener("scroll", this._onScroll);
+        window.addEventListener("resize", this._onResize);
+    }
+
+    destroy() {
+        this.viewport.removeEventListener("scroll", this._onScroll);
+        window.removeEventListener("resize", this._onResize);
+        this.rows = [];
     }
 
     get _impl() {

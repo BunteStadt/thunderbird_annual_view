@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
-const shellSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'index.html'), 'utf8');
+const shellSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'annual-view.tsx'), 'utf8');
 const appSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'app.js'), 'utf8');
 
 // The view shell in core is the single source of truth for the app markup.
@@ -20,6 +20,10 @@ test('view shell contains every element id initApp reads from the DOM', () => {
             `view shell is missing #${id} required by app.js`
         );
     }
+});
+
+test('React view shell does not force dark mode before theme preferences load', () => {
+    assert.doesNotMatch(shellSource, /className="av-app theme-dark"/);
 });
 
 test('view shell contains every data-ui-slot the host bootstraps mount into', () => {
@@ -40,10 +44,11 @@ test('view shell contains every data-ui-slot the host bootstraps mount into', ()
 });
 
 test('Vite builds the one core HTML page with a host selected at compile time', () => {
-    const entrySource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'entry.js'), 'utf8');
+    const entrySource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'entry.tsx'), 'utf8');
     const viteConfig = fs.readFileSync(path.join(repoRoot, 'vite.config.mjs'), 'utf8');
 
     assert.match(entrySource, /from "@calendar-host"/);
+    assert.match(entrySource, /mountAnnualView/);
     assert.match(viteConfig, /src\/hosts\/thunderbird\/main\.js/);
     assert.match(viteConfig, /src\/hosts\/web\/main\.js/);
     assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'year-view.html')));

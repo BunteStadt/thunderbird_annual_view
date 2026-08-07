@@ -30,7 +30,7 @@ As of 2026-08-06, the planned first-release application is implemented locally:
 | Stripe Checkout, Billing Portal, and signed webhook handling | Implemented; requires Stripe configuration |
 | Active-subscription authorization | Implemented; only `active` grants access |
 | Allowlisted Google Calendar Worker proxy | Implemented |
-| Shared annual view embedded through React and Shadow DOM | Implemented |
+| Shared annual view mounted through shared React/TypeScript/Tailwind core | Implemented |
 | Unit, contract, type, build, and Worker bundle checks | Passing |
 | Browser automation and live sandbox lifecycle test | Not yet implemented/run |
 | Production deployment and legal completion | Not yet done |
@@ -158,7 +158,7 @@ No additional product features are required for the defined first release.
 | --- | --- |
 | SaaS UI | React, TypeScript, Vite, Tailwind CSS |
 | Icons | Lucide React |
-| Existing annual view | Reuse `src/core` renderer and providers |
+| Existing annual view | Reuse `src/core` React/Tailwind UI, renderer, and providers |
 | Hosting | Cloudflare Workers Static Assets |
 | Server endpoints | Cloudflare Worker `/api/*` routes |
 | Identity | Supabase Auth with Google OAuth and PKCE |
@@ -166,10 +166,11 @@ No additional product features are required for the defined first release.
 | Billing | Stripe Checkout, Billing Portal, and webhooks |
 | Calendar source | Google Calendar API, read-only |
 
-New SaaS code lives under `src/hosts/saas` and uses React, TypeScript, and
-Tailwind. The existing Thunderbird host, standalone web host, and shared core
-remain JavaScript. Rewriting the proven calendar renderer is not part of this
-work.
+SaaS, the standalone web host, and the Thunderbird host all mount the shared
+React/TypeScript core from `src/core/ui/annual-view.tsx`. Tailwind is compiled
+in the core Vite build as well as the SaaS build. Provider, storage, and
+calendar-engine contracts remain host-neutral; Thunderbird still supplies its
+WebExtension adapters at the bootstrap boundary.
 
 ## 3. Runtime boundaries
 
@@ -396,13 +397,14 @@ The shared renderer now supports React embedding:
 2. The returned API exposes `destroy()`.
 3. Teardown removes DOM, document, window, and media-query listeners; clears
    refresh intervals; and calls cleanup returned by mounted host modules.
-4. The React bridge renders the canonical core shell inside a Shadow DOM,
-   installs storage and calendar adapters, calls `initApp`, and destroys it on
-   unmount.
+4. The shared React component renders the canonical core shell, installs
+   storage and calendar adapters through the host, calls `initApp`, and
+   destroys it on unmount.
 
-The existing `year-view.css` remains responsible for the embedded calendar.
-Tailwind styles the surrounding SaaS shell and all new pages. The legacy CSS is
-scoped so it cannot alter public pages.
+The shared `year-view.css` is the Tailwind entry for the core and also contains
+the specialized virtual-grid rules. SaaS styles the product shell; both layers
+use the core's dense calendar design as the baseline rather than duplicating a
+second calendar shell.
 
 ## 11. User experience direction
 
@@ -491,7 +493,7 @@ npx wrangler deploy --dry-run
    subscription migration.
 2. Completed: Worker auth, entitlement, Stripe routes, webhook synchronization,
    protected Google proxy, and focused tests.
-3. Completed: shared renderer lifecycle support and React/Shadow DOM bridge.
+3. Completed: shared renderer lifecycle support and unified React core mount.
 4. Pending: browser automation and live Stripe sandbox lifecycle validation.
 5. Pending: legal completion, production configuration, and deployment.
 

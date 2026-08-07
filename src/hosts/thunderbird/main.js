@@ -6,9 +6,14 @@ import { createCalendarProvider, registerProviderFactory, setCalendarProvider } 
 import { createWebExtensionStorageAdapter, setStorageAdapter } from "../../core/storage-port.js";
 import { ThunderbirdCalendarProvider } from "./thunderbird-calendar-provider.js";
 
-export function start() {
+export function start(root = document, mount = null) {
     setStorageAdapter(createWebExtensionStorageAdapter());
     registerProviderFactory("thunderbird", () => new ThunderbirdCalendarProvider());
     setCalendarProvider(createCalendarProvider("thunderbird"));
-    initApp({ uiModules: [] }).catch((err) => console.error("[main] init failed", err));
+    const config = { uiModules: [] };
+    if (mount) {
+        mount(root, config);
+        return;
+    }
+    initApp(config).catch((err) => console.error("[main] init failed", err));
 }

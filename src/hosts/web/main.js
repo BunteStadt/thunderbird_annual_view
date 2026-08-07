@@ -21,7 +21,7 @@ function isTruthyQueryFlag(value) {
 
 const dummyMode = globalThis.ENABLE_DUMMY_CALENDARS === true || isTruthyQueryFlag(queryParams.get("dummy"));
 
-export function start() {
+export function start(root = document, mount = null) {
     setStorageAdapter(createWebHostStorageAdapter());
     const googleProvider = new GoogleCalendarProvider();
     registerProviderFactory("google", () => googleProvider);
@@ -63,11 +63,16 @@ export function start() {
     ];
 
     const initialYear = parseYearHash(globalThis.location?.hash);
-    initApp({
+    const config = {
         uiModules,
         initialYear: initialYear ?? undefined,
         onYearChange: (year) => updateYearHash(year)
-    }).then((appApi) => {
+    };
+    if (mount) {
+        mount(root, config);
+        return;
+    }
+    initApp(config).then((appApi) => {
         setupDeepLinks(appApi);
     }).catch((err) => console.error("[main] init failed", err));
 }

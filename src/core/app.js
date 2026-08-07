@@ -452,8 +452,8 @@ export async function initApp(config = {}) {
         selectedCalendarIds = config.selectAllCalendars
             ? new Set(availableCalendars.map((calendar) => calendar.id))
             : found
-            ? new Set(availableCalendars.filter((c) => persistedIds.has(c.id)).map((c) => c.id))
-            : new Set(availableCalendars.map((c) => c.id));
+                ? new Set(availableCalendars.filter((c) => persistedIds.has(c.id)).map((c) => c.id))
+                : new Set(availableCalendars.map((c) => c.id));
         calendarAllDayModes = modes;
         calendarMinDurationHours = hours;
 

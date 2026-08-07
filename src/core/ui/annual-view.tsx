@@ -29,7 +29,7 @@ export function AnnualView({ config = {} }: { config?: AnnualViewConfig }) {
     useEffect(() => {
         const root = rootRef.current;
         if (!root) return;
-        const themeRoot = root.querySelector<HTMLElement>(".av-app");
+        const themeRoot = root.ownerDocument?.documentElement ?? document.documentElement;
         if (!themeRoot) return;
         let disposed = false;
         let api: { destroy?: () => void } | null = null;

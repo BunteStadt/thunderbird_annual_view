@@ -1,7 +1,8 @@
+@import "./design-tokens.css";
 @import "tailwindcss";
 
 .annual-view-document,
-.annual-view-document > #root {
+.annual-view-document>#root {
   height: 100%;
   margin: 0;
 }
@@ -14,71 +15,38 @@ body.annual-view-document {
 
 .av-app {
   color-scheme: light;
-  --bg: #ffffff;
-  --panel: #ffffff;
-  --panel-strong: #eef3ff;
-  --header-bg: linear-gradient(145deg, #f3f6ff, #e6edff);
-  --sidebar-bg: #f9fbff;
-  --grid-line: rgba(12, 39, 82, 0.14);
-  --text: #0f1d35;
-  --muted: #7b8697;
-  --accent: #0a84ff;
-  --accent-strong: #075ecb;
-  --chip-bg: #ffffff;
-  --chip-hover: rgba(10, 132, 255, 0.08);
-  --chip-selected: rgba(10, 132, 255, 0.16);
-  --weekday-bg: #ffffff;
-  --weekday-text: #4b5563;
-  --weekend-bg: #f1f3fa;
-  --weekend-text: #0f1d35;
-  --disabled-day-bg: #dde3f0;
-  --month-col: #ffffff;
-  --shadow: 0 18px 36px rgba(12, 39, 82, 0.16);
-  --event-bg1: rgba(10, 132, 255, 0.16);
-  --event-bg2: rgba(10, 132, 255, 0.32);
-  --event-border: rgba(10, 132, 255, 0.5);
-  --event-text: #000000;
-  --btn-surface: #e1e1e4;
-  --btn-hover: #f4f4f5;
-  --input-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  --input-shadow-compact: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  --event-shadow: 0 8px 16px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.theme-dark {
-  color-scheme: dark;
-  --bg: #18181b;
-  --panel: #18181b;
-  --panel-strong: #18181b;
-  --header-bg: #18181b;
-  --sidebar-bg: #3f3f46;
-  --grid-line: rgba(255, 255, 255, 0.08);
-  --text: #f4f4f5;
-  --muted: #97a3b7;
-  --accent: #64a9ff;
-  --chip-bg: #1e2738;
-  --chip-hover: rgba(255, 255, 255, 0.08);
-  --chip-selected: rgba(255, 255, 255, 0.16);
-  --weekday-bg: #1b1c20;
-  --weekday-text: #ffffff;
-  --weekend-bg: #262834;
-  --weekend-text: #f4f4f5;
-  --disabled-day-bg: #111216;
-  --disabled-day-text: #8b93a5;
-  --month-col: #3f3f46;
-  --shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
-  --event-bg1: rgba(100, 169, 255, 0.28);
-  --event-bg2: rgba(58, 119, 255, 0.38);
-  --event-border: rgba(100, 169, 255, 0.6);
-  --event-text: #f7fbff;
-  --btn-surface: #3a3a3d;
-  --btn-hover: #444447;
-  --btn-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 18px rgba(0, 0, 0, 0.45);
-  --btn-shadow-compact: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 16px rgba(0, 0, 0, 0.4);
-  --btn-active-shadow: 0 5px 9px rgba(255, 255, 255, 0.1);
-  --input-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  --input-shadow-compact: inset 0 1px 0 rgba(255, 255, 255, 0.16);
-  --event-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --bg: var(--av-bg);
+  --panel: var(--av-panel);
+  --panel-strong: var(--av-panel-strong);
+  --header-bg: var(--av-header-bg);
+  --sidebar-bg: var(--av-sidebar-bg);
+  --grid-line: var(--av-grid-line);
+  --text: var(--av-text);
+  --muted: var(--av-muted);
+  --accent: var(--av-accent);
+  --accent-strong: var(--av-accent-strong);
+  --chip-bg: var(--av-panel);
+  --chip-hover: var(--av-chip-hover);
+  --chip-selected: var(--av-chip-selected);
+  --weekday-bg: var(--av-weekday-bg);
+  --weekday-text: var(--av-weekday-text);
+  --weekend-bg: var(--av-weekend-bg);
+  --weekend-text: var(--av-weekend-text);
+  --disabled-day-bg: var(--av-disabled-day-bg);
+  --month-col: var(--av-month-col);
+  --shadow: var(--av-shadow);
+  --event-bg1: var(--av-event-bg1);
+  --event-bg2: var(--av-event-bg2);
+  --event-border: var(--av-event-border);
+  --event-text: var(--av-event-text);
+  --btn-surface: var(--av-btn-surface);
+  --btn-hover: var(--av-btn-hover);
+  --input-shadow: var(--av-input-shadow);
+  --input-shadow-compact: var(--av-input-shadow-compact);
+  --event-shadow: var(--av-event-shadow);
+  --btn-shadow: var(--av-btn-shadow);
+  --btn-shadow-compact: var(--av-btn-shadow-compact);
+  --btn-active-shadow: var(--av-btn-active-shadow);
 }
 
 * {
@@ -92,7 +60,7 @@ body.annual-view-document {
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--av-font);
   display: flex;
   flex-direction: column;
   padding-bottom: 12px;
@@ -113,7 +81,7 @@ body.annual-view-document {
 }
 
 .av-root,
-.av-root > .av-app {
+.av-root>.av-app {
   width: 100%;
   height: 100%;
   min-height: 0;

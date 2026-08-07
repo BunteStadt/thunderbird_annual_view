@@ -1,18 +1,19 @@
 @import "tailwindcss";
+@import "../../../core/ui/design-tokens.css";
 
 @theme {
-    --font-sans: "Manrope Variable", sans-serif;
-    --font-display: "Newsreader Variable", serif;
-    --color-ink: #17201c;
-    --color-paper: #f4f3ee;
-    --color-signal: #e5532d;
-    --color-moss: #24594b;
+    --font-sans: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --font-display: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --color-ink: #0f1d35;
+    --color-paper: #ffffff;
+    --color-signal: #0a84ff;
+    --color-moss: #075ecb;
 }
 
 :root {
-    font-family: "Manrope Variable", sans-serif;
-    color: #17201c;
-    background: #f4f3ee;
+    font-family: var(--av-font);
+    color: var(--av-text);
+    background: var(--av-bg);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
 }
@@ -28,7 +29,7 @@ html {
 body {
     margin: 0;
     min-width: 320px;
-    background: #f4f3ee;
+    background: var(--av-bg);
 }
 
 button,
@@ -42,7 +43,7 @@ button {
 
 button:focus-visible,
 a:focus-visible {
-    outline: 3px solid #e5532d;
+    outline: 3px solid #0a84ff;
     outline-offset: 3px;
 }
 
@@ -539,10 +540,10 @@ a:focus-visible {
     height: calc(100vh - 72px);
     min-height: 0;
     overflow: hidden;
-    background: #18181b;
+    background: #ffffff;
 }
 
-.year-view-page > .av-root {
+.year-view-page>.av-root {
     width: 100%;
     height: 100%;
     min-height: 0;
@@ -939,4 +940,161 @@ a:focus-visible {
         animation-iteration-count: 1 !important;
         transition-duration: .01ms !important;
     }
+}
+
+.site-header,
+.trust-band {
+    border-color: var(--av-grid-line);
+    background: var(--av-panel-strong);
+}
+
+.brand,
+.nav-links>button,
+.text-link,
+.footer-grid a {
+    color: var(--av-text);
+}
+
+.eyebrow,
+.kicker,
+.back-link,
+.trust-list svg,
+.account-section>svg,
+.status-page>svg {
+    color: var(--av-accent-strong);
+}
+
+.hero-lead,
+.page-intro>p:last-child,
+.account-section p,
+.account-section small,
+.included p,
+.legal-intro,
+.legal-page section p,
+.trust-list,
+.steps p {
+    color: var(--av-weekday-text);
+}
+
+.brand-mark,
+.pricing-band,
+.price-summary,
+.auth-icon {
+    background: var(--av-accent-strong);
+}
+
+.brand-mark {
+    border-radius: 10px;
+}
+
+.icon-button,
+.button-quiet,
+.auth-panel,
+.account-grid,
+.product-preview {
+    border-color: var(--av-grid-line);
+}
+
+.icon-button,
+.button-quiet {
+    background: var(--av-panel);
+}
+
+.button {
+    border-radius: 10px;
+    transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.button-primary {
+    background: var(--av-accent);
+}
+
+.button-primary:hover {
+    background: var(--av-accent-strong);
+}
+
+.button-inverse {
+    color: var(--av-text);
+    background: var(--av-panel);
+}
+
+.hero h1,
+.page-intro h1,
+.auth-panel h1,
+.legal-page h1,
+.section-heading h2,
+.pricing-band h2,
+.account-page>h1,
+.account-section h2,
+.price-summary strong,
+.included h2,
+.status-page h1,
+.legal-page h2,
+.price strong,
+.steps li>span {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero h1,
+.page-intro h1,
+.auth-panel h1,
+.legal-page h1,
+.account-page>h1 {
+    font-weight: 700;
+    line-height: 0.95;
+}
+
+.preview-wrap::before {
+    border-color: var(--av-grid-line);
+}
+
+.product-preview {
+    background: var(--av-panel);
+    box-shadow: var(--av-shadow);
+}
+
+.preview-toolbar,
+.preview-month,
+.steps,
+.steps li,
+.account-section,
+.legal-page section {
+    border-color: var(--av-grid-line);
+}
+
+.event-0 {
+    background: var(--av-accent);
+}
+
+.event-1 {
+    background: var(--av-accent-strong);
+}
+
+.event-2 {
+    background: #6f8fb8;
+}
+
+.event-3 {
+    background: #4b78a8;
+}
+
+.steps li>span,
+.included li svg {
+    color: var(--av-accent);
+}
+
+.pricing-band .kicker {
+    color: #b9d7ff;
+}
+
+.pricing-band {
+    color: #ffffff;
+}
+
+.site-footer {
+    background: var(--av-text);
+}
+
+.year-view-page {
+    background: var(--av-bg);
 }

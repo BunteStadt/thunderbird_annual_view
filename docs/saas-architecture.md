@@ -141,6 +141,17 @@ Before accepting real payments:
 
 No additional product features are required for the defined first release.
 
+### Potential future improvements
+
+- Replace repeated year-range event fetches with Google Calendar incremental
+   synchronization using a per-calendar `syncToken`. Store the synchronized
+   events and tokens in browser-local storage such as IndexedDB, handle expired
+   tokens with a full resync, and apply the annual year filter locally.
+- Load and render calendars independently so the annual view can display the
+   first available results while larger calendars continue loading in the
+   background. This would reduce the perceived delay for users with many
+   calendars or recurring events.
+
 ## 2. Chosen stack
 
 | Concern | Choice |

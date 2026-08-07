@@ -7,6 +7,7 @@ const repositoryRoot = import.meta.dirname;
 
 export default defineConfig({
     root: resolve(repositoryRoot, "src/hosts/saas"),
+    envDir: repositoryRoot,
     base: "/",
     publicDir: false,
     plugins: [react(), tailwindcss()],

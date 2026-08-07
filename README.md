@@ -106,6 +106,9 @@ The view mode can be changed directly in the annual view header: select between 
 
 ## Development
 
+For the step-by-step Supabase, Google OAuth, Stripe, and Cloudflare SaaS setup,
+see [docs/saas-setup.md](docs/saas-setup.md).
+
 Use a separate Thunderbird profile.
 
 Use `just tb` or:

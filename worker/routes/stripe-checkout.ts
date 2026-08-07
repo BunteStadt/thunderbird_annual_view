@@ -42,6 +42,7 @@ export async function stripeCheckout(request: Request, env: Env): Promise<Respon
         client_reference_id: auth.user.id,
         line_items: [{ price: env.STRIPE_PRICE_ID, quantity: 1 }],
         automatic_tax: { enabled: true },
+        customer_update: { address: "auto" },
         subscription_data: {
             metadata: { supabase_user_id: auth.user.id }
         },

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { ArrowLeft, CircleUserRound } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { YearView } from "../../../core/ui/annual-view";
+import { YearView as CoreYearView } from "../../../core/ui/annual-view";
 import { EmptyCalendarProvider, registerProviderFactory, setCalendarProvider } from "../../../core/providers/calendar-service.js";
 import { setStorageAdapter } from "../../../core/storage-port.js";
 import { createWebHostStorageAdapter } from "../../web/web-storage-adapter.js";
@@ -68,7 +68,7 @@ export function YearView({ session, navigate, demo = false }: { session?: Sessio
 
     return (
         <main className={`year-view-page${demo ? "" : " app-page"}`}>
-            {ready && <YearView config={{
+            {ready && <CoreYearView config={{
                 icsCalendars: demo ? demoCalendars : undefined,
                 icsReadOnly: demo,
                 selectAllCalendars: demo,

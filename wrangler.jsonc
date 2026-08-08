@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "annual-view-saas",
+  "name": "yearview",
   "main": "./worker/index.ts",
   "compatibility_date": "2026-08-06",
   "compatibility_flags": ["nodejs_compat"],

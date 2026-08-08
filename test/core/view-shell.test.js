@@ -6,6 +6,9 @@ const path = require('node:path');
 const repoRoot = path.resolve(__dirname, '..', '..');
 const shellSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'annual-view.tsx'), 'utf8');
 const appSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'app.js'), 'utf8');
+const storageSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'storage.js'), 'utf8');
+const onboardingSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'onboarding-tour.js'), 'utf8');
+const icsSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ics-calendar-integration.js'), 'utf8');
 
 // The view shell in core is the single source of truth for the app markup.
 // These guards make it impossible for app.js, the host bootstraps, or the
@@ -41,6 +44,21 @@ test('view shell contains every data-ui-slot the host bootstraps mount into', ()
             `view shell is missing data-ui-slot="${slot}"`
         );
     }
+});
+
+test('view shell exposes the core onboarding targets and expanded options by default', () => {
+    assert.match(shellSource, /data-tour="calendar-list"/);
+    assert.match(shellSource, /data-tour="global-all-day"/);
+    assert.match(shellSource, /data-tour="global-duration"/);
+    assert.match(shellSource, /data-tour="display-options"/);
+    assert.match(shellSource, /data-tour="view-mode"/);
+    assert.match(icsSource, /uploadButton\.dataset\.tour = "upload-ics"/);
+    assert.match(storageSource, /export async function loadPanelState[\s\S]*return true;/);
+    assert.match(appSource, /onboarding-tour/);
+    assert.match(onboardingSource, /global-all-day/);
+    assert.match(onboardingSource, /specific-all-day/);
+    assert.match(onboardingSource, /specific-duration/);
+    assert.match(onboardingSource, /upload-ics/);
 });
 
 test('Vite builds the one core HTML page with a host selected at compile time', () => {

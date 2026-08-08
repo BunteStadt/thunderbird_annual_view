@@ -31,7 +31,7 @@ export function safeReturnPath(value: string | null, fallback = "/app"): string 
     return value;
 }
 
-export async function signInWithGoogle(returnPath: string): Promise<void> {
+export async function signInWithGoogle(returnPath: string, prompt = "consent"): Promise<void> {
     const supabase = getSupabaseClient();
     if (!supabase) {
         throw new Error("Supabase is not configured. Add the values from .env.example.");
@@ -46,8 +46,7 @@ export async function signInWithGoogle(returnPath: string): Promise<void> {
             redirectTo: callbackUrl.toString(),
             scopes: "openid email profile https://www.googleapis.com/auth/calendar.readonly",
             queryParams: {
-                access_type: "offline",
-                prompt: "consent"
+                prompt
             }
         }
     });

@@ -111,10 +111,10 @@ domain is known.
 2. Turn on **Test mode**.
 3. Open **Product catalog > Add product**.
 4. Create a product for Annual View.
-6. Add two recurring prices to the product:
+5. Add two recurring prices to the product:
    - Currency: EUR; amount `2.00`; interval: monthly
    - Currency: EUR; amount `12.00`; interval: yearly
-7. Copy both **Price IDs**, which start with `price_`.
+6. Copy both **Price IDs**, which start with `price_`.
 7. Configure the Stripe Billing Portal.
 8. Configure automatic tax for the test account.
 9. Configure cancellation at the end of the paid period.

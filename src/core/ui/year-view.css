@@ -660,6 +660,94 @@ input[type="number"] {
   color: var(--grid-line);
 }
 
+.display-options {
+  display: flex;
+  width: 100%;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.onboarding-tour[hidden] {
+  display: none;
+}
+
+.onboarding-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.onboarding-tour-card {
+  position: fixed;
+  padding: 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0f1d35;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
+  pointer-events: auto;
+}
+
+.onboarding-tour-card::after {
+  content: "";
+  position: absolute;
+  left: 1.5rem;
+  border: 8px solid transparent;
+}
+
+.onboarding-tour-card[data-placement="below"]::after {
+  top: -16px;
+  border-bottom-color: var(--accent);
+}
+
+.onboarding-tour-card[data-placement="above"]::after {
+  bottom: -16px;
+  border-top-color: var(--accent);
+}
+
+.onboarding-tour-step {
+  margin: 0 0 0.25rem;
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.onboarding-tour-card h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.onboarding-tour-card > p:not(.onboarding-tour-step) {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.onboarding-tour-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.onboarding-tour-spacer {
+  flex: 1;
+}
+
+.onboarding-tour-next {
+  background: var(--accent);
+  color: var(--panel);
+}
+
+.onboarding-tour-target {
+  position: relative;
+  z-index: 41;
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
 /* Rows stack vertically; each row is its own CSS grid. */
 .calendar-rows {
   display: flex;

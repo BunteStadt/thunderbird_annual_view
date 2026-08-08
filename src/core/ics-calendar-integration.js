@@ -90,6 +90,7 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initial
         uploadButton.dataset.size = "compact";
         uploadButton.type = "button";
         uploadButton.textContent = "Upload ICS";
+        uploadButton.dataset.tour = "upload-ics";
 
         const separator = globalThis.document.createElement("div");
         separator.className = "separator";
@@ -97,6 +98,18 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initial
         const buttonRow = globalThis.document.createElement("div");
         buttonRow.className = "select-buttons";
         buttonRow.appendChild(uploadButton);
+
+        const tourButton = globalThis.document.createElement("button");
+        if (tourButton !== uploadButton) {
+            tourButton.className = "btn";
+            tourButton.dataset.size = "compact";
+            tourButton.type = "button";
+            tourButton.textContent = "Redo tour";
+            tourButton.addEventListener("click", () => {
+                (mount.ownerDocument || globalThis.document)?.dispatchEvent(new CustomEvent("annual-view:restart-tour"));
+            });
+            buttonRow.appendChild(tourButton);
+        }
 
         mount.replaceChildren(separator, fileInput, buttonRow);
     }

@@ -1842,6 +1842,18 @@ a:focus-visible {
     background: var(--av-bg);
 }
 
+.year-view-page.app-page {
+    flex: 1;
+    height: auto;
+}
+
+.app-shell {
+    height: 100vh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .year-view-page>.av-root {
     width: 100%;
     height: 100%;

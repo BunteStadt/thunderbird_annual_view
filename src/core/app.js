@@ -28,6 +28,7 @@ import {
     persistViewMode
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./ui/theme.js";
+import { setupOnboardingTour } from "./ui/onboarding-tour.js";
 
 // Builds a map of slot name -> container element from [data-ui-slot] markers.
 export function resolveUiSlots(rootDocument) {
@@ -680,6 +681,7 @@ export async function initApp(config = {}) {
 
     const uiSlots = resolveUiSlots(root);
     let mountedUiModules = [];
+    let onboardingTour = null;
     const appApi = {
         getCalendarProvider,
         refreshCalendars: refreshCalendarData,
@@ -696,11 +698,13 @@ export async function initApp(config = {}) {
             }
             gridView.destroy?.();
             mountedUiModules.forEach((mounted) => mounted?.destroy?.());
+            onboardingTour?.destroy?.();
         }
     };
     mountedUiModules = mountUiModules(config.uiModules, uiSlots, appApi);
 
     await init();
     mountedUiModules.forEach((mounted) => mounted?.update?.());
+    onboardingTour = setupOnboardingTour({ root });
     return appApi;
 }

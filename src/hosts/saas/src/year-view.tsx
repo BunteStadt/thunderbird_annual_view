@@ -67,7 +67,7 @@ export function YearView({ session, navigate, demo = false }: { session?: Sessio
     }, [session]);
 
     return (
-        <main className="year-view-page">
+        <main className={`year-view-page${demo ? "" : " app-page"}`}>
             {ready && <AnnualView config={{
                 icsCalendars: demo ? demoCalendars : undefined,
                 icsReadOnly: demo,

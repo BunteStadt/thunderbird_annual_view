@@ -145,7 +145,7 @@ export async function loadPanelState() {
     try {
         const stored = await getStorageAdapter().get("calendarPanelExpanded");
         if (stored === undefined) {
-            return false;
+            return true;
         }
         return Boolean(stored);
     } catch (err) {
@@ -159,6 +159,21 @@ export async function persistPanelState(expanded) {
         await getStorageAdapter().set("calendarPanelExpanded", !!expanded);
     } catch (err) {
         console.error("[storage] save panel state failed", err);
+    }
+}
+export async function loadOnboardingCompleted() {
+    try {
+        return Boolean(await getStorageAdapter().get("onboardingTourCompleted"));
+    } catch (err) {
+        console.error("[storage] load onboarding state failed", err);
+        return false;
+    }
+}
+export async function persistOnboardingCompleted(completed) {
+    try {
+        await getStorageAdapter().set("onboardingTourCompleted", !!completed);
+    } catch (err) {
+        console.error("[storage] save onboarding state failed", err);
     }
 }
 

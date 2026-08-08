@@ -62,14 +62,12 @@ behavior in production, the intended product statement is:
 > directly from Google to your browser. Calendar event data is not routed through
 > or stored on the Annual View application server.
 
-This statement applies to the direct-browser calendar flow. It must not be used
-while the SaaS Cloudflare Google Calendar proxy remains active for calendar
-requests.
+This statement applies to the implemented SaaS direct-browser calendar flow.
 
 ## Important boundary
 
-This is a design decision, not yet the implemented SaaS flow. The current SaaS
-implementation routes Google Calendar requests through the Cloudflare Worker for
-entitlement checks. Adopting this design requires changing that transport so the
-browser calls Google directly and the Worker is used only for application
-authentication, subscription checks, and billing-related operations.
+This flow is implemented for SaaS. The paid `/app` route checks the user's
+subscription in Supabase before mounting the calendar application. The browser
+then uses the short-lived Google provider token from the Supabase session for
+direct Google Calendar requests. The Cloudflare Worker handles authentication,
+subscription, and billing operations, but does not proxy Google Calendar data.

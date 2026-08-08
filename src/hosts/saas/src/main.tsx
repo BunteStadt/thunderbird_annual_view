@@ -853,11 +853,14 @@ function App() {
     else if (legalContent[path]) page = <LegalPage path={path} />;
     else page = <NotFound navigate={navigate} />;
 
-    return <>
-        {!(path === "/app" && session) && !isEmbeddedDemo && <SiteHeader navigate={navigate} session={session} />}
+    const isAppRoute = path === "/app";
+    const isAuthenticatedApp = isAppRoute && !!session;
+
+    return <div className={isAuthenticatedApp ? "app-shell" : undefined}>
+        {!isAuthenticatedApp && !isEmbeddedDemo && (!isAppRoute || authReady) && <SiteHeader navigate={navigate} session={session} />}
         {page}
-        {!isEmbeddedDemo && <SiteFooter navigate={navigate} />}
-    </>;
+        {!isEmbeddedDemo && (!isAppRoute || authReady) && <SiteFooter navigate={navigate} />}
+    </div>;
 }
 
 createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);

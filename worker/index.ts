@@ -2,7 +2,6 @@ import { json, errorMessage } from "./shared/http";
 import { stripeCheckout } from "./routes/stripe-checkout";
 import { stripePortal } from "./routes/stripe-portal";
 import { stripeWebhook } from "./routes/stripe-webhook";
-import { googleCalendar } from "./routes/google-calendar";
 
 export default {
     async fetch(request, env): Promise<Response> {
@@ -27,9 +26,6 @@ export default {
             }
             if (url.pathname === "/api/stripe/webhook") {
                 return await stripeWebhook(request, env);
-            }
-            if (url.pathname.startsWith("/api/google/")) {
-                return await googleCalendar(request, env);
             }
             if (url.pathname.startsWith("/api/")) {
                 return json({ error: "Not found" }, { status: 404 });

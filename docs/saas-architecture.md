@@ -30,7 +30,7 @@ As of 2026-08-06, the planned first-release application is implemented locally:
 | Subscription schema and RLS migration | Implemented; must be applied to the target project |
 | Stripe Checkout, Billing Portal, and signed webhook handling | Implemented; requires Stripe configuration |
 | Active-subscription authorization | Implemented; only `active` grants access |
-| Allowlisted Google Calendar Worker proxy | Implemented |
+| Direct browser-to-Google Calendar access with subscription-gated app entry | Implemented |
 | Shared annual view mounted through shared React/TypeScript/Tailwind core | Implemented |
 | Unit, contract, type, build, and Worker bundle checks | Passing |
 | Browser automation and live sandbox lifecycle test | Not yet implemented/run |
@@ -193,16 +193,17 @@ flowchart LR
    Worker -->|service role| DB
    Worker --> Stripe
    Stripe -->|signed webhook| Worker
-   Worker -->|user Google token| Google
+   Browser -->|short-lived Google token| Google
 ```
 
 The browser may contain only the Supabase URL, Supabase publishable key, and
 other intentionally public configuration. Stripe secrets, the webhook secret,
 and the Supabase service-role key exist only as Cloudflare Worker secrets.
 
-The React route guard improves the user experience but is not the security
-boundary. Worker API routes independently verify the Supabase JWT and current
-subscription before allowing a Google Calendar request or billing action.
+The React route guard checks the current subscription before mounting the paid
+calendar application. Worker API routes independently verify the Supabase JWT
+and current subscription for billing actions. Google Calendar requests go
+directly from the browser to Google after the token is issued.
 
 Static JavaScript delivered by Cloudflare can always be downloaded. The paywall
 therefore protects useful account data and the calendar API, not the existence
@@ -225,7 +226,6 @@ worker/
    index.ts
    shared/
    routes/
-      google-calendar.ts
       stripe-checkout.ts
       stripe-portal.ts
       stripe-webhook.ts
@@ -359,32 +359,27 @@ short-lived Billing Portal session, and returns its URL. Stripe Portal handles
 payment methods, invoices, and cancellation at period end. No custom payment
 form or cancellation engine is built locally.
 
-## 9. Protected Google Calendar flow
+## 9. Direct Google Calendar flow
 
 The shared `GoogleCalendarProvider` continues to own year bounds, pagination,
 event normalization, and filtering. A SaaS-specific auth-session adapter
 implements its `authorizedFetch` contract.
 
 1. `GoogleCalendarProvider` asks the adapter for a Google Calendar URL.
-2. The adapter maps it to `GET /api/google/calendar-list` or
-   `GET /api/google/calendars/{calendarId}/events`, sends the Google access token
-   from the Supabase session in a dedicated header, and sends the Supabase
-   bearer token.
-3. The Worker verifies the Supabase user and queries the current subscription
-   row using trusted server credentials.
-4. Inactive users receive `403`. Expired Supabase sessions receive `401`.
-5. The Worker validates the requested Google operation against an allowlist.
-6. The Worker calls Google with the user token and returns the JSON response.
+2. The SaaS adapter sends that URL directly to Google with the short-lived
+   provider token from the Supabase session.
+3. The paid `/app` route checks the current subscription before mounting the
+   calendar application; inactive users are not allowed to start this flow.
+4. Google validates the provider token and returns calendar JSON directly to the
+   browser.
 
-Allowed operations are limited to:
+The provider uses only these Google operations:
 
 - `GET /calendar/v3/users/me/calendarList`
 - `GET /calendar/v3/calendars/{calendarId}/events`
 
-Only the query parameters required by the existing provider are accepted:
+Only the query parameters required by the existing provider are used:
 `singleEvents`, `orderBy`, `timeMin`, `timeMax`, `maxResults`, and `pageToken`.
-The proxy rejects other origins, methods, paths, and redirect responses. It must
-never become an arbitrary authenticated HTTP proxy.
 
 Calendar event payloads are returned to the browser and remain in the existing
 in-memory event store. Preferences and optional ICS files remain local to the
@@ -496,7 +491,7 @@ npx wrangler deploy --dry-run
 1. Completed: architecture, isolated SaaS build, public UI, auth client, and
    subscription migration.
 2. Completed: Worker auth, entitlement, Stripe routes, webhook synchronization,
-   protected Google proxy, and focused tests.
+   direct browser Google Calendar access, and focused tests.
 3. Completed: shared renderer lifecycle support and unified React core mount.
 4. Pending: browser automation and live Stripe sandbox lifecycle validation.
 5. Pending: legal completion, production configuration, and deployment.

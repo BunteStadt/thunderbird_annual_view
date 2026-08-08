@@ -3,22 +3,30 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const source = fs.readFileSync(
-    path.resolve(__dirname, '../../../worker/routes/google-calendar.ts'),
+const providerSource = fs.readFileSync(
+    path.resolve(__dirname, '../../../src/hosts/saas/src/saas-google-provider.ts'),
+    'utf8'
+);
+const authSource = fs.readFileSync(
+    path.resolve(__dirname, '../../../src/hosts/saas/src/auth.ts'),
+    'utf8'
+);
+const workerSource = fs.readFileSync(
+    path.resolve(__dirname, '../../../worker/index.ts'),
     'utf8'
 );
 
-test('Google proxy enforces paid access before reading the provider token', () => {
-    const entitlement = source.indexOf('requireEntitlement(request, env)');
-    const providerToken = source.indexOf('X-Google-Access-Token');
-    assert.ok(entitlement >= 0);
-    assert.ok(providerToken > entitlement);
+test('SaaS sends the short-lived Google token directly to Google Calendar', () => {
+    assert.match(providerSource, /fetch\(googleUrl/);
+    assert.match(providerSource, /Authorization: `Bearer \$\{session\.provider_token\}`/);
+    assert.doesNotMatch(providerSource, /X-Google-Access-Token|\/api\/google/);
 });
 
-test('Google proxy fixes the upstream origin and allowlists operations and parameters', () => {
-    assert.match(source, /const GOOGLE_CALENDAR_API = "https:\/\/www\.googleapis\.com\/calendar\/v3"/);
-    assert.match(source, /url\.pathname === "\/api\/google\/calendar-list"/);
-    assert.match(source, /\/api\\\/google\\\/calendars/);
-    assert.match(source, /EVENT_PARAMETERS\.has\(name\)/);
-    assert.doesNotMatch(source, /new URL\(url\.searchParams\.get/);
+test('OAuth does not request an offline refresh token and Worker has no Google route', () => {
+    assert.doesNotMatch(authSource, /access_type:\s*["']offline["']/);
+    assert.match(authSource, /prompt = "consent"/);
+    assert.match(providerSource, /auth\.getSession\(\)/);
+    assert.match(providerSource, /auth\.refreshSession\(\)/);
+    assert.match(providerSource, /signInWithGoogle\("\/app", "none"\)/);
+    assert.doesNotMatch(workerSource, /google-calendar|\/api\/google/);
 });

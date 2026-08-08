@@ -26,6 +26,7 @@ import privacyContent from "./legal/privacy";
 import termsContent from "./legal/terms";
 import oneWeekScreenshot from "./assets/generated/one-week-rows-light.png";
 import twoWeekScreenshot from "./assets/generated/two-week-rows-light.png";
+import annualViewIcon from "../../../../assets/icons/annual_view_inverted.svg";
 import "./styles.css";
 
 type Navigate = (path: string) => void;
@@ -110,8 +111,9 @@ function ModeCard({
     );
 }
 
-function SiteHeader({ navigate, session }: { navigate: Navigate; session: Session | null }) {
+function SiteHeader({ navigate, path, session }: { navigate: Navigate; path: string; session: Session | null }) {
     const [open, setOpen] = useState(false);
+    const isDemoPage = path === "/demo";
     const closeAndNavigate = (path: string) => {
         setOpen(false);
         navigate(path);
@@ -121,7 +123,7 @@ function SiteHeader({ navigate, session }: { navigate: Navigate; session: Sessio
         <header className="site-header">
             <nav className="page-width nav-shell" aria-label="Primary navigation">
                 <Link to="/" navigate={navigate} className="brand" aria-label="Annual View home">
-                    <span className="brand-mark"><CalendarDays aria-hidden="true" /></span>
+                    <span className="brand-mark"><img src={annualViewIcon} alt="" /></span>
                     <span>Annual View</span>
                 </Link>
                 <button
@@ -134,12 +136,20 @@ function SiteHeader({ navigate, session }: { navigate: Navigate; session: Sessio
                     {open ? <X /> : <Menu />}
                 </button>
                 <div className={`nav-links ${open ? "is-open" : ""}`}>
+                    <a
+                        className="button button-quiet nav-addon-link"
+                        href="https://services.addons.thunderbird.net/De/thunderbird/addon/calendar-annual-view/"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <SiThunderbird aria-hidden="true" /> Thunderbird add-on
+                    </a>
                     <button type="button" onClick={() => closeAndNavigate("/pricing")}>Pricing</button>
                     <button type="button" className="button button-quiet" onClick={() => closeAndNavigate(session ? "/account" : "/login")}>
                         {session ? <CircleUserRound aria-hidden="true" /> : <LogIn aria-hidden="true" />} {session ? "Account" : "Sign in"}
                     </button>
-                    <button type="button" className="button button-primary nav-demo-link" onClick={() => closeAndNavigate(session ? "/app" : "/demo")}>
-                        <Eye aria-hidden="true" /> {session ? "Open YearView" : "Open demo"}
+                    <button type="button" className="button button-primary nav-demo-link" onClick={() => closeAndNavigate(session ? "/app" : isDemoPage ? "/login?next=/account" : "/demo")}>
+                        {session ? "Open YearView" : isDemoPage ? "Sign up" : "Open demo"}
                     </button>
                 </div>
             </nav>
@@ -857,7 +867,7 @@ function App() {
     const isAuthenticatedApp = isAppRoute && !!session;
 
     return <div className={isAuthenticatedApp ? "app-shell" : undefined}>
-        {!isAuthenticatedApp && !isEmbeddedDemo && (!isAppRoute || authReady) && <SiteHeader navigate={navigate} session={session} />}
+        {!isAuthenticatedApp && !isEmbeddedDemo && (!isAppRoute || authReady) && <SiteHeader navigate={navigate} path={path} session={session} />}
         {page}
         {!isEmbeddedDemo && (!isAppRoute || authReady) && <SiteFooter navigate={navigate} />}
     </div>;

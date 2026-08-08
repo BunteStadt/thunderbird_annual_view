@@ -104,6 +104,12 @@ a:focus-visible {
     width: 19px;
 }
 
+.brand-mark img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
 .nav-links {
     display: flex;
     align-items: center;
@@ -170,6 +176,17 @@ a:focus-visible {
 
 .button-quiet {
     border-color: var(--av-grid-line) !important;
+}
+
+.nav-addon-link {
+    color: var(--av-accent-strong);
+    border-color: color-mix(in srgb, var(--av-accent) 55%, var(--av-grid-line)) !important;
+    text-decoration: none;
+}
+
+.nav-addon-link:hover {
+    color: #fff;
+    background: var(--av-accent) !important;
 }
 
 .button-inverse {
@@ -2306,6 +2323,10 @@ a:focus-visible {
     .nav-links>button {
         min-height: 44px;
         text-align: left;
+    }
+
+    .nav-addon-link {
+        justify-content: flex-start;
     }
 
     .hero {

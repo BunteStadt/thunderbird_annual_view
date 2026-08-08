@@ -24,12 +24,13 @@ import { YearView } from "./year-view";
 import imprintContent from "./legal/imprint";
 import privacyContent from "./legal/privacy";
 import termsContent from "./legal/terms";
-import oneWeekScreenshot from "./assets/generated/one-week-rows-light.png";
-import twoWeekScreenshot from "./assets/generated/two-week-rows-light.png";
 import yearViewIcon from "../../../../assets/icons/annual_view_inverted.svg";
 import "./styles.css";
 
 type Navigate = (path: string) => void;
+
+const oneWeekScreenshot = "https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/one-week-rows-light.png";
+const twoWeekScreenshot = "https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/two-week-rows-light.png";
 
 function usePathname(): [string, Navigate] {
     const [pathname, setPathname] = useState(globalThis.location.pathname);

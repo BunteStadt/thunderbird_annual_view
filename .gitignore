@@ -23,3 +23,5 @@ Thumbs.db
 
 # E2E test output (screenshots, logs, results)
 test-results/
+src/hosts/saas/src/assets/generated/one-week-rows-light.png
+src/hosts/saas/src/assets/generated/two-week-rows-light.png

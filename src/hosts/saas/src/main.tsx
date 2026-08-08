@@ -1,6 +1,6 @@
 import "@fontsource-variable/manrope";
 import "@fontsource-variable/newsreader";
-import { StrictMode, useCallback, useEffect, useState, type ReactNode } from "react";
+import { StrictMode, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import type { Session } from "@supabase/supabase-js";
 import {
@@ -21,6 +21,8 @@ import {
 import { getSupabaseClient, safeReturnPath, signInWithGoogle } from "./auth";
 import { redirectFromApi, type Subscription } from "./api";
 import { YearView } from "./year-view";
+import oneWeekScreenshot from "./assets/generated/one-week-rows-light.png";
+import twoWeekScreenshot from "./assets/generated/two-week-rows-light.png";
 import "./styles.css";
 
 type Navigate = (path: string) => void;
@@ -65,6 +67,46 @@ function Link({ to, navigate, children, className = "" }: {
     );
 }
 
+function ModeCard({
+    alt,
+    children,
+    className,
+    image
+}: {
+    alt: string;
+    children: ReactNode;
+    className: string;
+    image: string;
+}) {
+    const cardRef = useRef<HTMLElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        const card = cardRef.current;
+        if (!card || !("IntersectionObserver" in globalThis)) {
+            setIsVisible(true);
+            return;
+        }
+
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                setIsVisible(true);
+                observer.disconnect();
+            }
+        }, { threshold: 0.18 });
+
+        observer.observe(card);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <figure ref={cardRef} className={`mode-card ${className}${isVisible ? " is-visible" : ""}`}>
+            <img src={image} alt={alt} loading="lazy" />
+            {children}
+        </figure>
+    );
+}
+
 function SiteHeader({ navigate, session }: { navigate: Navigate; session: Session | null }) {
     const [open, setOpen] = useState(false);
     const closeAndNavigate = (path: string) => {
@@ -89,7 +131,7 @@ function SiteHeader({ navigate, session }: { navigate: Navigate; session: Sessio
                     {open ? <X /> : <Menu />}
                 </button>
                 <div className={`nav-links ${open ? "is-open" : ""}`}>
-                    <button type="button" onClick={() => closeAndNavigate("/pricing")}>Pricing</button>
+                    <button type="button" onClick={() => closeAndNavigate("/pricing")}>Membership</button>
                     <button type="button" onClick={() => closeAndNavigate("/privacy")}>Privacy</button>
                     <button type="button" className="button button-quiet" onClick={() => closeAndNavigate(session ? "/account" : "/login")}>
                         {session ? <CircleUserRound aria-hidden="true" /> : <LogIn aria-hidden="true" />} {session ? "Account" : "Sign in"}
@@ -123,23 +165,9 @@ function SiteFooter({ navigate }: { navigate: Navigate }) {
 }
 
 function ProductPreview() {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return (
         <figure className="product-preview" aria-label="Preview of the annual calendar interface">
-            <div className="preview-toolbar">
-                <span>2026</span>
-                <div><i /><i /><i /></div>
-            </div>
-            <div className="preview-grid">
-                {months.map((month, index) => (
-                    <div className="preview-month" key={month}>
-                        <strong>{month}</strong>
-                        <span className={`event-line event-${index % 4}`} />
-                        <span className={`event-line event-${(index + 2) % 4}`} />
-                        <span className="day-dots" />
-                    </div>
-                ))}
-            </div>
+            <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Annual calendar with color-coded events and calendar filters" />
             <figcaption>Preview of the Annual View calendar interface.</figcaption>
         </figure>
     );
@@ -155,12 +183,12 @@ function LandingPage({ navigate }: { navigate: Navigate }) {
                         <h1>Annual View</h1>
                         <p className="hero-lead">See the shape of your Google Calendar year before the busy weeks arrive.</p>
                         <div className="hero-actions">
-                            <button className="button button-primary" type="button" onClick={() => navigate("/pricing")}>
-                                Start for €1/month <ArrowRight aria-hidden="true" />
+                            <button className="button button-primary" type="button" onClick={() => navigate("/login?next=/account")}>
+                                Get started <ArrowRight aria-hidden="true" />
                             </button>
                             <a className="text-link" href="#how-it-works">How it works <ChevronRight aria-hidden="true" /></a>
                         </div>
-                        <p className="fine-print">VAT included. Cancel anytime. Read-only Google Calendar access.</p>
+                        <p className="fine-print">Read-only Google Calendar access. Your schedule stays yours.</p>
                     </div>
                     <div className="preview-wrap reveal reveal-late">
                         <ProductPreview />
@@ -187,12 +215,77 @@ function LandingPage({ navigate }: { navigate: Navigate }) {
                     </ol>
                 </section>
 
+                <section className="view-showcase page-width" aria-labelledby="view-showcase-title">
+                    <div className="section-heading">
+                        <p className="kicker">Five ways to see the year</p>
+                        <h2 id="view-showcase-title">Choose the view that matches the work.</h2>
+                    </div>
+                    <div className="mode-showcase">
+                        <ModeCard className="mode-card-left" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Compact annual calendar view">
+                            <figcaption><strong>Compact</strong><span>Scan the whole year for patterns, gaps, and recurring events.</span></figcaption>
+                        </ModeCard>
+                        <ModeCard className="mode-card-right" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png" alt="Aligned annual calendar view">
+                            <figcaption><strong>Aligned</strong><span>Keep weekdays lined up when weekly rhythm matters.</span></figcaption>
+                        </ModeCard>
+                        <ModeCard className="mode-card-left" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png" alt="Four-week annual calendar view">
+                            <figcaption><strong>4-week</strong><span>Read each month as full weeks for projects and vacations.</span></figcaption>
+                        </ModeCard>
+                        <ModeCard className="mode-card-right" image={twoWeekScreenshot} alt="Two-week annual calendar view">
+                            <figcaption><strong>2-week</strong><span>Give each fortnight more room without losing the year.</span></figcaption>
+                        </ModeCard>
+                        <ModeCard className="mode-card-left" image={oneWeekScreenshot} alt="One-week annual calendar view">
+                            <figcaption><strong>1-week</strong><span>Use the most detail for busy periods and date-by-date planning.</span></figcaption>
+                        </ModeCard>
+                    </div>
+                </section>
+
+                <section className="planning-tools page-width" aria-labelledby="planning-tools-title">
+                    <div className="section-heading">
+                        <p className="kicker">Make the view fit the question</p>
+                        <h2 id="planning-tools-title">A mode for the moment. A filter for the noise.</h2>
+                    </div>
+                    <div className="tool-guides">
+                        <article className="tool-guide">
+                            <span className="tool-guide-label">View modes</span>
+                            <p className="tool-guide-intro">Start wide, then add detail only when you need it.</p>
+                            <dl>
+                                <div><dt>Compact</dt><dd>Scan the entire year quickly. Best for spotting seasons, gaps, and recurring patterns.</dd></div>
+                                <div><dt>Aligned</dt><dd>Keep weekdays lined up across months. Useful when dates and weekly rhythm matter.</dd></div>
+                                <div><dt>4-week</dt><dd>See each month as a sequence of full weeks. A strong fit for projects and vacation planning.</dd></div>
+                                <div><dt>2-week</dt><dd>Give each fortnight more room while keeping the year visible in one continuous view.</dd></div>
+                                <div><dt>1-week</dt><dd>Use the most detailed layout for busy periods, handovers, and date-by-date planning.</dd></div>
+                            </dl>
+                        </article>
+                        <article className="tool-guide tool-guide-accent">
+                            <span className="tool-guide-label">Filter options</span>
+                            <p className="tool-guide-intro">Turn a full calendar into the signal you need right now.</p>
+                            <dl>
+                                <div><dt>Calendars</dt><dd>Show only the calendars that matter, such as work, family, travel, or school.</dd></div>
+                                <div><dt>All-day events</dt><dd>Focus on holidays, milestones, and full-day commitments without timed appointments.</dd></div>
+                                <div><dt>Minimum duration</dt><dd>Hide short appointments and surface blocks that shape the day or week.</dd></div>
+                                <div><dt>Display helpers</dt><dd>Toggle week numbers, gray past days, and highlight today for faster orientation.</dd></div>
+                            </dl>
+                        </article>
+                    </div>
+                </section>
+
+                <section className="live-demo page-width" id="live-demo" aria-labelledby="live-demo-title">
+                    <div className="live-demo-copy">
+                        <p className="kicker">Try the real interface</p>
+                        <h2 id="live-demo-title">See how the pieces work together.</h2>
+                        <p>Switch modes, open the options panel, and scroll through a sample year before you connect your own Google Calendar.</p>
+                        <a className="text-link" href="/demo">Open the demo full-screen <ArrowRight aria-hidden="true" /></a>
+                    </div>
+                    <div className="live-demo-frame">
+                        <iframe src="/demo" title="Interactive Annual View demo" loading="lazy" referrerPolicy="no-referrer" />
+                    </div>
+                </section>
+
                 <section className="pricing-band">
-                    <div className="page-width price-callout">
-                        <div><p className="kicker">Simple on purpose</p><h2>Everything in the annual view.</h2></div>
-                        <div className="price"><strong>€1</strong><span>per month<br />VAT included</span></div>
-                        <button className="button button-inverse" type="button" onClick={() => navigate("/pricing")}>
-                            See pricing <ArrowRight aria-hidden="true" />
+                    <div className="page-width access-callout">
+                        <div><p className="kicker">Ready when you are</p><h2>Give your year some room.</h2></div>
+                        <button className="button button-inverse" type="button" onClick={() => navigate("/login?next=/account")}>
+                            Continue with Google <ArrowRight aria-hidden="true" />
                         </button>
                     </div>
                 </section>

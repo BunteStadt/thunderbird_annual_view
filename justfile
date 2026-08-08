@@ -12,3 +12,7 @@ tag:
 # start Thunderbird with addon-test profile
 tb:
 	thunderbird -P addon-test --no-remote
+
+# build and start the SaaS website with Wrangler
+website:
+	npm run dev:saas:full

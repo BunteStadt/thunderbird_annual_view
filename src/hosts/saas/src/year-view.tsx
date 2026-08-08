@@ -72,6 +72,7 @@ export function YearView({ session, navigate, demo = false }: { session?: Sessio
                 icsCalendars: demo ? demoCalendars : undefined,
                 icsReadOnly: demo,
                 selectAllCalendars: demo,
+                embeddedDemo: demo && new URLSearchParams(globalThis.location.search).get("embed") === "1",
                 uiModules: demo ? [] : [
                     createSaasHeaderAction("header-leading", navigate),
                     createSaasHeaderAction("header-actions", navigate)

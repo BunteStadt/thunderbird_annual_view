@@ -253,8 +253,9 @@ Verify the exact marketplace metric before publication. If Thunderbird labels th
 
 Recommended quotes:
 
-- "Great! Very useful!" - Firefox-Benutzer 02fb61, Thunderbird Add-ons
-- "Very nice tool. I really missed an annual view in Thunderbird." - LaughingT, Thunderbird Add-ons
+- "Great! Very useful!" - Firefox-Benutzer 02fb61, Thunderbird Add-ons <https://services.addons.thunderbird.net/De/thunderbird/addon/calendar-annual-view/reviews/1177605/>
+- "Very nice tool. I really missed an annual view in Thunderbird." - LaughingT, Thunderbird Add-ons <https://services.addons.thunderbird.net/De/thunderbird/addon/calendar-annual-view/reviews/1177473/>
+- Thanks for making this! -  NIronwolf am Feb. 13, 2026  <https://services.addons.thunderbird.net/De/thunderbird/addon/calendar-annual-view/reviews/1177523/>
 
 Each quote should link to its permanent review. Do not include feature-request text in the testimonial presentation. Do not imply that the reviewers used Google Calendar or the paid SaaS edition.
 

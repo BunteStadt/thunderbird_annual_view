@@ -5,7 +5,27 @@ import "./year-view.css";
 
 export type AnnualViewConfig = Record<string, unknown>;
 
-function AnnualViewShell() {
+function AnnualViewShell({ embeddedDemo = false }: { embeddedDemo?: boolean }) {
+    const [showScrollHint, setShowScrollHint] = useState(false);
+    const scrollHintTimerRef = useRef<number | null>(null);
+    const gridViewportRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const gridViewport = gridViewportRef.current;
+        if (!embeddedDemo || !gridViewport) return;
+        const onWheel = () => {
+            setShowScrollHint(true);
+            if (scrollHintTimerRef.current !== null) window.clearTimeout(scrollHintTimerRef.current);
+            scrollHintTimerRef.current = window.setTimeout(() => setShowScrollHint(false), 3200);
+        };
+        gridViewport.addEventListener("wheel", onWheel);
+        return () => gridViewport.removeEventListener("wheel", onWheel);
+    }, [embeddedDemo]);
+
+    useEffect(() => () => {
+        if (scrollHintTimerRef.current !== null) window.clearTimeout(scrollHintTimerRef.current);
+    }, []);
+
     return (
         <div className="av-app">
             <header className="av-toolbar"><div className="controls"><div data-ui-slot="header-leading" hidden />
@@ -17,7 +37,7 @@ function AnnualViewShell() {
             <div id="yearLayout" className="year-layout"><aside id="calendarFilters" className="calendar-filters collapsed" aria-label="Calendar filters"><div className="cal-actions">
                 <label htmlFor="showWeekNumbers" className="btn cal-chip-toggle" data-size="compact"><input id="showWeekNumbers" type="checkbox" defaultChecked /><span className="chip-indicator" aria-hidden="true" /><span className="chip-text">Show week numbers</span></label><label htmlFor="grayPastDays" className="btn cal-chip-toggle" data-size="compact"><input id="grayPastDays" type="checkbox" /><span className="chip-indicator" aria-hidden="true" /><span className="chip-text">Gray out past days</span></label><label htmlFor="highlightCurrentDay" className="btn cal-chip-toggle" data-size="compact"><input id="highlightCurrentDay" type="checkbox" /><span className="chip-indicator" aria-hidden="true" /><span className="chip-text">Highlight current day</span></label><div className="separator" /><div id="durationFiltersNotice" className="duration-filters-notice" hidden>Duration filter is off. All-day and duration options below are inactive.</div><label htmlFor="allDayOnly" className="btn cal-chip-toggle" data-size="compact"><input id="allDayOnly" type="checkbox" /><span className="chip-indicator" aria-hidden="true" /><span className="chip-text">Show all-day only</span></label>
                 <label htmlFor="minDurationHours" className="cal-chip" aria-label="Minimum event length in hours"><span>Min event length (h)</span><input id="minDurationHours" className="input" type="number" min="0" step="0.25" defaultValue="25" title="Minimum event length in hours." /><span className="min-duration-controls"><button id="minDurationDown" className="btn" data-size="compact" type="button" aria-label="Decrease minimum length by one hour">-</button><button id="minDurationUp" className="btn" data-size="compact" type="button" aria-label="Increase minimum length by one hour">+</button></span></label><div className="select-buttons"><button id="selectAllCals" className="btn" data-size="compact" type="button">Select all</button><button id="deselectAllCals" className="btn" data-size="compact" type="button">Deselect all</button></div>
-            </div><div className="cal-list-head" aria-hidden="true"><span>Calendar</span><span>All-day</span><span>Min event length</span></div><div className="cal-list" id="calendarList" aria-label="Calendars" /><div data-ui-slot="sidebar-sections" /><div data-ui-slot="sidebar-footer" /></aside><main className="main-panel"><div data-ui-slot="content-empty-state" className="content-empty-state" hidden /><div className="calendar-wrap"><div id="gridViewport" className="grid-viewport" aria-label="Scrollable annual calendar"><div id="gridHeader" className="grid-header hidden" aria-hidden="true" /><section id="gridRows" className="calendar-rows" aria-label="Calendar months" /></div></div></main></div>
+            </div><div className="cal-list-head" aria-hidden="true"><span>Calendar</span><span>All-day</span><span>Min event length</span></div><div className="cal-list" id="calendarList" aria-label="Calendars" /><div data-ui-slot="sidebar-sections" /><div data-ui-slot="sidebar-footer" /></aside><main className="main-panel"><div data-ui-slot="content-empty-state" className="content-empty-state" hidden /><div className="calendar-wrap"><div id="gridViewport" ref={gridViewportRef} className="grid-viewport" aria-label="Scrollable annual calendar"><div id="gridHeader" className="grid-header hidden" aria-hidden="true" /><section id="gridRows" className="calendar-rows" aria-label="Calendar months" /></div>{embeddedDemo && <p className={`scroll-hint${showScrollHint ? " is-visible" : ""}`} role="status">Scrolling is enabled on the full page demo.</p>}</div></main></div>
         </div>
     );
 }
@@ -45,7 +65,7 @@ export function AnnualView({ config = {} }: { config?: AnnualViewConfig }) {
         };
     }, [config]);
 
-    return <div ref={rootRef} className="av-root">{error && <p className="app-error" role="alert">{error}</p>}<AnnualViewShell /></div>;
+    return <div ref={rootRef} className="av-root">{error && <p className="app-error" role="alert">{error}</p>}<AnnualViewShell embeddedDemo={config.embeddedDemo === true} /></div>;
 }
 
 export function mountAnnualView(element: Element, config: AnnualViewConfig = {}) {

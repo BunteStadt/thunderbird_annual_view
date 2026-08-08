@@ -7,7 +7,6 @@ import {
     ArrowRight,
     CalendarDays,
     Check,
-    ChevronRight,
     CircleUserRound,
     CreditCard,
     Clock3,
@@ -18,6 +17,7 @@ import {
     ShieldCheck,
     X
 } from "lucide-react";
+import { SiGithub, SiThunderbird } from "react-icons/si";
 import { getSupabaseClient, safeReturnPath, signInWithGoogle } from "./auth";
 import { redirectFromApi, type Subscription } from "./api";
 import { YearView } from "./year-view";
@@ -149,11 +149,16 @@ function SiteFooter({ navigate }: { navigate: Navigate }) {
     return (
         <footer className="site-footer">
             <div className="page-width footer-grid">
-                <div>
+                <div className="footer-brand">
                     <strong>Annual View</strong>
-                    <p>A calmer way to understand the year ahead.</p>
+                    <span>Made with ❤️ in Germany</span>
                 </div>
-                <nav aria-label="Legal">
+                <nav aria-label="Footer navigation">
+                    <Link to="/pricing" navigate={navigate}>Pricing</Link>
+                    <Link to="/demo" navigate={navigate}>Demo</Link>
+                    <Link to="/login?next=/account" navigate={navigate}>Sign in</Link>
+                    <a href="https://github.com/BunteStadt/thunderbird_annual_view" target="_blank" rel="noreferrer"><SiGithub aria-hidden="true" /> GitHub</a>
+                    <a href="https://services.addons.thunderbird.net/De/thunderbird/addon/calendar-annual-view/" target="_blank" rel="noreferrer"><SiThunderbird aria-hidden="true" /> Thunderbird</a>
                     <Link to="/privacy" navigate={navigate}>Privacy</Link>
                     <Link to="/terms" navigate={navigate}>Terms</Link>
                     <Link to="/cancellation" navigate={navigate}>Cancellation</Link>
@@ -167,123 +172,333 @@ function SiteFooter({ navigate }: { navigate: Navigate }) {
 function ProductPreview() {
     return (
         <figure className="product-preview" aria-label="Preview of the annual calendar interface">
+            <div className="product-preview-bar" aria-hidden="true">
+                <span className="product-preview-name"><CalendarDays /> Annual View</span>
+                <span className="product-preview-status"><i /> Google Calendar connected</span>
+            </div>
             <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Annual calendar with color-coded events and calendar filters" />
             <figcaption>Preview of the Annual View calendar interface.</figcaption>
         </figure>
     );
 }
 
+function LandingCalendarBackdrop() {
+    const year = new Date().getFullYear();
+    const months = Array.from({ length: 192 }, (_, monthOffset) => {
+        const date = new Date(year, monthOffset, 1);
+        const month = date.getMonth();
+        const monthYear = date.getFullYear();
+        const daysInMonth = new Date(monthYear, month + 1, 0).getDate();
+        const firstEventStart = (monthOffset * 5) % Math.max(daysInMonth - 8, 1) + 1;
+        const secondEventStart = (monthOffset * 11 + 7) % Math.max(daysInMonth - 6, 1) + 1;
+        return {
+            name: new Intl.DateTimeFormat(undefined, { month: "short" }).format(date),
+            year: monthYear,
+            events: monthOffset % 2 === 0 ? [
+                { start: firstEventStart, length: 14 + monthOffset % 8, color: monthOffset % 4 },
+                { start: secondEventStart, length: 7 + monthOffset % 10, color: (monthOffset + 1) % 4 }
+            ] : [],
+            days: Array.from({ length: 31 }, (_, day) => {
+                if (day >= daysInMonth) return null;
+                const dayDate = new Date(monthYear, month, day + 1);
+                return {
+                    number: day + 1,
+                    weekend: dayDate.getDay() === 0 || dayDate.getDay() === 6
+                };
+            })
+        };
+    });
+
+    return (
+        <div className="landing-calendar-backdrop" aria-hidden="true">
+            <div className="landing-calendar-grid">
+                {months.map((month) => (
+                    <div className="landing-calendar-row" key={`${month.name}-${month.year}`}>
+                        <div className="landing-calendar-month"><span>{month.name}</span><small>{month.year}</small></div>
+                        {month.days.map((day, index) => (
+                            <div className={`landing-calendar-cell${day?.weekend ? " weekend" : ""}${day ? "" : " is-empty"}`} key={`${month.name}-${month.year}-${index}`}>
+                                {day?.number}
+                            </div>
+                        ))}
+                        <div className="landing-calendar-events">
+                            {month.events.map((event, index) => (
+                                <span
+                                    className={`landing-calendar-event event-${event.color}`}
+                                    key={`${month.name}-${month.year}-event-${index}`}
+                                    style={{ gridColumn: `${event.start + 1} / span ${event.length}`, gridRow: index + 1 }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function LandingPage({ navigate }: { navigate: Navigate }) {
     return (
-        <>
-            <main>
-                <section className="hero page-width">
-                    <div className="hero-copy reveal">
-                        <p className="eyebrow"><Eye aria-hidden="true" /> One year. One clear view.</p>
-                        <h1>Annual View</h1>
-                        <p className="hero-lead">See the shape of your Google Calendar year before the busy weeks arrive.</p>
-                        <div className="hero-actions">
-                            <button className="button button-primary" type="button" onClick={() => navigate("/login?next=/account")}>
-                                Get started <ArrowRight aria-hidden="true" />
-                            </button>
-                            <a className="text-link" href="#how-it-works">How it works <ChevronRight aria-hidden="true" /></a>
+        <div className="landing-page">
+            <LandingCalendarBackdrop />
+            <main className="landing-main">
+                <section className="hero">
+                    <div className="hero-layout page-width">
+                        <div className="hero-copy reveal">
+                            <p className="eyebrow"><CalendarDays aria-hidden="true" /> Your Google Calendar, at year scale</p>
+                            <h1>See your year <span>at a glance.</span></h1>
+                            <p className="hero-lead">See busy periods, open stretches, and important dates across your Google Calendar, without creating another plan to maintain.</p>
+                            <div className="hero-actions">
+                                <button className="button button-primary hero-demo-button" type="button" onClick={() => navigate("/demo")}>
+                                    <Eye aria-hidden="true" /> Try the demo
+                                </button>
+                            </div>
+                            <div className="hero-assurance">
+                                <ShieldCheck aria-hidden="true" />
+                                <p><strong>Read-only by design.</strong> Events are never saved to our database.</p>
+                            </div>
                         </div>
-                        <p className="fine-print">Read-only Google Calendar access. Your schedule stays yours.</p>
-                    </div>
-                    <div className="preview-wrap reveal reveal-late">
-                        <ProductPreview />
-                    </div>
-                </section>
-
-                <section className="trust-band" aria-label="Product assurances">
-                    <div className="page-width trust-list">
-                        <span><ShieldCheck aria-hidden="true" /> Subscription checked securely</span>
-                        <span><Eye aria-hidden="true" /> Calendar stays read-only</span>
-                        <span><Clock3 aria-hidden="true" /> Understand twelve months at once</span>
+                        <div className="preview-wrap reveal reveal-late">
+                            <ProductPreview />
+                        </div>
                     </div>
                 </section>
 
-                <section id="how-it-works" className="page-width section-grid">
-                    <div className="section-heading">
-                        <p className="kicker">Designed for perspective</p>
-                        <h2>Your calendar already has the details. Annual View reveals the pattern.</h2>
-                    </div>
-                    <ol className="steps">
-                        <li><span>01</span><div><strong>Connect Google</strong><p>Use one familiar login and approve read-only Calendar access.</p></div></li>
-                        <li><span>02</span><div><strong>Choose your calendars</strong><p>Filter work, family, travel, and long events without changing Google.</p></div></li>
-                        <li><span>03</span><div><strong>Plan at year scale</strong><p>Move between compact and week-aligned views as your planning changes.</p></div></li>
-                    </ol>
-                </section>
-
-                <section className="view-showcase page-width" aria-labelledby="view-showcase-title">
-                    <div className="section-heading">
-                        <p className="kicker">Five ways to see the year</p>
-                        <h2 id="view-showcase-title">Choose the view that matches the work.</h2>
-                    </div>
-                    <div className="mode-showcase">
-                        <ModeCard className="mode-card-left" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Compact annual calendar view">
-                            <figcaption><strong>Compact</strong><span>Scan the whole year for patterns, gaps, and recurring events.</span></figcaption>
-                        </ModeCard>
-                        <ModeCard className="mode-card-right" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png" alt="Aligned annual calendar view">
-                            <figcaption><strong>Aligned</strong><span>Keep weekdays lined up when weekly rhythm matters.</span></figcaption>
-                        </ModeCard>
-                        <ModeCard className="mode-card-left" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png" alt="Four-week annual calendar view">
-                            <figcaption><strong>4-week</strong><span>Read each month as full weeks for projects and vacations.</span></figcaption>
-                        </ModeCard>
-                        <ModeCard className="mode-card-right" image={twoWeekScreenshot} alt="Two-week annual calendar view">
-                            <figcaption><strong>2-week</strong><span>Give each fortnight more room without losing the year.</span></figcaption>
-                        </ModeCard>
-                        <ModeCard className="mode-card-left" image={oneWeekScreenshot} alt="One-week annual calendar view">
-                            <figcaption><strong>1-week</strong><span>Use the most detail for busy periods and date-by-date planning.</span></figcaption>
-                        </ModeCard>
+                <section className="problem-recognition" aria-labelledby="problem-title">
+                    <div className="page-width problem-layout">
+                        <div className="problem-intro">
+                            <p className="kicker">Planning beyond one month</p>
+                            <h2 id="problem-title">Some decisions need more than a month view.</h2>
+                            <p>Important dates are spread across the year. Clicking forward loses the thread, while copying everything into another planner creates work that quickly goes stale.</p>
+                        </div>
+                        <div className="planning-questions" aria-label="Questions Annual View helps you see in context">
+                            <p>When you are trying to place one more thing, the questions sound familiar:</p>
+                            <ul>
+                                <li>When can the holiday fit between exams and existing events?</li>
+                                <li>Is there room for the new project or event request?</li>
+                                <li>Which upcoming weeks are already crowded?</li>
+                                <li>Where are the quieter stretches?</li>
+                                <li>Which deadlines must not disappear among everyday appointments?</li>
+                            </ul>
+                        </div>
                     </div>
                 </section>
 
-                <section className="planning-tools page-width" aria-labelledby="planning-tools-title">
-                    <div className="section-heading">
-                        <p className="kicker">Make the view fit the question</p>
-                        <h2 id="planning-tools-title">A mode for the moment. A filter for the noise.</h2>
+                <section className="solution-section" aria-labelledby="solution-title">
+                    <div className="page-width solution-layout">
+                        <div className="solution-intro">
+                            <p className="kicker">One source of truth, a better perspective</p>
+                            <h2 id="solution-title">Your calendar already has the details. Annual View reveals the pattern.</h2>
+                            <p>Annual View arranges the events already in Google Calendar for long-range planning. Keep managing events where you always have; open Annual View when you need a wider perspective.</p>
+                        </div>
+                        <div className="solution-benefits">
+                            <article>
+                                <span className="solution-number">01</span>
+                                <h3>Start with what is already there</h3>
+                                <p>Connect Google Calendar and use your existing events immediately. Nothing to copy or recreate.</p>
+                            </article>
+                            <article>
+                                <span className="solution-number">02</span>
+                                <h3>See busy and quiet periods</h3>
+                                <p>Compare weeks and months without repeatedly navigating between separate calendar screens.</p>
+                            </article>
+                            <article>
+                                <span className="solution-number">03</span>
+                                <h3>Bring important dates forward</h3>
+                                <p>Filter calendars, short appointments, and all-day events to reveal the commitments shaping the plan.</p>
+                            </article>
+                        </div>
                     </div>
-                    <div className="tool-guides">
-                        <article className="tool-guide">
-                            <span className="tool-guide-label">View modes</span>
-                            <p className="tool-guide-intro">Start wide, then add detail only when you need it.</p>
-                            <dl>
-                                <div><dt>Compact</dt><dd>Scan the entire year quickly. Best for spotting seasons, gaps, and recurring patterns.</dd></div>
-                                <div><dt>Aligned</dt><dd>Keep weekdays lined up across months. Useful when dates and weekly rhythm matter.</dd></div>
-                                <div><dt>4-week</dt><dd>See each month as a sequence of full weeks. A strong fit for projects and vacation planning.</dd></div>
-                                <div><dt>2-week</dt><dd>Give each fortnight more room while keeping the year visible in one continuous view.</dd></div>
-                                <div><dt>1-week</dt><dd>Use the most detailed layout for busy periods, handovers, and date-by-date planning.</dd></div>
-                            </dl>
+                </section>
+
+                <section className="demo-section" id="demo" aria-labelledby="demo-title">
+                    <div className="page-width">
+                        <div className="demo-heading">
+                            <p className="kicker">Interactive demo</p>
+                            <h2 id="demo-title">Try the real Annual View.</h2>
+                            <p>Explore a sample year, switch layouts, filter calendars, and scroll across year boundaries. No sign-in required.</p>
+                            <a className="button button-primary demo-open-link" href="/demo">
+                                Open demo full-screen <ArrowRight aria-hidden="true" />
+                            </a>
+                        </div>
+                        <div className="demo-stage">
+                            <div className="demo-stage-bar" aria-hidden="true">
+                                <span></span><span></span><span></span>
+                                <small>annualview / sample year</small>
+                            </div>
+                            <div className="demo-frame">
+                                <iframe src="/demo?embed=1" title="Interactive Annual View sample year" loading="lazy" referrerPolicy="no-referrer" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="outcomes-section" aria-labelledby="outcomes-title">
+                    <div className="page-width outcomes-layout">
+                        <div className="outcomes-intro">
+                            <p className="kicker">Outcomes and use cases</p>
+                            <h2 id="outcomes-title">See where the year gets busy, and where plans can breathe.</h2>
+                        </div>
+                        <div className="outcomes-grid">
+                            <article>
+                                <span className="outcome-number">01</span>
+                                <h3>Plan travel with context</h3>
+                                <p>Compare holidays, exams, work commitments, and existing trips before choosing dates.</p>
+                            </article>
+                            <article>
+                                <span className="outcome-number">02</span>
+                                <h3>Place projects and events</h3>
+                                <p>See which periods are already crowded before accepting a request or choosing a start date.</p>
+                            </article>
+                            <article>
+                                <span className="outcome-number">03</span>
+                                <h3>Keep deadlines visible</h3>
+                                <p>Surface milestones and important all-day events without losing them among short appointments.</p>
+                            </article>
+                            <article>
+                                <span className="outcome-number">04</span>
+                                <h3>Understand the rhythm ahead</h3>
+                                <p>Recognize demanding months, recurring patterns, and quieter stretches at a glance.</p>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="features-section" aria-labelledby="features-title">
+                    <div className="page-width">
+                        <div className="features-heading">
+                            <p className="kicker">Features that support the outcome</p>
+                            <h2 id="features-title">Change the view. Filter the noise.</h2>
+                        </div>
+                        <div className="feature-view-gallery">
+                            <ModeCard className="mode-card-left" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Compact annual calendar view showing a full year">
+                                <figcaption><strong>Compact</strong><span>See the broad annual pattern across the whole year at once.</span></figcaption>
+                            </ModeCard>
+                            <ModeCard className="mode-card-right" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/day-aligned-light.png" alt="Day-aligned annual calendar view with weekdays lined up">
+                                <figcaption><strong>Aligned</strong><span>Keep weekdays lined up when weekly rhythm matters.</span></figcaption>
+                            </ModeCard>
+                            <ModeCard className="mode-card-left" image="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/week-rows-light.png" alt="Four-week annual calendar view with full weeks">
+                                <figcaption><strong>4-week</strong><span>Read each month as full weeks for projects and vacations.</span></figcaption>
+                            </ModeCard>
+                            <ModeCard className="mode-card-right" image={twoWeekScreenshot} alt="Two-week annual calendar view with more detail">
+                                <figcaption><strong>2-week</strong><span>Give each fortnight more room while keeping the year in view.</span></figcaption>
+                            </ModeCard>
+                            <ModeCard className="mode-card-left" image={oneWeekScreenshot} alt="One-week annual calendar view for detailed planning">
+                                <figcaption><strong>1-week</strong><span>Use the most detail for busy periods and date-by-date planning.</span></figcaption>
+                            </ModeCard>
+                        </div>
+                        <article className="feature-filter-panel">
+                            <div className="feature-panel-copy">
+                                <span className="feature-label">Focus on what shapes the plan</span>
+                                <h3>Filter the noise without changing your calendar.</h3>
+                                <ul>
+                                    <li>Select the calendars relevant to the current decision</li>
+                                    <li>Show only all-day events for holidays, deadlines, and milestones</li>
+                                    <li>Hide short appointments with duration filters</li>
+                                    <li>Use week numbers, past-day treatment, and today's highlight for orientation</li>
+                                </ul>
+                            </div>
                         </article>
-                        <article className="tool-guide tool-guide-accent">
-                            <span className="tool-guide-label">Filter options</span>
-                            <p className="tool-guide-intro">Turn a full calendar into the signal you need right now.</p>
-                            <dl>
-                                <div><dt>Calendars</dt><dd>Show only the calendars that matter, such as work, family, travel, or school.</dd></div>
-                                <div><dt>All-day events</dt><dd>Focus on holidays, milestones, and full-day commitments without timed appointments.</dd></div>
-                                <div><dt>Minimum duration</dt><dd>Hide short appointments and surface blocks that shape the day or week.</dd></div>
-                                <div><dt>Display helpers</dt><dd>Toggle week numbers, gray past days, and highlight today for faster orientation.</dd></div>
-                            </dl>
-                        </article>
                     </div>
                 </section>
 
-                <section className="live-demo page-width" id="live-demo" aria-labelledby="live-demo-title">
-                    <div className="live-demo-copy">
-                        <p className="kicker">Try the real interface</p>
-                        <h2 id="live-demo-title">See how the pieces work together.</h2>
-                        <p>Switch modes, open the options panel, and scroll through a sample year before you connect your own Google Calendar.</p>
-                        <a className="text-link" href="/demo">Open the demo full-screen <ArrowRight aria-hidden="true" /></a>
+                <section className="social-proof-section" aria-labelledby="social-proof-title">
+                    <div className="page-width social-proof-layout">
+                        <div className="social-proof-intro">
+                            <p className="kicker">Open-source proof</p>
+                            <h2 id="social-proof-title">An annual view people were missing.</h2>
+                            <p>The open-source Thunderbird edition already helps 114 people use an annual calendar view and has received three 5-star ratings.</p>
+                            <a className="text-link" href="https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/" target="_blank" rel="noreferrer">
+                                <SiThunderbird aria-hidden="true" /> See the Thunderbird edition <ArrowRight aria-hidden="true" />
+                            </a>
+                        </div>
+                        <div className="social-proof-quotes">
+                            <blockquote>
+                                <p>“Great! Very useful!”</p>
+                                <cite><span>Firefox-Benutzer 02fb61</span><a href="https://services.addons.thunderbird.net/De/thunderbird/addon/calendar-annual-view/reviews/1177605/" target="_blank" rel="noreferrer"><SiThunderbird aria-hidden="true" /> Thunderbird Add-ons review</a></cite>
+                            </blockquote>
+                            <blockquote>
+                                <p>“Very nice tool. I really missed an annual view in Thunderbird.”</p>
+                                <cite><span>LaughingT</span><a href="https://services.addons.thunderbird.net/De/thunderbird/addon/calendar-annual-view/reviews/1177473/" target="_blank" rel="noreferrer"><SiThunderbird aria-hidden="true" /> Thunderbird Add-ons review</a></cite>
+                            </blockquote>
+                            <blockquote>
+                                <p>“Thanks for making this!”</p>
+                                <cite><span>NIronwolf</span><a href="https://services.addons.thunderbird.net/De/thunderbird/addon/calendar-annual-view/reviews/1177523/" target="_blank" rel="noreferrer"><SiThunderbird aria-hidden="true" /> Thunderbird Add-ons review</a></cite>
+                            </blockquote>
+                        </div>
                     </div>
-                    <div className="live-demo-frame">
-                        <iframe src="/demo" title="Interactive Annual View demo" loading="lazy" referrerPolicy="no-referrer" />
+                </section>
+
+                <section className="privacy-proof-section" aria-labelledby="privacy-proof-title">
+                    <div className="page-width privacy-proof-layout">
+                        <div className="privacy-proof-intro">
+                            <p className="kicker">Privacy and open source</p>
+                            <h2 id="privacy-proof-title">Your calendar stays your calendar.</h2>
+                            <p className="privacy-proof-lead">Annual View is built to look, not touch.</p>
+                            <p>Events are processed only as needed to display them and are not persistently stored by Annual View.</p>
+                            <div className="privacy-proof-actions">
+                                <a className="button button-primary" href="https://github.com/BunteStadt/thunderbird_annual_view" target="_blank" rel="noreferrer">
+                                    <SiGithub aria-hidden="true" /> View source on GitHub <ArrowRight aria-hidden="true" />
+                                </a>
+                                <Link className="text-link" to="/privacy" navigate={navigate}>Read the privacy policy <ArrowRight aria-hidden="true" /></Link>
+                            </div>
+                        </div>
+                        <div className="privacy-boundaries">
+                            <div><ShieldCheck aria-hidden="true" /><span>Google access is read-only. Annual View cannot create, edit, or delete events.</span></div>
+                            <div><ShieldCheck aria-hidden="true" /><span>Calendar requests and responses are encrypted in transit.</span></div>
+                            <div><ShieldCheck aria-hidden="true" /><span>Events are securely requested from Google only when needed and displayed in your browser.</span></div>
+                            <div><ShieldCheck aria-hidden="true" /><span>Google Calendar remains the source of truth. Events are never saved to the Annual View database or server cache.</span></div>
+                            <div><ShieldCheck aria-hidden="true" /><span>Annual View is open source, so its data handling can be inspected, followed, and improved in public.</span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="faq-section" aria-labelledby="faq-title">
+                    <div className="page-width faq-layout">
+                        <div className="faq-intro">
+                            <p className="kicker">Frequently asked questions</p>
+                            <h2 id="faq-title">The useful answers, before you connect.</h2>
+                        </div>
+                        <div className="faq-list">
+                            <details>
+                                <summary>Can Annual View change my Google Calendar?</summary>
+                                <p>No. Access is read-only. Annual View cannot create, edit, or delete events.</p>
+                            </details>
+                            <details>
+                                <summary>Are my calendar events stored by Annual View?</summary>
+                                <p>No. Events are securely requested from Google when needed and displayed in the browser. They are not saved to the Annual View database or server cache.</p>
+                            </details>
+                            <details>
+                                <summary>Do I need to enter my events again?</summary>
+                                <p>No. Annual View uses events already maintained in Google Calendar, so there is no duplicate calendar to keep synchronized.</p>
+                            </details>
+                            <details>
+                                <summary>Does Annual View recommend free dates?</summary>
+                                <p>No. It gives you the long-range context to recognize busy periods and open stretches and make that decision yourself.</p>
+                            </details>
+                            <details>
+                                <summary>Can I choose which events I see?</summary>
+                                <p>Yes. Select calendars and use all-day and duration filters to focus on the events relevant to the current planning decision.</p>
+                            </details>
+                            <details>
+                                <summary>Is there a free trial?</summary>
+                                <p>There is no trial. The interactive demo lets visitors use the real interface with sample data before subscribing. The full service costs EUR 1 per month, VAT included, and can be cancelled anytime.</p>
+                            </details>
+                            <details>
+                                <summary>What happens when I cancel?</summary>
+                                <p>Access continues until the end of the paid period. Billing is managed securely through Stripe.</p>
+                            </details>
+                        </div>
                     </div>
                 </section>
 
                 <section className="pricing-band">
                     <div className="page-width access-callout">
-                        <div><p className="kicker">Ready when you are</p><h2>Give your year some room.</h2></div>
+                        <div className="final-conversion-copy">
+                            <p className="kicker">Your events. A clearer year.</p>
+                            <h2>Ready to see your own year?</h2>
+                            <p>Connect your Google Calendar for EUR 1 per month. Every current view and filter is included. Cancel anytime.</p>
+                            <small>Read-only access. VAT included. Access continues through the paid period after cancellation.</small>
+                        </div>
                         <button className="button button-inverse" type="button" onClick={() => navigate("/login?next=/account")}>
                             Continue with Google <ArrowRight aria-hidden="true" />
                         </button>
@@ -291,7 +506,7 @@ function LandingPage({ navigate }: { navigate: Navigate }) {
                 </section>
             </main>
             <SiteFooter navigate={navigate} />
-        </>
+        </div>
     );
 }
 
@@ -551,6 +766,13 @@ function App() {
     const [path, navigate] = usePathname();
     const [session, setSession] = useState<Session | null>(null);
     const [authReady, setAuthReady] = useState(false);
+    const isEmbeddedDemo = path === "/demo" && new URLSearchParams(globalThis.location.search).get("embed") === "1";
+
+    useEffect(() => {
+        const documentClasses = [document.documentElement, document.body];
+        documentClasses.forEach((element) => element.classList.toggle("embedded-demo-document", isEmbeddedDemo));
+        return () => documentClasses.forEach((element) => element.classList.remove("embedded-demo-document"));
+    }, [isEmbeddedDemo]);
 
     useEffect(() => {
         const supabase = getSupabaseClient();
@@ -581,7 +803,7 @@ function App() {
     else if (legalContent[path]) page = <LegalPage path={path} />;
     else page = <NotFound navigate={navigate} />;
 
-    return <>{!(path === "/app" && session) && <SiteHeader navigate={navigate} session={session} />}{page}</>;
+    return <>{!(path === "/app" && session) && !isEmbeddedDemo && <SiteHeader navigate={navigate} session={session} />}{page}</>;
 }
 
 createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);

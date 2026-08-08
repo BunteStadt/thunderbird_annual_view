@@ -299,6 +299,33 @@ input[type="number"] {
   box-shadow: var(--shadow);
 }
 
+.scroll-hint {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 1rem;
+  max-width: calc(100% - 2rem);
+  margin: 0;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--grid-line);
+  border-radius: 8px;
+  background: var(--panel-strong);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 0.5rem);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.scroll-hint.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 /* Scroll container for the infinite grid */
 .grid-viewport {
   flex: 1;

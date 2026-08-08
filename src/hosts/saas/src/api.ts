@@ -19,8 +19,8 @@ export async function authenticatedFetch(path: string, init: RequestInit = {}): 
     return fetch(path, { ...init, headers });
 }
 
-export async function redirectFromApi(path: string): Promise<void> {
-    const response = await authenticatedFetch(path, { method: "POST" });
+export async function redirectFromApi(path: string, init: RequestInit = {}): Promise<void> {
+    const response = await authenticatedFetch(path, { ...init, method: "POST" });
     const result = await response.json() as { url?: string; error?: string };
     if (!response.ok || !result.url) {
         throw new Error(result.error ?? "The billing request failed.");

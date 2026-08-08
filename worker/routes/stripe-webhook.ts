@@ -52,22 +52,52 @@ async function eventSubscription(event: Stripe.Event, stripe: Stripe): Promise<S
 }
 
 async function syncSubscription(event: Stripe.Event, subscription: Stripe.Subscription, env: Env): Promise<void> {
-    const userId = subscription.metadata.supabase_user_id;
     const item = subscription.items.data[0];
-    if (!userId || !item) {
-        throw new Error("Stripe subscription is missing required ownership or price metadata.");
+    if (!item) {
+        throw new Error("Stripe subscription is missing its price item.");
     }
 
     const supabase = adminClient(env);
+    const customerId = id(subscription.customer);
+    let userId = subscription.metadata.supabase_user_id ?? null;
+    if (!userId) {
+        const ownershipFilters = [`stripe_subscription_id.eq.${subscription.id}`];
+        if (customerId) {
+            ownershipFilters.push(`stripe_customer_id.eq.${customerId}`);
+        }
+        const { data, error } = await supabase
+            .from("subscriptions")
+            .select("user_id")
+            .or(ownershipFilters.join(","))
+            .maybeSingle();
+        if (error) {
+            throw new Error(`Subscription owner lookup failed: ${error.message}`);
+        }
+        userId = data?.user_id ?? null;
+    }
+    if (!userId) {
+        throw new Error("Stripe subscription is missing an existing Supabase ownership mapping.");
+    }
+
     const existing = await getSubscription(supabase, userId);
     const eventCreatedAt = new Date(event.created * 1000);
     if (existing?.stripe_event_created_at && new Date(existing.stripe_event_created_at) > eventCreatedAt) {
+        console.log(JSON.stringify({
+            message: "stripe subscription event ignored as stale",
+            eventId: event.id,
+            eventType: event.type,
+            subscriptionId: subscription.id,
+            status: subscription.status,
+            cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            eventCreatedAt: eventCreatedAt.toISOString(),
+            existingEventCreatedAt: existing.stripe_event_created_at
+        }));
         return;
     }
 
     const { error } = await supabase.from("subscriptions").upsert({
         user_id: userId,
-        stripe_customer_id: id(subscription.customer),
+        stripe_customer_id: customerId,
         stripe_subscription_id: subscription.id,
         stripe_price_id: item.price.id,
         status: subscription.status,
@@ -79,6 +109,15 @@ async function syncSubscription(event: Stripe.Event, subscription: Stripe.Subscr
     if (error) {
         throw new Error(`Subscription synchronization failed: ${error.message}`);
     }
+    console.log(JSON.stringify({
+        message: "stripe subscription synchronized",
+        eventId: event.id,
+        eventType: event.type,
+        subscriptionId: subscription.id,
+        status: subscription.status,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        userId
+    }));
 }
 
 export async function stripeWebhook(request: Request, env: Env): Promise<Response> {
@@ -110,6 +149,16 @@ export async function stripeWebhook(request: Request, env: Env): Promise<Respons
         return json({ received: true });
     }
 
+    const subscriptionObject = event.data.object as Stripe.Subscription | Stripe.Checkout.Session | Stripe.Invoice;
+    console.log(JSON.stringify({
+        message: "stripe webhook received",
+        eventId: event.id,
+        eventType: event.type,
+        subscriptionId: event.type.startsWith("customer.subscription.") ? (subscriptionObject as Stripe.Subscription).id : null,
+        status: event.type.startsWith("customer.subscription.") ? (subscriptionObject as Stripe.Subscription).status : null,
+        cancelAtPeriodEnd: event.type.startsWith("customer.subscription.") ? (subscriptionObject as Stripe.Subscription).cancel_at_period_end : null
+    }));
+
     const supabase = adminClient(env);
     const { error: claimError } = await supabase.from("stripe_webhook_events").insert({
         event_id: event.id,
@@ -130,6 +179,12 @@ export async function stripeWebhook(request: Request, env: Env): Promise<Respons
         }
     } catch (error) {
         await supabase.from("stripe_webhook_events").delete().eq("event_id", event.id);
+        console.error(JSON.stringify({
+            message: "stripe webhook synchronization failed",
+            eventId: event.id,
+            eventType: event.type,
+            error: error instanceof Error ? error.message : String(error)
+        }));
         throw error;
     }
 

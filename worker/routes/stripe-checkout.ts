@@ -12,6 +12,16 @@ export async function stripeCheckout(request: Request, env: Env): Promise<Respon
         return auth;
     }
 
+    let body: { termsAccepted?: unknown } | null = null;
+    try {
+        body = await request.json() as { termsAccepted?: unknown };
+    } catch {
+        return json({ error: "Terms acceptance is required before checkout." }, { status: 400 });
+    }
+    if (body?.termsAccepted !== true) {
+        return json({ error: "Terms acceptance is required before checkout." }, { status: 400 });
+    }
+
     const stripe = createStripe(env);
     const existing = await getSubscription(auth.adminClient, auth.user.id);
     let customerId = existing?.stripe_customer_id ?? null;

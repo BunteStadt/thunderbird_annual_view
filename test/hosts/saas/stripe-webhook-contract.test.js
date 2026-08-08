@@ -31,3 +31,8 @@ test('Stripe webhook handles subscription lifecycle events idempotently', () => 
     assert.match(source, /stripe_event_created_at/);
     assert.match(source, /\.delete\(\)\.eq\("event_id", event\.id\)/);
 });
+
+test('Stripe subscription updates persist cancellation state separately from status', () => {
+    assert.match(source, /status: subscription\.status/);
+    assert.match(source, /cancel_at_period_end: subscription\.cancel_at_period_end/);
+});

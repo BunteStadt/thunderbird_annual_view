@@ -21,6 +21,9 @@ import { SiGithub, SiThunderbird } from "react-icons/si";
 import { getSupabaseClient, safeReturnPath, signInWithGoogle } from "./auth";
 import { redirectFromApi, type Subscription } from "./api";
 import { YearView } from "./year-view";
+import imprintContent from "./legal/imprint";
+import privacyContent from "./legal/privacy";
+import termsContent from "./legal/terms";
 import oneWeekScreenshot from "./assets/generated/one-week-rows-light.png";
 import twoWeekScreenshot from "./assets/generated/two-week-rows-light.png";
 import "./styles.css";
@@ -236,7 +239,7 @@ function LandingCalendarBackdrop() {
     );
 }
 
-function LandingPage({ navigate }: { navigate: Navigate }) {
+function LandingPage({ navigate, session }: { navigate: Navigate; session: Session | null }) {
     return (
         <div className="landing-page">
             <LandingCalendarBackdrop />
@@ -248,8 +251,8 @@ function LandingPage({ navigate }: { navigate: Navigate }) {
                             <h1>See your year <span>at a glance.</span></h1>
                             <p className="hero-lead">See busy periods, open stretches, and important dates across your Google Calendar, without creating another plan to maintain.</p>
                             <div className="hero-actions">
-                                <button className="button button-primary hero-demo-button" type="button" onClick={() => navigate("/demo")}>
-                                    <Eye aria-hidden="true" /> Try the demo
+                                <button className="button button-primary hero-demo-button" type="button" onClick={() => navigate(session ? "/app" : "/demo")}>
+                                    <Eye aria-hidden="true" /> {session ? "Open YearView" : "Try the demo"}
                                 </button>
                             </div>
                             <div className="hero-assurance">
@@ -505,7 +508,6 @@ function LandingPage({ navigate }: { navigate: Navigate }) {
                     </div>
                 </section>
             </main>
-            <SiteFooter navigate={navigate} />
         </div>
     );
 }
@@ -580,12 +582,23 @@ function LoginPage({ navigate }: { navigate: Navigate }) {
 
 function AuthCallback({ navigate }: { navigate: Navigate }) {
     const [message, setMessage] = useState("Completing secure sign-in…");
+    const completed = useRef(false);
 
     useEffect(() => {
+        if (completed.current) {
+            return;
+        }
+        completed.current = true;
+
         const complete = async () => {
             const search = new URLSearchParams(globalThis.location.search);
             const code = search.get("code");
             const supabase = getSupabaseClient();
+            const oauthError = search.get("error_description") ?? search.get("error");
+            if (oauthError) {
+                setMessage(`Sign-in was not completed: ${oauthError}`);
+                return;
+            }
             if (!code || !supabase) {
                 setMessage("The sign-in response is incomplete. Please return to login.");
                 return;
@@ -593,6 +606,11 @@ function AuthCallback({ navigate }: { navigate: Navigate }) {
             const { error } = await supabase.auth.exchangeCodeForSession(code);
             if (error) {
                 setMessage("Sign-in could not be completed. Please try again.");
+                return;
+            }
+            const { data } = await supabase.auth.getSession();
+            if (!data.session) {
+                setMessage("Sign-in completed, but the session was not available yet. Please try again.");
                 return;
             }
             navigate(safeReturnPath(search.get("next")));
@@ -637,13 +655,18 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
     const { subscription, loading } = useSubscription(session);
     const [pending, setPending] = useState<"checkout" | "portal" | "logout" | "">("");
     const [error, setError] = useState("");
+    const [termsAccepted, setTermsAccepted] = useState(false);
     const active = subscription?.status === "active";
+    const cancellationScheduled = active && subscription?.cancel_at_period_end === true;
 
     const run = async (action: "checkout" | "portal", path: string) => {
         setPending(action);
         setError("");
         try {
-            await redirectFromApi(path);
+            await redirectFromApi(path, action === "checkout" ? {
+                body: JSON.stringify({ termsAccepted: true }),
+                headers: { "Content-Type": "application/json" }
+            } : undefined);
         } catch (reason) {
             setError(reason instanceof Error ? reason.message : "The billing request failed.");
             setPending("");
@@ -672,17 +695,23 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
                 <section className="account-section">
                     <CreditCard aria-hidden="true" />
                     <h2>Membership</h2>
-                    <p>{loading ? "Checking subscription…" : active ? "Active · €1 per month" : "No active subscription"}</p>
+                    <p>{loading ? "Checking subscription…" : cancellationScheduled ? "Cancellation scheduled" : active ? "Active · €1 per month" : "No active subscription"}</p>
                     {active ? (
                         <>
-                            {subscription?.current_period_end && <small>Current period ends {new Date(subscription.current_period_end).toLocaleDateString()}.</small>}
+                            {subscription?.current_period_end && <small>{cancellationScheduled ? "Access remains available until " : "Current period ends "}{new Date(subscription.current_period_end).toLocaleDateString()}.</small>}
                             <button className="button button-primary" type="button" disabled={!!pending} onClick={() => void run("portal", "/api/stripe/portal")}>Manage billing</button>
                             <button className="back-link" type="button" onClick={() => navigate("/app")}>Open Annual View</button>
                         </>
                     ) : (
-                        <button className="button button-primary" type="button" disabled={loading || !!pending} onClick={() => void run("checkout", "/api/stripe/checkout")}>
-                            {pending === "checkout" ? "Opening checkout…" : "Subscribe for €1/month"}
-                        </button>
+                        <>
+                            <label className="terms-consent">
+                                <input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
+                                <span>I agree to the <Link to="/terms" navigate={navigate}>Terms</Link>, acknowledge the <Link to="/privacy" navigate={navigate}>Privacy Policy</Link>, and have read the <Link to="/cancellation" navigate={navigate}>withdrawal information</Link>.</span>
+                            </label>
+                            <button className="button button-primary" type="button" disabled={loading || !!pending || !termsAccepted} onClick={() => void run("checkout", "/api/stripe/checkout")}>
+                                {pending === "checkout" ? "Opening checkout…" : "Subscribe for €1/month"}
+                            </button>
+                        </>
                     )}
                     {error && <p className="form-error" role="alert">{error}</p>}
                 </section>
@@ -719,37 +748,32 @@ function ProtectedApp({ session, navigate }: { session: Session; navigate: Navig
     return <YearView session={session} navigate={navigate} />;
 }
 
-const legalContent: Record<string, { title: string; intro: string; sections: Array<[string, string]> }> = {
-    "/privacy": {
-        title: "Privacy",
-        intro: "A plain-language outline for implementation review. Operator details require legal completion before launch.",
-        sections: [
-            ["What is processed", "Supabase processes account identity and subscription status. Stripe processes billing. Google provides read-only calendar data. Cloudflare serves the application and its protected endpoints."],
-            ["Calendar data", "Calendar events are requested for the signed-in session and are not stored in the Supabase subscription database. Local preferences and imported ICS files stay in browser storage."],
-            ["Launch requirement", "Replace this section with reviewed controller identity, retention periods, legal bases, user rights, processor details, and contact information before accepting live subscriptions."]
-        ]
-    },
-    "/terms": {
-        title: "Terms",
-        intro: "Draft product terms pending operator and jurisdiction review.",
-        sections: [["Service", "Annual View provides a read-only annual visualization of connected calendar data."], ["Launch requirement", "Add operator identity, acceptable use, availability, liability, governing law, and termination terms before launch."]]
-    },
+type LegalContent = {
+    title: string;
+    intro: string;
+    sections: string[][];
+};
+
+const legalContent: Record<string, LegalContent> = {
+    "/privacy": privacyContent,
+    "/terms": termsContent,
     "/cancellation": {
         title: "Cancellation",
-        intro: "Subscriptions can be canceled at any time through Stripe Billing Portal.",
-        sections: [["Access period", "Cancellation takes effect at the end of the current paid period. Access remains available until then."], ["Launch requirement", "Add the reviewed withdrawal and refund policy required by the operator's jurisdiction before launch."]]
+        intro: "Subscriptions can be canceled at any time through Stripe Billing Portal. This page also provides the withdrawal information for consumers.",
+        sections: [
+            ["Cancellation", "Open the Stripe Billing Portal from your Annual View account and choose cancel subscription. Cancellation takes effect at the end of the current paid period. Access remains available until then."],
+            ["Withdrawal right", "If you are a consumer, you generally have the right to withdraw from the subscription contract within 14 days without giving a reason. The period begins when the contract is concluded. To exercise the right, send an unambiguous statement to Richard Pergens, Stephanstraße 6, 52064 Aachen, Germany, or email info@yearview.org before the period expires. You may use the model wording below, but it is not required."],
+            ["Model withdrawal wording", "I/We hereby withdraw from the contract for the provision of the Annual View subscription. Ordered on: ____. Name: ____. Address: ____. Date: ____. Signature only required for a paper notice."],
+            ["Effects of withdrawal", "After a valid withdrawal, we refund payments received without undue delay using the original payment method. If you expressly requested that service provision begin during the withdrawal period, you may owe the proportionate amount for service provided until withdrawal. Statutory exceptions and consumer rights remain unaffected."]
+        ]
     },
-    "/imprint": {
-        title: "Imprint",
-        intro: "Required operator information must be completed before public launch.",
-        sections: [["Operator", "TODO: legal name, address, authorized representative, and contact details."], ["Registration and tax", "TODO: applicable registration authority, registration number, and VAT identification details."]]
-    }
+    "/imprint": imprintContent
 };
 
 function LegalPage({ path }: { path: string }) {
     const content = legalContent[path] ?? legalContent["/privacy"];
     return (
-        <main className="page-width legal-page">
+        <main className={`page-width legal-page${path === "/imprint" ? " imprint-page" : ""}`}>
             <p className="kicker">Legal</p>
             <h1>{content.title}</h1>
             <p className="legal-intro">{content.intro}</p>
@@ -789,7 +813,7 @@ function App() {
     }, []);
 
     let page: ReactNode;
-    if (path === "/") page = <LandingPage navigate={navigate} />;
+    if (path === "/") page = <LandingPage navigate={navigate} session={session} />;
     else if (path === "/demo") page = <YearView navigate={navigate} demo />;
     else if (path === "/pricing") page = <PricingPage navigate={navigate} session={session} />;
     else if (path === "/login") page = <LoginPage navigate={navigate} />;
@@ -803,7 +827,11 @@ function App() {
     else if (legalContent[path]) page = <LegalPage path={path} />;
     else page = <NotFound navigate={navigate} />;
 
-    return <>{!(path === "/app" && session) && !isEmbeddedDemo && <SiteHeader navigate={navigate} session={session} />}{page}</>;
+    return <>
+        {!(path === "/app" && session) && !isEmbeddedDemo && <SiteHeader navigate={navigate} session={session} />}
+        {page}
+        {!isEmbeddedDemo && <SiteFooter navigate={navigate} />}
+    </>;
 }
 
 createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);

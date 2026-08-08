@@ -537,7 +537,9 @@ export async function initApp(config = {}) {
         if (themeToggleBtn) {
             const label = themeMode === "auto" ? `Theme: Auto (${resolved})` : `Theme: ${resolved}`;
             const next = themeMode === "auto" ? "Light" : themeMode === "light" ? "Dark" : "Auto";
-            themeToggleBtn.textContent = `${label} → ${next}`;
+            themeToggleBtn.setAttribute("aria-label", `${label}. Change to ${next}`);
+            themeToggleBtn.setAttribute("title", `${label}. Change to ${next}`);
+            themeToggleBtn.dataset.themeMode = themeMode;
         }
     }
 

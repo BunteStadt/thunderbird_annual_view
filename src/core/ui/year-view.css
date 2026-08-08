@@ -164,6 +164,37 @@ body.annual-view-document {
   flex: none;
 }
 
+.icon-button {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-icon {
+  display: none;
+}
+
+#themeToggle[data-theme-mode="dark"] .theme-icon-moon {
+  display: block;
+}
+
+#themeToggle:not([data-theme-mode]) .theme-icon-auto,
+#themeToggle[data-theme-mode="auto"] .theme-icon-auto {
+  display: block;
+}
+
+#themeToggle[data-theme-mode="light"] .theme-icon-sun {
+  display: block;
+}
+
 .input {
   width: 6rem;
   padding: 0.38rem 0.55rem;
@@ -936,11 +967,18 @@ input[type="number"] {
 #refreshButton.refreshing {
   pointer-events: none;
   opacity: 0.6;
+  position: relative;
 }
 
 #refreshButton.refreshing::before {
-  content: "⟳ ";
+  content: "";
   display: inline-block;
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 

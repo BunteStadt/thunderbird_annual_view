@@ -1766,6 +1766,30 @@ a:focus-visible {
     color: #657069;
 }
 
+.terms-consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin: 0 0 20px;
+    color: var(--av-weekday-text);
+    font-size: .9rem;
+    line-height: 1.5;
+}
+
+.terms-consent input {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--av-accent-strong);
+}
+
+.terms-consent a {
+    color: var(--av-accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .account-section .button {
     margin-top: auto;
 }
@@ -1970,6 +1994,10 @@ a:focus-visible {
     border-top: 1px solid var(--av-grid-line);
 }
 
+.imprint-page section {
+    border-top: 0;
+}
+
 .legal-page h2 {
     font-family: "Newsreader Variable", serif;
     font-size: 2rem;
@@ -1979,6 +2007,7 @@ a:focus-visible {
 .legal-page section p {
     color: var(--av-weekday-text);
     line-height: 1.75;
+    white-space: pre-line;
 }
 
 .status-page {
@@ -2004,7 +2033,7 @@ a:focus-visible {
 }
 
 .site-footer {
-    padding-block: 20px;
+    padding-block: 12px;
     color: var(--av-text);
     background: #ffffff;
     border-top: 1px solid var(--av-line);
@@ -2450,7 +2479,7 @@ a:focus-visible {
 
 .site-header {
     border-color: var(--av-grid-line);
-    background: var(--av-panel-strong);
+    background: var(--av-panel);
 }
 
 .brand,
@@ -2485,7 +2514,7 @@ a:focus-visible {
 .pricing-band,
 .price-summary,
 .auth-icon {
-    background: var(--av-accent-strong);
+    background: var(--av-accent);
 }
 
 .brand-mark {
@@ -2520,7 +2549,7 @@ a:focus-visible {
 
 .nav-demo-link {
     color: #fff !important;
-    background: var(--av-accent-strong) !important;
+    background: var(--av-accent) !important;
 }
 
 .nav-demo-link:hover {

@@ -66,7 +66,7 @@ test('Vite builds the one core HTML page with a host selected at compile time', 
     const viteConfig = fs.readFileSync(path.join(repoRoot, 'vite.config.mjs'), 'utf8');
 
     assert.match(entrySource, /from "@calendar-host"/);
-    assert.match(entrySource, /mountAnnualView/);
+    assert.match(entrySource, /mountYearView/);
     assert.match(viteConfig, /src\/hosts\/thunderbird\/main\.js/);
     assert.match(viteConfig, /src\/hosts\/web\/main\.js/);
     assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'year-view.html')));

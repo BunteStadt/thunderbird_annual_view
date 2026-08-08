@@ -2,7 +2,7 @@
 
 ## 1. Product scope
 
-The SaaS host is a paid website for the existing annual calendar view. It adds
+The SaaS host is a paid website for the existing Year View calendar. It adds
 public product pages, Google login, monthly and annual subscriptions, account and
 billing management, and subscription-gated Google Calendar access.
 
@@ -14,7 +14,7 @@ The first release has one product with two billing periods:
 - no trial
 - cancel at any time, effective at the end of the paid period
 
-The annual view remains read-only. Calendar events are not copied into the SaaS
+The Year View remains read-only. Calendar events are not copied into the SaaS
 database. Additional login providers, teams, annual billing, coupons, analytics,
 and an administration dashboard are outside this release.
 
@@ -31,7 +31,7 @@ As of 2026-08-06, the planned first-release application is implemented locally:
 | Stripe Checkout, Billing Portal, and signed webhook handling | Implemented; requires Stripe configuration |
 | Active-subscription authorization | Implemented; only `active` grants access |
 | Direct browser-to-Google Calendar access with subscription-gated app entry | Implemented |
-| Shared annual view mounted through shared React/TypeScript/Tailwind core | Implemented |
+| Shared Year View mounted through shared React/TypeScript/Tailwind core | Implemented |
 | Unit, contract, type, build, and Worker bundle checks | Passing |
 | Browser automation and live sandbox lifecycle test | Not yet implemented/run |
 | Production deployment and legal completion | Not yet done |
@@ -149,7 +149,7 @@ No additional product features are required for the defined first release.
    synchronization using a per-calendar `syncToken`. Store the synchronized
    events and tokens in browser-local storage such as IndexedDB, handle expired
    tokens with a full resync, and apply the annual year filter locally.
-- Load and render calendars independently so the annual view can display the
+- Load and render calendars independently so the Year View can display the
    first available results while larger calendars continue loading in the
    background. This would reduce the perceived delay for users with many
    calendars or recurring events.
@@ -160,7 +160,7 @@ No additional product features are required for the defined first release.
 | --- | --- |
 | SaaS UI | React, TypeScript, Vite, Tailwind CSS |
 | Icons | Lucide React |
-| Existing annual view | Reuse `src/core` React/Tailwind UI, renderer, and providers |
+| Existing Year View | Reuse `src/core` React/Tailwind UI, renderer, and providers |
 | Hosting | Cloudflare Workers Static Assets |
 | Server endpoints | Cloudflare Worker `/api/*` routes |
 | Identity | Supabase Auth with Google OAuth and PKCE |

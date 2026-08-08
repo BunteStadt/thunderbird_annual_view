@@ -97,7 +97,7 @@ provider, and host-specific UI modules through the bootstrap.
 
 - [src/core/ui/annual-view.tsx](../src/core/ui/annual-view.tsx)
   - single React/TypeScript source of truth for the shared app markup
-  - exposes `AnnualView` and `mountAnnualView()` for all hosts
+  - exposes `YearView` and `mountYearView()` for all hosts
 
 - [src/core/ui/index.html](../src/core/ui/index.html)
   - minimal Vite document containing the React root
@@ -123,7 +123,7 @@ A calendar is a named data source with:
 
 ### 3.2 Event
 
-An event is the smallest unit of business data rendered in the annual view. Each event should carry:
+An event is the smallest unit of business data rendered in the year view. Each event should carry:
 
 - a title
 - a start date/time

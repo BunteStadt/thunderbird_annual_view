@@ -1,14 +1,14 @@
 @import "./design-tokens.css";
 @import "tailwindcss";
 
-.annual-view-document,
-.annual-view-document>#root {
+.year-view-document,
+.year-view-document>#root {
   height: 100%;
   margin: 0;
 }
 
-html.annual-view-document,
-body.annual-view-document {
+html.year-view-document,
+body.year-view-document {
   min-height: 100%;
   overflow: hidden;
 }

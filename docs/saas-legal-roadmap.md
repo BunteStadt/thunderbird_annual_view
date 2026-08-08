@@ -2,7 +2,7 @@
 
 Stand: 08.08.2026
 
-This roadmap is a practical launch checklist for the Annual View SaaS operated by
+This roadmap is a practical launch checklist for the Year View SaaS operated by
 one person as a hobby project. It is not legal advice. Operating without a
 registered company does not by itself remove obligations relating to consumer
 contracts, taxes, privacy, or provider contracts.
@@ -71,7 +71,7 @@ manual process is sufficient as an initial operating procedure if it is actually
 usable:
 
 1. Receive requests at `info@yearview.org` and verify the requester's identity.
-2. Export or describe the account and subscription data held by Annual View.
+2. Export or describe the account and subscription data held by Year View.
 3. Handle deletion, restriction, correction, or objection requests.
 4. Delete the Supabase user and associated subscription record where permitted.
 5. Ask Stripe about deletion limits and retain only legally required billing data.

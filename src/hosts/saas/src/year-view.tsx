@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { ArrowLeft, CircleUserRound } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { AnnualView } from "../../../core/ui/annual-view";
+import { YearView } from "../../../core/ui/annual-view";
 import { EmptyCalendarProvider, registerProviderFactory, setCalendarProvider } from "../../../core/providers/calendar-service.js";
 import { setStorageAdapter } from "../../../core/storage-port.js";
 import { createWebHostStorageAdapter } from "../../web/web-storage-adapter.js";
@@ -27,8 +27,8 @@ function createSaasHeaderAction(slot: "header-leading" | "header-actions", navig
             const action = document.createElement(slot === "header-leading" ? "a" : "button");
             action.className = "btn av-header-action";
             action.dataset.size = "compact";
-            action.setAttribute("aria-label", slot === "header-leading" ? "Back to Annual View home" : "Open account");
-            action.title = slot === "header-leading" ? "Back to Annual View home" : "Open account";
+            action.setAttribute("aria-label", slot === "header-leading" ? "Back to Year View home" : "Open account");
+            action.title = slot === "header-leading" ? "Back to Year View home" : "Open account";
             if (slot === "header-leading") {
                 action.setAttribute("href", "/");
                 action.innerHTML = `${renderToStaticMarkup(<ArrowLeft aria-hidden="true" />)}<span>YearView</span>`;
@@ -68,7 +68,7 @@ export function YearView({ session, navigate, demo = false }: { session?: Sessio
 
     return (
         <main className={`year-view-page${demo ? "" : " app-page"}`}>
-            {ready && <AnnualView config={{
+            {ready && <YearView config={{
                 icsCalendars: demo ? demoCalendars : undefined,
                 icsReadOnly: demo,
                 selectAllCalendars: demo,

@@ -1,4 +1,4 @@
-// Web host bootstrap for the annual view. Uses client-side storage only
+// Web host bootstrap for the year view. Uses client-side storage only
 // (localStorage + IndexedDB), the Google provider on demand, and host UI
 // modules for Google login, empty state, and clearing local data.
 import { initApp } from "../../core/app.js";

@@ -106,7 +106,7 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initial
             tourButton.type = "button";
             tourButton.textContent = "Redo tour";
             tourButton.addEventListener("click", () => {
-                (mount.ownerDocument || globalThis.document)?.dispatchEvent(new CustomEvent("annual-view:restart-tour"));
+                (mount.ownerDocument || globalThis.document)?.dispatchEvent(new CustomEvent("year-view:restart-tour"));
             });
             buttonRow.appendChild(tourButton);
         }

@@ -196,7 +196,7 @@ test('storage port throws without an adapter and adapters behave correctly', asy
     await webExtAdapter.remove('answer');
     assert.equal(await webExtAdapter.get('answer'), undefined);
 
-    // Web adapter round-trips JSON with the annualView.storage. prefix.
+    // Web adapter round-trips JSON with the yearView.storage. prefix.
     const localData = new Map();
     globalThis.localStorage = {
         getItem(key) {
@@ -213,12 +213,12 @@ test('storage port throws without an adapter and adapters behave correctly', asy
     const webAdapter = storagePort.createWebStorageAdapter();
     assert.equal(await webAdapter.get('missing'), undefined);
     await webAdapter.set('viewMode', 'linear');
-    assert.equal(localData.get('annualView.storage.viewMode'), JSON.stringify('linear'));
+    assert.equal(localData.get('yearView.storage.viewMode'), JSON.stringify('linear'));
     assert.equal(await webAdapter.get('viewMode'), 'linear');
     await webAdapter.remove('viewMode');
     assert.equal(await webAdapter.get('viewMode'), undefined);
 
     // Corrupted JSON is survived (returns undefined, logs an error).
-    localData.set('annualView.storage.broken', '{not json');
+    localData.set('yearView.storage.broken', '{not json');
     assert.equal(await webAdapter.get('broken'), undefined);
 });

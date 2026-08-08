@@ -1,9 +1,9 @@
 import { loadOnboardingCompleted, persistOnboardingCompleted } from "../storage.js";
 
-const TOUR_EVENT = "annual-view:restart-tour";
+const TOUR_EVENT = "year-view:restart-tour";
 
 const steps = [
-    { target: "calendar-list", title: "Choose calendars", text: "Click a calendar name to include or remove it from the annual view." },
+    { target: "calendar-list", title: "Choose calendars", text: "Click a calendar name to include or remove it from the year view." },
     { target: "global-all-day", title: "Global All-day filter", text: "Show only events marked as all-day. All-day is an event flag, not simply an event lasting from 00:00 to 24:00." },
     { target: "global-duration", title: "Global duration filter", text: "Set the minimum event duration used by calendars that follow the global setting." },
     { target: "specific-all-day", title: "Per-calendar All-day filter", text: "Use the first calendar's All-day control as a pattern for each calendar. A checkmark shows only all-day events; an x also shows timed events; a dash follows the global setting." },
@@ -43,7 +43,7 @@ export function setupOnboardingTour({ root } = {}) {
     const tour = documentRoot.createElement("section");
     tour.className = "onboarding-tour";
     tour.hidden = true;
-    tour.setAttribute("aria-label", "Annual view tour");
+    tour.setAttribute("aria-label", "Year View tour");
     root.appendChild(tour);
 
     let currentStep = 0;

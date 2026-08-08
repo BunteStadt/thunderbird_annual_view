@@ -34,7 +34,7 @@ export function createWebExtensionStorageAdapter() {
 }
 
 // Adapter on top of window.localStorage, JSON-serializing values under a prefix.
-export function createWebStorageAdapter({ prefix = "annualView.storage." } = {}) {
+export function createWebStorageAdapter({ prefix = "yearView.storage." } = {}) {
     return {
         async get(key) {
             const localStorageApi = globalThis.localStorage;

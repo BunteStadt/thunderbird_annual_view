@@ -4,9 +4,9 @@ import { Monitor, Moon, RefreshCw, Sun } from "lucide-react";
 import { initApp } from "../app.js";
 import "./year-view.css";
 
-export type AnnualViewConfig = Record<string, unknown>;
+export type YearViewConfig = Record<string, unknown>;
 
-function AnnualViewShell({ embeddedDemo = false }: { embeddedDemo?: boolean }) {
+function YearViewShell({ embeddedDemo = false }: { embeddedDemo?: boolean }) {
     const [showScrollHint, setShowScrollHint] = useState(false);
     const scrollHintTimerRef = useRef<number | null>(null);
     const gridViewportRef = useRef<HTMLDivElement>(null);
@@ -43,7 +43,7 @@ function AnnualViewShell({ embeddedDemo = false }: { embeddedDemo?: boolean }) {
     );
 }
 
-export function AnnualView({ config = {} }: { config?: AnnualViewConfig }) {
+export function YearView({ config = {} }: { config?: YearViewConfig }) {
     const rootRef = useRef<HTMLDivElement>(null);
     const [error, setError] = useState("");
 
@@ -58,7 +58,7 @@ export function AnnualView({ config = {} }: { config?: AnnualViewConfig }) {
             if (disposed) nextApi.destroy?.();
             else api = nextApi;
         }).catch((reason: unknown) => {
-            if (!disposed) setError(reason instanceof Error ? reason.message : "Annual View could not start.");
+            if (!disposed) setError(reason instanceof Error ? reason.message : "Year View could not start.");
         });
         return () => {
             disposed = true;
@@ -66,11 +66,11 @@ export function AnnualView({ config = {} }: { config?: AnnualViewConfig }) {
         };
     }, [config]);
 
-    return <div ref={rootRef} className="av-root">{error && <p className="app-error" role="alert">{error}</p>}<AnnualViewShell embeddedDemo={config.embeddedDemo === true} /></div>;
+    return <div ref={rootRef} className="av-root">{error && <p className="app-error" role="alert">{error}</p>}<YearViewShell embeddedDemo={config.embeddedDemo === true} /></div>;
 }
 
-export function mountAnnualView(element: Element, config: AnnualViewConfig = {}) {
+export function mountYearView(element: Element, config: YearViewConfig = {}) {
     const root = createRoot(element);
-    root.render(<AnnualView config={config} />);
+    root.render(<YearView config={config} />);
     return () => root.unmount();
 }

@@ -1,7 +1,7 @@
 # End-to-end installation test
 
 This directory contains the real-Thunderbird end-to-end test for the
-Calendar Annual View add-on.  The test installs the add-on **from source**
+Calendar Year View add-on.  The test installs the add-on **from source**
 (via Thunderbird's extension-proxy mechanism, which is equivalent to the
 "Load Temporary Add-on" flow on the Debug Add-on page) and verifies the
 following:

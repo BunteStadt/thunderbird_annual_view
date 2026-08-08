@@ -1,6 +1,6 @@
-# Annual View SaaS Setup
+# Year View SaaS Setup
 
-This guide records the setup sequence for the Annual View SaaS application. It
+This guide records the setup sequence for the Year View SaaS application. It
 uses Supabase for authentication and the subscription database, Google Cloud
 for Google OAuth and Calendar access, Stripe for test subscriptions, and
 Cloudflare Workers for the application server and static assets.
@@ -110,7 +110,7 @@ domain is known.
 1. Open the Stripe Dashboard.
 2. Turn on **Test mode**.
 3. Open **Product catalog > Add product**.
-4. Create a product for Annual View.
+4. Create a product for Year View.
 5. Add two recurring prices to the product:
    - Currency: EUR; amount `2.00`; interval: monthly
    - Currency: EUR; amount `12.00`; interval: yearly

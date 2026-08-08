@@ -69,6 +69,7 @@ export function deleteWebHostDatabase() {
 // when IndexedDB is unavailable.
 export function createWebHostStorageAdapter({ icsKey = ICS_STORAGE_KEY } = {}) {
     const preferenceAdapter = createWebStorageAdapter();
+    const legacyPreferenceAdapter = createWebStorageAdapter({ prefix: LEGACY_PREFIX });
 
     if (!globalThis.indexedDB) {
         console.error("[web-storage] IndexedDB unavailable, falling back to localStorage");
@@ -89,7 +90,7 @@ export function createWebHostStorageAdapter({ icsKey = ICS_STORAGE_KEY } = {}) {
             if (existing !== undefined) {
                 return;
             }
-            const legacy = await preferenceAdapter.get(icsKey);
+            const legacy = await legacyPreferenceAdapter.get(icsKey);
             if (legacy !== undefined) {
                 await icsAdapter.set(icsKey, legacy);
                 await preferenceAdapter.remove(icsKey);
@@ -106,7 +107,8 @@ export function createWebHostStorageAdapter({ icsKey = ICS_STORAGE_KEY } = {}) {
                 await migrateLegacyIcsValue();
                 return icsAdapter.get(key);
             }
-            return preferenceAdapter.get(key);
+            const value = await preferenceAdapter.get(key);
+            return value === undefined ? legacyPreferenceAdapter.get(key) : value;
         },
         async set(key, value) {
             if (key === icsKey) {
@@ -114,6 +116,7 @@ export function createWebHostStorageAdapter({ icsKey = ICS_STORAGE_KEY } = {}) {
                 return;
             }
             await preferenceAdapter.set(key, value);
+            await legacyPreferenceAdapter.remove(key);
         },
         async remove(key) {
             if (key === icsKey) {
@@ -121,6 +124,7 @@ export function createWebHostStorageAdapter({ icsKey = ICS_STORAGE_KEY } = {}) {
                 return;
             }
             await preferenceAdapter.remove(key);
+            await legacyPreferenceAdapter.remove(key);
         }
     };
 }

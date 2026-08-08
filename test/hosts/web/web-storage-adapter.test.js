@@ -105,12 +105,12 @@ test('web host adapter routes the ICS key to IndexedDB and preferences to localS
     const adapter = createWebHostStorageAdapter();
 
     await adapter.set('viewMode', 'linear');
-    assert.equal(localData.get('annualView.storage.viewMode'), JSON.stringify('linear'));
+    assert.equal(localData.get('yearView.storage.viewMode'), JSON.stringify('linear'));
     assert.equal(await adapter.get('viewMode'), 'linear');
 
     const icsValue = [{ id: 'ics-a', content: 'BEGIN:VCALENDAR\nEND:VCALENDAR' }];
     await adapter.set('icsCalendars', icsValue);
-    assert.equal(localData.has('annualView.storage.icsCalendars'), false, 'ICS content must not land in localStorage');
+    assert.equal(localData.has('yearView.storage.icsCalendars'), false, 'ICS content must not land in localStorage');
     assert.deepEqual(await adapter.get('icsCalendars'), icsValue);
     assert.deepEqual(idbStores.get('annual-view')?.get('icsCalendars'), icsValue);
 
@@ -152,6 +152,6 @@ test('web host adapter falls back to localStorage when IndexedDB is unavailable'
     const adapter = createWebHostStorageAdapter();
 
     await adapter.set('icsCalendars', [{ id: 'ics-a', content: 'X' }]);
-    assert.equal(localData.has('annualView.storage.icsCalendars'), true);
+    assert.equal(localData.has('yearView.storage.icsCalendars'), true);
     assert.ok(errors.some((args) => String(args[0]).includes('IndexedDB unavailable')));
 });

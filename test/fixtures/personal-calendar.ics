@@ -1,6 +1,6 @@
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Annual View Test//Personal Calendar//EN
+PRODID:-//Year View Test//Personal Calendar//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 NAME:Personal

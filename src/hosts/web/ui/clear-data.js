@@ -3,7 +3,7 @@
 
 import { deleteWebHostDatabase } from "../web-storage-adapter.js";
 
-const STORAGE_PREFIX = "annualView.storage.";
+const STORAGE_PREFIX = "yearView.storage.";
 
 function clearLocalStorageKeys() {
     const localStorageApi = globalThis.localStorage;

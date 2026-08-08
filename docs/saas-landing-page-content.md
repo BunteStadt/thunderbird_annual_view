@@ -2,15 +2,15 @@
 
 ## Purpose
 
-This document defines the positioning, message hierarchy, content, and section order for the Annual View SaaS landing page. It is a content plan, not an implementation specification.
+This document defines the positioning, message hierarchy, content, and section order for the Year View SaaS landing page. It is a content plan, not an implementation specification.
 
-The page should help visitors quickly understand that Annual View uses the events they already maintain in Google Calendar to reveal busy periods, open stretches, deadlines, and the shape of the months ahead. It is a read-only view, not another calendar or planning system to maintain.
+The page should help visitors quickly understand that Year View uses the events they already maintain in Google Calendar to reveal busy periods, open stretches, deadlines, and the shape of the months ahead. It is a read-only view, not another calendar or planning system to maintain.
 
 ## Confirmed positioning
 
 ### Audience
 
-Annual View is for everyday Google Calendar users who need to coordinate dates across more than one month. Their plans may include:
+Year View is for everyday Google Calendar users who need to coordinate dates across more than one month. Their plans may include:
 
 - holidays and travel
 - exams and school dates
@@ -38,9 +38,9 @@ The recurring questions are:
 
 ### Solution
 
-Annual View turns existing Google Calendar events into a continuous, filterable long-range view. There is no need to recreate events or maintain another planning tool. Google Calendar remains the single source of truth.
+Year View turns existing Google Calendar events into a continuous, filterable long-range view. There is no need to recreate events or maintain another planning tool. Google Calendar remains the single source of truth.
 
-Annual View does not calculate availability or recommend dates. It helps people visually recognize busy periods, open stretches, and important events so they can make their own planning decisions with better context.
+Year View does not calculate availability or recommend dates. It helps people visually recognize busy periods, open stretches, and important events so they can make their own planning decisions with better context.
 
 ### Core promise
 
@@ -59,7 +59,7 @@ The product mechanism is seeing a year of events at once. The customer outcome i
 
 ### Scope boundaries
 
-The landing page must not imply that Annual View:
+The landing page must not imply that Year View:
 
 - creates, edits, or deletes events
 - recommends the best date for an activity
@@ -89,7 +89,7 @@ Recommended final CTA:
 
 Keep the navigation short and predictable:
 
-- Annual View brand/home
+- Year View brand/home
 - Pricing
 - Privacy
 - GitHub
@@ -140,15 +140,15 @@ This section should establish one shared problem across different lifestyles. It
 
 ### 3. Solution: one source of truth, a better perspective
 
-**Goal:** Explain why Annual View is different from another planner.
+**Goal:** Explain why Year View is different from another planner.
 
 Suggested heading:
 
-**Your calendar already has the details. Annual View reveals the pattern.**
+**Your calendar already has the details. Year View reveals the pattern.**
 
 Suggested message:
 
-Annual View loads the events already in Google Calendar and arranges them for long-range planning. There is nothing to copy, recreate, or keep synchronized. Continue managing events in Google Calendar; open Annual View when a wider perspective is needed.
+Year View loads the events already in Google Calendar and arranges them for long-range planning. There is nothing to copy, recreate, or keep synchronized. Continue managing events in Google Calendar; open Year View when a wider perspective is needed.
 
 Present three concise benefits:
 
@@ -161,7 +161,7 @@ Present three concise benefits:
 3. **Bring important dates forward**  
    Filter calendars, short appointments, and all-day events to reveal the commitments that shape the plan.
 
-Avoid saying that Annual View finds, calculates, or recommends free time.
+Avoid saying that Year View finds, calculates, or recommends free time.
 
 ### 4. Interactive demo: prove the experience
 
@@ -169,7 +169,7 @@ Avoid saying that Annual View finds, calculates, or recommends free time.
 
 Suggested heading:
 
-**Try the real Annual View.**
+**Try the real Year View.**
 
 Suggested supporting copy:
 
@@ -243,7 +243,7 @@ Be explicit that the evidence comes from the open-source Thunderbird edition, no
 
 Suggested heading:
 
-**An annual view people were missing.**
+**A year view people were missing.**
 
 Suggested context:
 
@@ -269,28 +269,28 @@ Suggested heading:
 
 Suggested lead:
 
-**Annual View is built to look, not touch.**
+**Year View is built to look, not touch.**
 
 Explain the boundaries precisely:
 
 - Google access is read-only.
-- Annual View cannot create, edit, or delete events.
+- Year View cannot create, edit, or delete events.
 - Calendar requests and responses are encrypted in transit.
 - Events are securely requested from Google only when needed.
 - Events are displayed in the browser.
-- Events are never saved to the Annual View database or server cache.
+- Events are never saved to the Year View database or server cache.
 - Google Calendar remains the source of truth.
 
 Connect open source directly to verifiability:
 
-**Annual View is open source, so its data handling does not have to be taken on faith. Inspect the code, follow development, or contribute on GitHub.**
+**Year View is open source, so its data handling does not have to be taken on faith. Inspect the code, follow development, or contribute on GitHub.**
 
 Actions:
 
 - **View source on GitHub**
 - **Read the privacy policy**
 
-Avoid the claims **calendar data never touches our servers** and **Annual View never reads or accesses your calendar**. Calendar responses pass through the Cloudflare Worker and the application must process event data to display it. The accurate promise is that events are processed only as needed for display and are not persistently stored by Annual View.
+Avoid the claims **calendar data never touches our servers** and **Year View never reads or accesses your calendar**. Calendar responses pass through the Cloudflare Worker and the application must process event data to display it. The accurate promise is that events are processed only as needed for display and are not persistently stored by Year View.
 
 ### 9. Final conversion: move from sample data to the user's year
 
@@ -312,19 +312,19 @@ This is the first place on the landing page where price should be part of the ma
 
 Recommended questions:
 
-#### Can Annual View change my Google Calendar?
+#### Can Year View change my Google Calendar?
 
-No. Access is read-only. Annual View cannot create, edit, or delete events.
+No. Access is read-only. Year View cannot create, edit, or delete events.
 
-#### Are my calendar events stored by Annual View?
+#### Are my calendar events stored by Year View?
 
-No. Events are securely requested from Google when needed and displayed in the browser. They are not saved to the Annual View database or server cache.
+No. Events are securely requested from Google when needed and displayed in the browser. They are not saved to the Year View database or server cache.
 
 #### Do I need to enter my events again?
 
-No. Annual View uses events already maintained in Google Calendar, so there is no duplicate calendar to keep synchronized.
+No. Year View uses events already maintained in Google Calendar, so there is no duplicate calendar to keep synchronized.
 
-#### Does Annual View recommend free dates?
+#### Does Year View recommend free dates?
 
 No. It gives you the long-range context to recognize busy periods and open stretches and make that decision yourself.
 
@@ -344,7 +344,7 @@ Access continues until the end of the paid period. Billing is managed securely t
 
 Include:
 
-- Annual View name and concise descriptor
+- Year View name and concise descriptor
 - Pricing
 - Demo
 - GitHub
@@ -378,7 +378,7 @@ Feature names should never displace the customer outcome from the headline or op
 - Lead with clarity and usefulness, then calm and confidence.
 - Be specific about what visitors can see and do.
 - Use **busy periods**, **open stretches**, **important dates**, and **months ahead** consistently.
-- Describe Annual View as a view or perspective, not as another calendar.
+- Describe Year View as a view or perspective, not as another calendar.
 - Keep privacy claims factual and inspectable.
 - Avoid exaggerated productivity language, urgency, and fear of missing out.
 - Avoid promising automation that the product does not provide.
@@ -398,7 +398,7 @@ Feature names should never displace the customer outcome from the headline or op
 
 Use:
 
-- The existing full-year Annual View screenshot in the hero
+- The existing full-year Year View screenshot in the hero
 - The existing interactive sample-data demo
 - A small number of screenshots showing the range from broad to detailed views
 - Permanent links to the two strongest Thunderbird reviews
@@ -410,13 +410,13 @@ Do not use abstract calendar illustrations or stock imagery as the primary produ
 
 A first-time visitor should be able to answer these questions without visiting another page:
 
-- What does Annual View do?
+- What does Year View do?
 - Why is it more useful than clicking through Google Calendar month by month?
 - Does it require duplicate event entry?
 - Can it modify calendar events?
-- Are calendar events stored by Annual View?
+- Are calendar events stored by Year View?
 - Can the real interface be tried before paying?
 - What does the service cost?
 - Where can the source code be inspected?
 
-The page succeeds when the visitor understands that Annual View is a low-friction, privacy-conscious perspective on the calendar they already maintain, then chooses either to try the demo or connect their own calendar.
+The page succeeds when the visitor understands that Year View is a low-friction, privacy-conscious perspective on the calendar they already maintain, then chooses either to try the demo or connect their own calendar.

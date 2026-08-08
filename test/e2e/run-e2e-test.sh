@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # test/e2e/run-e2e-test.sh
 #
-# End-to-end installation test for the Calendar Annual View Thunderbird add-on.
+# End-to-end installation test for the Calendar Year View Thunderbird add-on.
 #
 # What this test does:
 #   1. Locates Thunderbird 153 on the host (snap or system install)
@@ -9,8 +9,8 @@
 #      pointing to this repository and the ICS calendar URIs patched to
 #      the actual local paths
 #   3. Starts Thunderbird in a headless virtual display (Xvfb)
-#   4. Waits for the Annual View space to open and calendars to fully load
-#   5. Takes a screenshot showing the Annual View calendar page
+#   4. Waits for the Year View space to open and calendars to fully load
+#   5. Takes a screenshot showing the Year View calendar page
 #   6. Checks the Thunderbird log for errors and warnings that are
 #      attributable to the add-on installation
 #   7. Verifies the add-on entry appears in the extensions database
@@ -208,11 +208,11 @@ if ! $WINDOW_FOUND; then
     exit 1
 fi
 
-# Give the add-on time to open the Annual View space, load calendars, and
+# Give the add-on time to open the Year View space, load calendars, and
 # render the full calendar grid.  The background.js onStartup listener fires
 # immediately after the window appears, but calendar fetching over local ICS
 # files still takes a few seconds on a loaded runner.
-log "Waiting 25s for Annual View to load and calendar events to render..."
+log "Waiting 25s for Year View to load and calendar events to render..."
 sleep 25
 
 # ---------------------------------------------------------------------------
@@ -358,7 +358,7 @@ fi
 echo ""
 echo "============================================================"
 if [ "$EXIT_CODE" -eq 0 ]; then
-    echo "  PASS — Calendar Annual View add-on installed on Thunderbird"
+    echo "  PASS — Calendar Year View add-on installed on Thunderbird"
     echo "         $TB_VERSION with no errors or warnings."
     echo ""
     echo "  Screenshot : test-results/addon-installed.png"

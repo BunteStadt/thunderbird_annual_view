@@ -3,7 +3,7 @@
 ## Goal
 
 Calendar event data should be fetched directly from Google to the user's browser
-whenever possible. The Annual View application should not proxy or persist Google
+whenever possible. The Year View application should not proxy or persist Google
 Calendar event data on its own server.
 
 Subscription enforcement does not need to be completely strict at the Google API
@@ -39,7 +39,7 @@ calendar event-data path after the temporary Google access token has been issued
 - When the access token expires, the browser must obtain another short-lived token
   through the supported OAuth/session renewal flow.
 - The Supabase session token and the Google Calendar access token are different
-  credentials. A Supabase token authenticates the user to Annual View; Google
+  credentials. A Supabase token authenticates the user to Year View; Google
   validates the Google token for Calendar access.
 
 ## Entitlement model
@@ -58,9 +58,9 @@ accepted in favor of keeping calendar data out of the application server.
 Subject to verifying logging, analytics, error reporting, and authentication
 behavior in production, the intended product statement is:
 
-> Annual View requests read-only Google Calendar access and fetches calendar data
+> Year View requests read-only Google Calendar access and fetches calendar data
 > directly from Google to your browser. Calendar event data is not routed through
-> or stored on the Annual View application server.
+> or stored on the Year View application server.
 
 This statement applies to the implemented SaaS direct-browser calendar flow.
 

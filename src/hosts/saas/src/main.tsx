@@ -26,7 +26,7 @@ import privacyContent from "./legal/privacy";
 import termsContent from "./legal/terms";
 import oneWeekScreenshot from "./assets/generated/one-week-rows-light.png";
 import twoWeekScreenshot from "./assets/generated/two-week-rows-light.png";
-import annualViewIcon from "../../../../assets/icons/annual_view_inverted.svg";
+import yearViewIcon from "../../../../assets/icons/annual_view_inverted.svg";
 import "./styles.css";
 
 type Navigate = (path: string) => void;
@@ -122,9 +122,9 @@ function SiteHeader({ navigate, path, session }: { navigate: Navigate; path: str
     return (
         <header className="site-header">
             <nav className="page-width nav-shell" aria-label="Primary navigation">
-                <Link to="/" navigate={navigate} className="brand" aria-label="Annual View home">
-                    <span className="brand-mark"><img src={annualViewIcon} alt="" /></span>
-                    <span>Annual View</span>
+                <Link to="/" navigate={navigate} className="brand" aria-label="Year View home">
+                    <span className="brand-mark"><img src={yearViewIcon} alt="" /></span>
+                    <span>Year View</span>
                 </Link>
                 <button
                     type="button"
@@ -162,7 +162,7 @@ function SiteFooter({ navigate }: { navigate: Navigate }) {
         <footer className="site-footer">
             <div className="page-width footer-grid">
                 <div className="footer-brand">
-                    <strong>Annual View</strong>
+                    <strong>Year View</strong>
                     <span>Made with ❤️ in Germany</span>
                 </div>
                 <nav aria-label="Footer navigation">
@@ -185,11 +185,11 @@ function ProductPreview() {
     return (
         <figure className="product-preview" aria-label="Preview of the annual calendar interface">
             <div className="product-preview-bar" aria-hidden="true">
-                <span className="product-preview-name"><CalendarDays /> Annual View</span>
+                <span className="product-preview-name"><CalendarDays /> Year View</span>
                 <span className="product-preview-status"><i /> Google Calendar connected</span>
             </div>
             <img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Annual calendar with color-coded events and calendar filters" />
-            <figcaption>Preview of the Annual View calendar interface.</figcaption>
+            <figcaption>Preview of the Year View calendar interface.</figcaption>
         </figure>
     );
 }
@@ -282,7 +282,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                             <h2 id="problem-title">Some decisions need more than a month view.</h2>
                             <p>Important dates are spread across the year. Clicking forward loses the thread, while copying everything into another planner creates work that quickly goes stale.</p>
                         </div>
-                        <div className="planning-questions" aria-label="Questions Annual View helps you see in context">
+                        <div className="planning-questions" aria-label="Questions Year View helps you see in context">
                             <p>When you are trying to place one more thing, the questions sound familiar:</p>
                             <ul>
                                 <li>When can the holiday fit between exams and existing events?</li>
@@ -299,8 +299,8 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                     <div className="page-width solution-layout">
                         <div className="solution-intro">
                             <p className="kicker">One source of truth, a better perspective</p>
-                            <h2 id="solution-title">Your calendar already has the details. Annual View reveals the pattern.</h2>
-                            <p>Annual View arranges the events already in Google Calendar for long-range planning. Keep managing events where you always have; open Annual View when you need a wider perspective.</p>
+                            <h2 id="solution-title">Your calendar already has the details. Year View reveals the pattern.</h2>
+                            <p>Year View arranges the events already in Google Calendar for long-range planning. Keep managing events where you always have; open Year View when you need a wider perspective.</p>
                         </div>
                         <div className="solution-benefits">
                             <article>
@@ -326,7 +326,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                     <div className="page-width">
                         <div className="demo-heading">
                             <p className="kicker">Interactive demo</p>
-                            <h2 id="demo-title">Try the real Annual View.</h2>
+                            <h2 id="demo-title">Try the real Year View.</h2>
                             <p>Explore a sample year, switch layouts, filter calendars, and scroll across year boundaries. No sign-in required.</p>
                             <a className="button button-primary demo-open-link" href="/demo">
                                 Open demo full-screen <ArrowRight aria-hidden="true" />
@@ -338,7 +338,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                                 <small>annualview / sample year</small>
                             </div>
                             <div className="demo-frame">
-                                <iframe src="/demo?embed=1" title="Interactive Annual View sample year" loading="lazy" referrerPolicy="no-referrer" />
+                                <iframe src="/demo?embed=1" title="Interactive Year View sample year" loading="lazy" referrerPolicy="no-referrer" />
                             </div>
                         </div>
                     </div>
@@ -417,7 +417,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                     <div className="page-width social-proof-layout">
                         <div className="social-proof-intro">
                             <p className="kicker">Open-source proof</p>
-                            <h2 id="social-proof-title">An annual view people were missing.</h2>
+                            <h2 id="social-proof-title">A year view people were missing.</h2>
                             <p>The open-source Thunderbird edition already helps 114 people use an annual calendar view and has received three 5-star ratings.</p>
                             <a className="text-link" href="https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/" target="_blank" rel="noreferrer">
                                 <SiThunderbird aria-hidden="true" /> See the Thunderbird edition <ArrowRight aria-hidden="true" />
@@ -445,8 +445,8 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                         <div className="privacy-proof-intro">
                             <p className="kicker">Privacy and open source</p>
                             <h2 id="privacy-proof-title">Your calendar stays your calendar.</h2>
-                            <p className="privacy-proof-lead">Annual View is built to look, not touch.</p>
-                            <p>Events are processed only as needed to display them and are not persistently stored by Annual View.</p>
+                            <p className="privacy-proof-lead">Year View is built to look, not touch.</p>
+                            <p>Events are processed only as needed to display them and are not persistently stored by Year View.</p>
                             <div className="privacy-proof-actions">
                                 <a className="button button-primary" href="https://github.com/BunteStadt/thunderbird_annual_view" target="_blank" rel="noreferrer">
                                     <SiGithub aria-hidden="true" /> View source on GitHub <ArrowRight aria-hidden="true" />
@@ -455,11 +455,11 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                             </div>
                         </div>
                         <div className="privacy-boundaries">
-                            <div><ShieldCheck aria-hidden="true" /><span>Google access is read-only. Annual View cannot create, edit, or delete events.</span></div>
+                            <div><ShieldCheck aria-hidden="true" /><span>Google access is read-only. Year View cannot create, edit, or delete events.</span></div>
                             <div><ShieldCheck aria-hidden="true" /><span>Calendar requests and responses are encrypted in transit.</span></div>
                             <div><ShieldCheck aria-hidden="true" /><span>Events are securely requested from Google only when needed and displayed in your browser.</span></div>
-                            <div><ShieldCheck aria-hidden="true" /><span>Google Calendar remains the source of truth. Events are never saved to the Annual View database or server cache.</span></div>
-                            <div><ShieldCheck aria-hidden="true" /><span>Annual View is open source, so its data handling can be inspected, followed, and improved in public.</span></div>
+                            <div><ShieldCheck aria-hidden="true" /><span>Google Calendar remains the source of truth. Events are never saved to the Year View database or server cache.</span></div>
+                            <div><ShieldCheck aria-hidden="true" /><span>Year View is open source, so its data handling can be inspected, followed, and improved in public.</span></div>
                         </div>
                     </div>
                 </section>
@@ -472,19 +472,19 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                         </div>
                         <div className="faq-list">
                             <details>
-                                <summary>Can Annual View change my Google Calendar?</summary>
-                                <p>No. Access is read-only. Annual View cannot create, edit, or delete events.</p>
+                                <summary>Can Year View change my Google Calendar?</summary>
+                                <p>No. Access is read-only. Year View cannot create, edit, or delete events.</p>
                             </details>
                             <details>
-                                <summary>Are my calendar events stored by Annual View?</summary>
-                                <p>No. Events are securely requested from Google when needed and displayed in the browser. They are not saved to the Annual View database or server cache.</p>
+                                <summary>Are my calendar events stored by Year View?</summary>
+                                <p>No. Events are securely requested from Google when needed and displayed in the browser. They are not saved to the Year View database or server cache.</p>
                             </details>
                             <details>
                                 <summary>Do I need to enter my events again?</summary>
-                                <p>No. Annual View uses events already maintained in Google Calendar, so there is no duplicate calendar to keep synchronized.</p>
+                                <p>No. Year View uses events already maintained in Google Calendar, so there is no duplicate calendar to keep synchronized.</p>
                             </details>
                             <details>
-                                <summary>Does Annual View recommend free dates?</summary>
+                                <summary>Does Year View recommend free dates?</summary>
                                 <p>No. It gives you the long-range context to recognize busy periods and open stretches and make that decision yourself.</p>
                             </details>
                             <details>
@@ -535,7 +535,7 @@ function PricingPage({ navigate, session }: { navigate: Navigate; session: Sessi
             </header>
             <section className="pricing-layout">
                 <div className="price-summary">
-                    <span>Annual View pricing</span>
+                    <span>Year View pricing</span>
                     <fieldset className="pricing-switch">
                         <legend>Billing period</legend>
                         <label>
@@ -591,7 +591,7 @@ function LoginPage({ navigate }: { navigate: Navigate }) {
         <main className="auth-page page-width">
             <section className="auth-panel">
                 <span className="auth-icon"><CircleUserRound aria-hidden="true" /></span>
-                <p className="kicker">Welcome to Annual View</p>
+                <p className="kicker">Welcome to Year View</p>
                 <h1>Sign in to see your year.</h1>
                 <p>Google identifies your account and grants separate read-only access to your calendars.</p>
                 <button className="button button-primary button-wide" type="button" disabled={pending} onClick={startLogin}>
@@ -725,7 +725,7 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
                         <>
                             {subscription?.current_period_end && <small>{cancellationScheduled ? "Access remains available until " : "Current period ends "}{new Date(subscription.current_period_end).toLocaleDateString()}.</small>}
                             <button className="button button-primary" type="button" disabled={!!pending} onClick={() => void run("portal", "/api/stripe/portal")}>Manage billing</button>
-                            <button className="back-link" type="button" onClick={() => navigate("/app")}>Open Annual View</button>
+                            <button className="back-link" type="button" onClick={() => navigate("/app")}>Open Year View</button>
                         </>
                     ) : (
                         <>
@@ -797,9 +797,9 @@ const legalContent: Record<string, LegalContent> = {
         title: "Cancellation",
         intro: "Subscriptions can be canceled at any time through Stripe Billing Portal. This page also provides the withdrawal information for consumers.",
         sections: [
-            ["Cancellation", "Open the Stripe Billing Portal from your Annual View account and choose cancel subscription. Cancellation takes effect at the end of the current paid period. Access remains available until then."],
+            ["Cancellation", "Open the Stripe Billing Portal from your Year View account and choose cancel subscription. Cancellation takes effect at the end of the current paid period. Access remains available until then."],
             ["Withdrawal right", "If you are a consumer, you generally have the right to withdraw from the subscription contract within 14 days without giving a reason. The period begins when the contract is concluded. To exercise the right, send an unambiguous statement to Richard Pergens, Stephanstraße 6, 52064 Aachen, Germany, or email info@yearview.org before the period expires. You may use the model wording below, but it is not required."],
-            ["Model withdrawal wording", "I/We hereby withdraw from the contract for the provision of the Annual View subscription. Ordered on: ____. Name: ____. Address: ____. Date: ____. Signature only required for a paper notice."],
+            ["Model withdrawal wording", "I/We hereby withdraw from the contract for the provision of the Year View subscription. Ordered on: ____. Name: ____. Address: ____. Date: ____. Signature only required for a paper notice."],
             ["Effects of withdrawal", "After a valid withdrawal, we refund payments received without undue delay using the original payment method. If you expressly requested that service provision begin during the withdrawal period, you may owe the proportionate amount for service provided until withdrawal. Statutory exceptions and consumer rights remain unaffected."]
         ]
     },

@@ -9,6 +9,8 @@ interface __BaseEnv_Env {
 	STRIPE_SECRET_KEY: string;
 	STRIPE_WEBHOOK_SECRET: string;
 	STRIPE_PRICE_ID: string;
+    STRIPE_PRICE_MONTHLY_ID: string;
+    STRIPE_PRICE_ANNUAL_ID: string;
 	APP_URL: string;
 }
 declare namespace Cloudflare {
@@ -22,7 +24,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "SUPABASE_URL" | "SUPABASE_PUBLISHABLE_KEY" | "SUPABASE_SERVICE_ROLE_KEY" | "STRIPE_SECRET_KEY" | "STRIPE_WEBHOOK_SECRET" | "STRIPE_PRICE_ID" | "APP_URL">> {}
+    interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "SUPABASE_URL" | "SUPABASE_PUBLISHABLE_KEY" | "SUPABASE_SERVICE_ROLE_KEY" | "STRIPE_SECRET_KEY" | "STRIPE_WEBHOOK_SECRET" | "STRIPE_PRICE_ID" | "STRIPE_PRICE_MONTHLY_ID" | "STRIPE_PRICE_ANNUAL_ID" | "APP_URL">> {}
 }
 
 // Begin runtime types

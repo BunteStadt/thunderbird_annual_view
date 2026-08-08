@@ -73,7 +73,7 @@ The landing page must not imply that Annual View:
 The landing page has two stages:
 
 1. Let visitors understand and experience the product without commitment.
-2. Invite convinced visitors to connect their own Google Calendar for EUR 1 per month.
+2. Invite convinced visitors to connect their own Google Calendar for EUR 2 per month or EUR 12 annually.
 
 The only primary hero CTA is **Try the demo**. The hero should not contain a pricing CTA or a second competing action. Pricing remains available in the top navigation.
 
@@ -82,7 +82,7 @@ After the product, outcomes, proof, and privacy model have been explained, the f
 Recommended final CTA:
 
 - Heading: **Ready to see your own year?**
-- Supporting copy: **Connect your Google Calendar for EUR 1 per month. Cancel anytime.**
+- Supporting copy: **Connect your Google Calendar for EUR 2 per month or EUR 12 annually. Cancel anytime.**
 - Button: **Continue with Google**
 
 ## Navigation
@@ -300,7 +300,7 @@ Suggested copy:
 
 - Eyebrow: **Your events. A clearer year.**
 - Heading: **Ready to see your own year?**
-- Supporting line: **Connect your Google Calendar for EUR 1 per month. Every current view and filter is included. Cancel anytime.**
+- Supporting line: **Connect your Google Calendar for EUR 2 per month or EUR 12 annually. Every current view and filter is included. Cancel anytime.**
 - CTA: **Continue with Google**
 - Reassurance: **Read-only access. VAT included. Access continues through the paid period after cancellation.**
 
@@ -334,7 +334,7 @@ Yes. Select calendars and use all-day and duration filters to focus on the event
 
 #### Is there a free trial?
 
-There is no trial. The interactive demo lets visitors use the real interface with sample data before subscribing. The full service costs EUR 1 per month, VAT included, and can be cancelled anytime.
+There is no trial. The interactive demo lets visitors use the real interface with sample data before subscribing. The full service costs EUR 2 per month or EUR 12 annually, VAT included, and can be cancelled anytime.
 
 #### What happens when I cancel?
 
@@ -368,7 +368,7 @@ When copy needs to be shortened, preserve ideas in this order:
 4. No duplicate entry and no second plan to synchronize.
 5. Filter noise and choose the right level of detail.
 6. Read-only, no event storage, and open source.
-7. EUR 1 per month after trying the demo.
+7. EUR 2 per month or EUR 12 annually after trying the demo.
 
 Feature names should never displace the customer outcome from the headline or opening copy.
 
@@ -386,7 +386,7 @@ Feature names should never displace the customer outcome from the headline or op
 
 ## Claims and facts to verify before publication
 
-- Confirm that the subscription remains EUR 1 per month with VAT included.
+- Confirm that the subscription remains EUR 2 per month or EUR 12 annually with VAT included.
 - Confirm that there is no free trial.
 - Confirm the exact Thunderbird marketplace label for the 114-user metric.
 - Confirm permission to quote and link the public Thunderbird reviews as presented.

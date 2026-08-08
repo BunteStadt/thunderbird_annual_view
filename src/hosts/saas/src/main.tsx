@@ -134,8 +134,7 @@ function SiteHeader({ navigate, session }: { navigate: Navigate; session: Sessio
                     {open ? <X /> : <Menu />}
                 </button>
                 <div className={`nav-links ${open ? "is-open" : ""}`}>
-                    <button type="button" onClick={() => closeAndNavigate("/pricing")}>Membership</button>
-                    <button type="button" onClick={() => closeAndNavigate("/privacy")}>Privacy</button>
+                    <button type="button" onClick={() => closeAndNavigate("/pricing")}>Pricing</button>
                     <button type="button" className="button button-quiet" onClick={() => closeAndNavigate(session ? "/account" : "/login")}>
                         {session ? <CircleUserRound aria-hidden="true" /> : <LogIn aria-hidden="true" />} {session ? "Account" : "Sign in"}
                     </button>
@@ -257,7 +256,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                             </div>
                             <div className="hero-assurance">
                                 <ShieldCheck aria-hidden="true" />
-                                <p><strong>Read-only by design.</strong> Events are never saved to our database.</p>
+                                <p><strong>Read-only by design.</strong> Calendar data is never stored on our server.</p>
                             </div>
                         </div>
                         <div className="preview-wrap reveal reveal-late">
@@ -484,7 +483,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                             </details>
                             <details>
                                 <summary>Is there a free trial?</summary>
-                                <p>There is no trial. The interactive demo lets visitors use the real interface with sample data before subscribing. The full service costs EUR 1 per month, VAT included, and can be cancelled anytime.</p>
+                                <p>There is no trial. The interactive demo lets visitors use the real interface with sample data before subscribing. The full service costs 2€ per month or 12€ annually, and can be cancelled anytime.</p>
                             </details>
                             <details>
                                 <summary>What happens when I cancel?</summary>
@@ -499,8 +498,8 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                         <div className="final-conversion-copy">
                             <p className="kicker">Your events. A clearer year.</p>
                             <h2>Ready to see your own year?</h2>
-                            <p>Connect your Google Calendar for EUR 1 per month. Every current view and filter is included. Cancel anytime.</p>
-                            <small>Read-only access. VAT included. Access continues through the paid period after cancellation.</small>
+                            <p>Connect your Google Calendar for 2€ per month or 12€ annually. Every current view and filter is included. Cancel anytime.</p>
+                            <small>Read-only access. Access continues through the paid period after cancellation.</small>
                         </div>
                         <button className="button button-inverse" type="button" onClick={() => navigate("/login?next=/account")}>
                             Continue with Google <ArrowRight aria-hidden="true" />
@@ -513,18 +512,33 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
 }
 
 function PricingPage({ navigate, session }: { navigate: Navigate; session: Session | null }) {
+    const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">("annual");
+    const annualBilling = billingPeriod === "annual";
+    const accountPath = `/account?billing=${billingPeriod}`;
+
     return (
-        <main className="page-width inner-page">
+        <main className="page-width inner-page pricing-page">
             <header className="page-intro">
                 <p className="kicker">One plan. No maze.</p>
                 <h1>Keep the whole year in view.</h1>
-                <p>One monthly plan with every current annual-view feature.</p>
+                <p>Choose the billing rhythm that fits you. Every current annual-view feature is included.</p>
             </header>
             <section className="pricing-layout">
                 <div className="price-summary">
-                    <span>Annual View membership</span>
-                    <div><strong>€1</strong><p>per month<br />VAT included</p></div>
-                    <button className="button button-primary button-wide" type="button" onClick={() => navigate(session ? "/account" : "/login?next=/account")}>
+                    <span>Annual View pricing</span>
+                    <fieldset className="pricing-switch">
+                        <legend>Billing period</legend>
+                        <label>
+                            <input type="radio" name="pricing-period" value="annual" checked={annualBilling} onChange={() => setBillingPeriod("annual")} />
+                            <span>Annual <strong>1€/month</strong></span>
+                        </label>
+                        <label>
+                            <input type="radio" name="pricing-period" value="monthly" checked={!annualBilling} onChange={() => setBillingPeriod("monthly")} />
+                            <span>Monthly <strong>2€/month</strong></span>
+                        </label>
+                    </fieldset>
+                    <div><strong>{annualBilling ? "1€" : "2€"}</strong><p>per month<br />{annualBilling ? "12€ billed annually" : "billed monthly"}</p></div>
+                    <button className="button button-primary button-wide" type="button" onClick={() => navigate(session ? accountPath : `/login?next=${encodeURIComponent(accountPath)}`)}>
                         {session ? "Open account" : "Continue with Google"} <ArrowRight aria-hidden="true" />
                     </button>
                     <small>Cancel anytime. Access continues through the paid period.</small>
@@ -540,7 +554,7 @@ function PricingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                         <li><Check aria-hidden="true" /> Stripe-hosted billing management</li>
                     </ul>
                     <h3>What happens after checkout?</h3>
-                    <p>Stripe confirms the subscription securely. Annual View opens as soon as the verified subscription reaches your account.</p>
+                    <p>Stripe confirms your subscription securely, and you are forwarded to YearView.</p>
                 </div>
             </section>
         </main>
@@ -656,6 +670,7 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
     const [pending, setPending] = useState<"checkout" | "portal" | "logout" | "">("");
     const [error, setError] = useState("");
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">(() => new URLSearchParams(globalThis.location.search).get("billing") === "monthly" ? "monthly" : "annual");
     const active = subscription?.status === "active";
     const cancellationScheduled = active && subscription?.cancel_at_period_end === true;
 
@@ -664,7 +679,7 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
         setError("");
         try {
             await redirectFromApi(path, action === "checkout" ? {
-                body: JSON.stringify({ termsAccepted: true }),
+                body: JSON.stringify({ termsAccepted: true, billingPeriod }),
                 headers: { "Content-Type": "application/json" }
             } : undefined);
         } catch (reason) {
@@ -695,7 +710,7 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
                 <section className="account-section">
                     <CreditCard aria-hidden="true" />
                     <h2>Membership</h2>
-                    <p>{loading ? "Checking subscription…" : cancellationScheduled ? "Cancellation scheduled" : active ? "Active · €1 per month" : "No active subscription"}</p>
+                    <p>{loading ? "Checking subscription…" : cancellationScheduled ? "Cancellation scheduled" : active ? "Active subscription" : "No active subscription"}</p>
                     {active ? (
                         <>
                             {subscription?.current_period_end && <small>{cancellationScheduled ? "Access remains available until " : "Current period ends "}{new Date(subscription.current_period_end).toLocaleDateString()}.</small>}
@@ -704,12 +719,23 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
                         </>
                     ) : (
                         <>
+                            <fieldset className="billing-options">
+                                <legend>Choose billing period</legend>
+                                <label>
+                                    <input type="radio" name="billing-period" value="monthly" checked={billingPeriod === "monthly"} onChange={() => setBillingPeriod("monthly")} />
+                                    <span><strong>2€</strong> monthly</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="billing-period" value="annual" checked={billingPeriod === "annual"} onChange={() => setBillingPeriod("annual")} />
+                                    <span><strong>12€</strong> annually</span>
+                                </label>
+                            </fieldset>
                             <label className="terms-consent">
                                 <input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
                                 <span>I agree to the <Link to="/terms" navigate={navigate}>Terms</Link>, acknowledge the <Link to="/privacy" navigate={navigate}>Privacy Policy</Link>, and have read the <Link to="/cancellation" navigate={navigate}>withdrawal information</Link>.</span>
                             </label>
                             <button className="button button-primary" type="button" disabled={loading || !!pending || !termsAccepted} onClick={() => void run("checkout", "/api/stripe/checkout")}>
-                                {pending === "checkout" ? "Opening checkout…" : "Subscribe for €1/month"}
+                                {pending === "checkout" ? "Opening checkout…" : `Subscribe for ${billingPeriod === "monthly" ? "2€/month" : "12€/year"}`}
                             </button>
                         </>
                     )}

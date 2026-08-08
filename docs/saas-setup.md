@@ -111,16 +111,16 @@ domain is known.
 2. Turn on **Test mode**.
 3. Open **Product catalog > Add product**.
 4. Create a product for Annual View.
-5. Add a recurring price:
-   - Currency: EUR
-   - Amount: 1.00
-   - Interval: monthly
-6. Copy the **Price ID**, which starts with `price_`.
+6. Add two recurring prices to the product:
+   - Currency: EUR; amount `2.00`; interval: monthly
+   - Currency: EUR; amount `12.00`; interval: yearly
+7. Copy both **Price IDs**, which start with `price_`.
 7. Configure the Stripe Billing Portal.
 8. Configure automatic tax for the test account.
 9. Configure cancellation at the end of the paid period.
 
-Use the Price ID, not the Product ID, in `STRIPE_PRICE_ID`.
+Use the Price IDs, not the Product ID, in `STRIPE_PRICE_MONTHLY_ID` and
+`STRIPE_PRICE_ANNUAL_ID`.
 
 ## 7. Create local environment files
 
@@ -146,7 +146,8 @@ SUPABASE_PUBLISHABLE_KEY=<supabase-publishable-key>
 SUPABASE_SERVICE_ROLE_KEY=<supabase-service-role-key>
 STRIPE_SECRET_KEY=<stripe-test-secret-key>
 STRIPE_WEBHOOK_SECRET=<stripe-local-webhook-secret>
-STRIPE_PRICE_ID=<stripe-test-price-id>
+STRIPE_PRICE_MONTHLY_ID=<stripe-monthly-price-id>
+STRIPE_PRICE_ANNUAL_ID=<stripe-annual-price-id>
 APP_URL=http://localhost:8788
 ```
 

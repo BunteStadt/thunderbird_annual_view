@@ -3,12 +3,13 @@
 ## 1. Product scope
 
 The SaaS host is a paid website for the existing annual calendar view. It adds
-public product pages, Google login, a single monthly subscription, account and
+public product pages, Google login, monthly and annual subscriptions, account and
 billing management, and subscription-gated Google Calendar access.
 
-The first release has one plan:
+The first release has one product with two billing periods:
 
-- EUR 1.00 per month
+- EUR 2.00 per month
+- EUR 12.00 per year
 - VAT included
 - no trial
 - cancel at any time, effective at the end of the paid period
@@ -96,8 +97,9 @@ For a working end-to-end flow:
 2. Enable Google in Supabase Auth and configure Google OAuth, the Calendar
    read-only scope, Site URL, and redirect allowlist. Include
    `http://localhost:8788/auth/callback` for local inspection.
-3. Create a Stripe test Product and recurring EUR 1 monthly Price, then set
-   `STRIPE_PRICE_ID` in `.dev.vars`.
+3. Create a Stripe test Product with recurring EUR 2 monthly and EUR 12 yearly
+   Prices, then set `STRIPE_PRICE_MONTHLY_ID` and `STRIPE_PRICE_ANNUAL_ID` in
+   `.dev.vars`.
 4. Configure Stripe Billing Portal and automatic tax for the test account.
 5. Forward Stripe test webhooks locally:
 
@@ -318,7 +320,8 @@ terminal update.
 2. Reuse the subscription row's Stripe customer or create one with the Supabase
    user ID in immutable metadata.
 3. Create a hosted Checkout Session in `subscription` mode using only
-   `STRIPE_PRICE_ID` from server configuration.
+   `STRIPE_PRICE_MONTHLY_ID` or `STRIPE_PRICE_ANNUAL_ID` from server
+   configuration.
 4. Set the Supabase user ID as client reference and subscription metadata.
 5. Enable automatic tax and redirect only to the configured application URL.
 6. Return the short-lived Stripe Checkout URL.
@@ -413,7 +416,7 @@ typography, strong contrast, visible focus states, and restrained motion. The
 landing page leads with the product name and a schematic annual-view preview.
 
 The landing page includes the core value proposition, read-only Google Calendar
-trust signal, product workflow, EUR 1 CTA, and legal footer. The pricing page has
+trust signal, product workflow, EUR 2 monthly / EUR 12 annual CTA, and legal footer. The pricing page has
 one clear tier rather than a fake comparison table. Account, checkout, and route
 authorization actions expose pending or denied states.
 
@@ -428,7 +431,8 @@ authorization actions expose pending or denied states.
 | `SUPABASE_SERVICE_ROLE_KEY` | No | Yes | Yes |
 | `STRIPE_SECRET_KEY` | No | Yes | Yes |
 | `STRIPE_WEBHOOK_SECRET` | No | Yes | Yes |
-| `STRIPE_PRICE_ID` | No | Yes | No |
+| `STRIPE_PRICE_MONTHLY_ID` | No | Yes | No |
+| `STRIPE_PRICE_ANNUAL_ID` | No | Yes | No |
 | `APP_URL` | No | Yes | No |
 
 Local secret values live in ignored `.dev.vars`; browser-safe local values live
@@ -502,7 +506,7 @@ npx wrangler deploy --dry-run
 - Supabase Google provider, Site URL, and preview/production redirects configured
 - Google OAuth branding, privacy URL, terms URL, and Calendar scope verified
 - migration applied and RLS tests passing
-- Stripe live product and EUR 1 inclusive-tax monthly Price created
+- Stripe live product and EUR 2 monthly / EUR 12 annual inclusive-tax Prices created
 - Stripe Portal configured for period-end cancellation
 - Stripe webhook endpoint registered with only required event types
 - Cloudflare public variables and secrets configured separately per environment

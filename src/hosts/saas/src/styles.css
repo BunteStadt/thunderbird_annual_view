@@ -1710,6 +1710,10 @@ a:focus-visible {
     padding-block: clamp(64px, 9vw, 120px);
 }
 
+.pricing-page {
+    padding-block: 24px 28px;
+}
+
 .account-page {
     padding-block: clamp(52px, 8vw, 100px);
 }
@@ -1764,6 +1768,39 @@ a:focus-visible {
 .account-section small {
     margin: -8px 0 24px;
     color: #657069;
+}
+
+.billing-options {
+    width: 100%;
+    margin: 0 0 24px;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    border: 0;
+}
+
+.billing-options legend {
+    margin-bottom: 8px;
+    font-size: .9rem;
+    font-weight: 760;
+}
+
+.billing-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--av-grid-line);
+    color: var(--av-weekday-text);
+    cursor: pointer;
+}
+
+.billing-options input {
+    accent-color: var(--av-accent-strong);
+}
+
+.billing-options strong {
+    color: var(--av-text);
 }
 
 .terms-consent {
@@ -1834,6 +1871,11 @@ a:focus-visible {
     line-height: .9;
 }
 
+.pricing-page .page-intro h1 {
+    max-width: 1000px;
+    font-size: clamp(3rem, 4.8vw, 4.5rem);
+}
+
 .page-intro>p:last-child {
     max-width: 620px;
     color: var(--av-weekday-text);
@@ -1841,7 +1883,7 @@ a:focus-visible {
 }
 
 .pricing-layout {
-    margin-top: 70px;
+    margin-top: 28px;
     display: grid;
     grid-template-columns: minmax(300px, .8fr) minmax(360px, 1.2fr);
     gap: clamp(42px, 9vw, 130px);
@@ -1859,6 +1901,50 @@ a:focus-visible {
     font-weight: 760;
 }
 
+.pricing-switch {
+    margin: 28px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border: 1px solid rgba(255, 255, 255, .36);
+}
+
+.pricing-switch legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.pricing-switch label {
+    padding: 12px 10px;
+    color: #c8d8ed;
+    text-align: center;
+    cursor: pointer;
+}
+
+.pricing-switch label:has(input:checked) {
+    color: var(--av-accent-strong);
+    background: #fff;
+}
+
+.pricing-switch input {
+    position: absolute;
+    opacity: 0;
+}
+
+.pricing-switch span {
+    display: grid;
+    gap: 3px;
+    font-size: .84rem;
+}
+
+.pricing-switch strong {
+    font-size: .95rem;
+}
+
 .price-summary>div {
     margin: 38px 0;
     display: flex;
@@ -1866,7 +1952,7 @@ a:focus-visible {
     gap: 18px;
 }
 
-.price-summary strong {
+.price-summary>div>strong {
     font-family: "Newsreader Variable", serif;
     font-size: 6rem;
     font-weight: 500;
@@ -1899,7 +1985,7 @@ a:focus-visible {
 }
 
 .included li {
-    padding: 15px 0;
+    padding: 9px 0;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1912,7 +1998,7 @@ a:focus-visible {
 }
 
 .included h3 {
-    margin-top: 42px;
+    margin-top: 24px;
 }
 
 .included p {

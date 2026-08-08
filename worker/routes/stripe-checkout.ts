@@ -12,7 +12,7 @@ export async function stripeCheckout(request: Request, env: Env): Promise<Respon
         return auth;
     }
 
-    let body: { termsAccepted?: unknown } | null = null;
+    let body: { termsAccepted?: unknown; billingPeriod?: unknown } | null = null;
     try {
         body = await request.json() as { termsAccepted?: unknown };
     } catch {
@@ -20,6 +20,14 @@ export async function stripeCheckout(request: Request, env: Env): Promise<Respon
     }
     if (body?.termsAccepted !== true) {
         return json({ error: "Terms acceptance is required before checkout." }, { status: 400 });
+    }
+    const billingPeriod = body.billingPeriod === "annual" ? "annual" : body.billingPeriod === "monthly" || body.billingPeriod === undefined ? "monthly" : null;
+    if (!billingPeriod) {
+        return json({ error: "Choose a monthly or annual billing period." }, { status: 400 });
+    }
+    const priceId = billingPeriod === "annual" ? env.STRIPE_PRICE_ANNUAL_ID : env.STRIPE_PRICE_MONTHLY_ID || env.STRIPE_PRICE_ID;
+    if (!priceId) {
+        return json({ error: "The selected billing plan is not configured." }, { status: 500 });
     }
 
     const stripe = createStripe(env);
@@ -50,7 +58,7 @@ export async function stripeCheckout(request: Request, env: Env): Promise<Respon
         mode: "subscription",
         customer: customerId,
         client_reference_id: auth.user.id,
-        line_items: [{ price: env.STRIPE_PRICE_ID, quantity: 1 }],
+        line_items: [{ price: priceId, quantity: 1 }],
         automatic_tax: { enabled: true },
         customer_update: { address: "auto" },
         subscription_data: {

@@ -16,3 +16,7 @@ tb:
 # build and start the SaaS website with Wrangler
 website:
 	npm run dev:saas:full
+
+#build website with vite and start it
+vweb:
+	npm run dev:saas

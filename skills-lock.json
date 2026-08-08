@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "agb-kontrolle": {
+      "source": "borghei/AI-Skills-German-Law",
+      "sourceType": "github",
+      "skillPath": "vertragsrecht/skills/agb-kontrolle/SKILL.md",
+      "computedHash": "b7377fbd53114a4538563ae8ee186d8f02a91d932ff540afd229d67ec225d773"
+    },
     "api-and-interface-design": {
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
@@ -18,6 +24,12 @@
       "sourceType": "github",
       "skillPath": "skills/ci-cd-and-automation/SKILL.md",
       "computedHash": "578b098a7d2352ccdac8b8abdc40eb6803538e81cf8382f138da6188a655087c"
+    },
+    "cloud-auftragsverarbeitung": {
+      "source": "borghei/AI-Skills-German-Law",
+      "sourceType": "github",
+      "skillPath": "it-recht/skills/cloud-auftragsverarbeitung/SKILL.md",
+      "computedHash": "c47e7dfe4c17aec728b96ba609938ecdb50b3cd9f8b04384fdab1659bbeebdb3"
     },
     "code-review-and-quality": {
       "source": "addyosmani/agent-skills",
@@ -60,6 +72,12 @@
       "sourceType": "github",
       "skillPath": "skills/doubt-driven-development/SKILL.md",
       "computedHash": "f6094460ebc9512285c85790e49f612081b9dd6a2b77d874fe2d960ef50a9ef1"
+    },
+    "e-commerce-pflichten": {
+      "source": "borghei/AI-Skills-German-Law",
+      "sourceType": "github",
+      "skillPath": "it-recht/skills/e-commerce-pflichten/SKILL.md",
+      "computedHash": "7b61aaeac9da9cabf2f7c29584499859e426f23d6b1595a05dd487b3f2d761b6"
     },
     "frontend-ui-engineering": {
       "source": "addyosmani/agent-skills",

@@ -89,18 +89,27 @@ function createDayCell(date, ctx) {
     return cell;
 }
 
+function appendLabelLines(element, label) {
+    for (const part of label.split(" / ")) {
+        const line = document.createElement("span");
+        line.textContent = part;
+        element.appendChild(line);
+    }
+}
+
 function createMonthLabelCell(meta) {
     const cell = document.createElement("div");
     cell.className = "cell month";
 
     const name = document.createElement("span");
     name.className = "month-name";
-    name.textContent = meta.monthLabel ?? MONTH_NAMES[meta.month].slice(0, 3);
+    const monthLabel = meta.monthLabel ?? MONTH_NAMES[meta.month].slice(0, 3);
+    appendLabelLines(name, monthLabel);
     cell.appendChild(name);
 
     const year = document.createElement("span");
     year.className = "month-year";
-    year.textContent = String(meta.yearLabel ?? meta.year);
+    appendLabelLines(year, String(meta.yearLabel ?? meta.year));
     cell.appendChild(year);
 
     return cell;
@@ -349,7 +358,10 @@ export class GridView {
         this._scrollPending = false;
 
         this._onScroll = () => this._scheduleScrollWork();
-        this._onResize = () => this._scheduleScrollWork();
+        this._onResize = () => {
+            this._syncMonthColumnWidth();
+            this._scheduleScrollWork();
+        };
         this.viewport.addEventListener("scroll", this._onScroll);
         window.addEventListener("resize", this._onResize);
     }
@@ -400,6 +412,7 @@ export class GridView {
     _rebuild(anchorKey, scrollTop = 0) {
         this.renderGen += 1;
         this.rows = [];
+        this.viewport.style.removeProperty("--month-column-width");
         this.rowsContainer.textContent = "";
         this._renderHeader();
         this._appendRow(anchorKey);
@@ -492,6 +505,7 @@ export class GridView {
         const row = this._createRow(key);
         this.rowsContainer.appendChild(row.el);
         this.rows.push(row);
+        this._syncMonthColumnWidth();
         return row;
     }
 
@@ -499,7 +513,17 @@ export class GridView {
         const row = this._createRow(key);
         this.rowsContainer.insertBefore(row.el, this.rowsContainer.firstChild);
         this.rows.unshift(row);
+        this._syncMonthColumnWidth();
         return row;
+    }
+
+    _syncMonthColumnWidth() {
+        this.viewport.style.removeProperty("--month-column-width");
+        let width = 0;
+        for (const month of this.rowsContainer.querySelectorAll(".month")) {
+            width = Math.max(width, month.getBoundingClientRect().width);
+        }
+        if (width > 0) this.viewport.style.setProperty("--month-column-width", `${width}px`);
     }
 
     _scheduleScrollWork() {

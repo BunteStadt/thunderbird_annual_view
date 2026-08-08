@@ -265,10 +265,16 @@ input[type="number"] {
 .view-mode-label {
   display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .view-mode-label select {
-  min-width: 90px;
+  width: 7.25rem;
+  min-width: 7.25rem;
+  padding-inline: 0.5rem 1.75rem;
+  text-align: start;
 }
 
 .btn,
@@ -720,7 +726,7 @@ input[type="number"] {
   font-size: 1rem;
 }
 
-.onboarding-tour-card > p:not(.onboarding-tour-step) {
+.onboarding-tour-card>p:not(.onboarding-tour-step) {
   margin: 0.5rem 0 1rem;
   font-size: 0.86rem;
   line-height: 1.45;
@@ -765,25 +771,25 @@ input[type="number"] {
 }
 
 .grid-row.linear {
-  grid-template-columns: 120px repeat(31, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(31, minmax(0, 1fr));
 }
 
 /* Day-of-week aligned view: needs up to 37 columns (6 empty + 31 days max) */
 .grid-row.day-aligned {
-  grid-template-columns: 120px repeat(37, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(37, minmax(0, 1fr));
 }
 
 /* Week-row views: month label column plus 4/2/1 weeks */
 .grid-row.week-rows {
-  grid-template-columns: 120px repeat(28, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(28, minmax(0, 1fr));
 }
 
 .grid-row.two-week-rows {
-  grid-template-columns: 120px repeat(14, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(14, minmax(0, 1fr));
 }
 
 .grid-row.one-week-rows {
-  grid-template-columns: 120px repeat(7, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(7, minmax(0, 1fr));
 }
 
 /* Sticky weekday header shared by all rows */
@@ -803,19 +809,19 @@ input[type="number"] {
 }
 
 .grid-header.day-aligned {
-  grid-template-columns: 120px repeat(37, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(37, minmax(0, 1fr));
 }
 
 .grid-header.week-rows {
-  grid-template-columns: 120px repeat(28, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(28, minmax(0, 1fr));
 }
 
 .grid-header.two-week-rows {
-  grid-template-columns: 120px repeat(14, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(14, minmax(0, 1fr));
 }
 
 .grid-header.one-week-rows {
-  grid-template-columns: 120px repeat(7, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(7, minmax(0, 1fr));
 }
 
 .weekday-header {
@@ -842,23 +848,23 @@ input[type="number"] {
 }
 
 .row-events.linear {
-  grid-template-columns: 120px repeat(31, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(31, minmax(0, 1fr));
 }
 
 .row-events.day-aligned {
-  grid-template-columns: 120px repeat(37, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(37, minmax(0, 1fr));
 }
 
 .row-events.week-rows {
-  grid-template-columns: 120px repeat(28, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(28, minmax(0, 1fr));
 }
 
 .row-events.two-week-rows {
-  grid-template-columns: 120px repeat(14, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(14, minmax(0, 1fr));
 }
 
 .row-events.one-week-rows {
-  grid-template-columns: 120px repeat(7, minmax(0, 1fr));
+  grid-template-columns: var(--month-column-width, max-content) repeat(7, minmax(0, 1fr));
 }
 
 .cell {
@@ -930,10 +936,11 @@ input[type="number"] {
 .month {
   background: var(--month-col);
   font-weight: 700;
-  padding-right: 0.75rem;
+  padding-inline: clamp(0.2rem, 0.5vw, 0.4rem);
+  font-size: clamp(0.65rem, 1.4vw, 1rem);
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
   gap: 2px;
   color: var(--text);
@@ -942,10 +949,22 @@ input[type="number"] {
   /* Always place month labels in the first column */
 }
 
+.month-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
+}
+
 .month .month-year {
-  font-size: 0.72rem;
+  font-size: clamp(0.52rem, 0.85vw, 0.72rem);
   font-weight: 600;
   color: var(--muted);
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
 }
 
 .event {
@@ -982,31 +1001,31 @@ input[type="number"] {
 
   .grid-row.linear,
   .row-events.linear {
-    grid-template-columns: 100px repeat(31, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(31, minmax(0, 1fr));
   }
 
   .grid-row.day-aligned,
   .row-events.day-aligned,
   .grid-header.day-aligned {
-    grid-template-columns: 100px repeat(37, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(37, minmax(0, 1fr));
   }
 
   .grid-row.week-rows,
   .row-events.week-rows,
   .grid-header.week-rows {
-    grid-template-columns: 100px repeat(28, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(28, minmax(0, 1fr));
   }
 
   .grid-row.two-week-rows,
   .row-events.two-week-rows,
   .grid-header.two-week-rows {
-    grid-template-columns: 100px repeat(14, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(14, minmax(0, 1fr));
   }
 
   .grid-row.one-week-rows,
   .row-events.one-week-rows,
   .grid-header.one-week-rows {
-    grid-template-columns: 100px repeat(7, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(7, minmax(0, 1fr));
   }
 }
 
@@ -1023,31 +1042,31 @@ input[type="number"] {
 
   .grid-row.linear,
   .row-events.linear {
-    grid-template-columns: 88px repeat(31, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(31, minmax(0, 1fr));
   }
 
   .grid-row.day-aligned,
   .row-events.day-aligned,
   .grid-header.day-aligned {
-    grid-template-columns: 88px repeat(37, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(37, minmax(0, 1fr));
   }
 
   .grid-row.week-rows,
   .row-events.week-rows,
   .grid-header.week-rows {
-    grid-template-columns: 88px repeat(28, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(28, minmax(0, 1fr));
   }
 
   .grid-row.two-week-rows,
   .row-events.two-week-rows,
   .grid-header.two-week-rows {
-    grid-template-columns: 88px repeat(14, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(14, minmax(0, 1fr));
   }
 
   .grid-row.one-week-rows,
   .row-events.one-week-rows,
   .grid-header.one-week-rows {
-    grid-template-columns: 88px repeat(7, minmax(0, 1fr));
+    grid-template-columns: var(--month-column-width, max-content) repeat(7, minmax(0, 1fr));
   }
 }
 

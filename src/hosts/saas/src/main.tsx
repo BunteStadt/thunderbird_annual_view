@@ -267,7 +267,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                             </div>
                             <div className="hero-assurance">
                                 <ShieldCheck aria-hidden="true" />
-                                <p><strong>Read-only Google Calendar access.</strong> No event edits. No calendar data stored on our server.</p>
+                                <p><strong>How it works.</strong> Year View uses your Google Calendar event and calendar list data to show a full-year overview. Access is read-only: no event edits and no calendar data stored on our server.</p>
                             </div>
                         </div>
                         <div className="preview-wrap reveal reveal-late">

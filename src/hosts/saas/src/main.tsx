@@ -137,7 +137,7 @@ function SiteHeader({ navigate, path, session }: { navigate: Navigate; path: str
                     {open ? <X /> : <Menu />}
                 </button>
                 <button className="button button-primary nav-demo-link" type="button" onClick={() => closeAndNavigate(session ? "/app" : isDemoPage ? "/login?next=/account" : "/demo")}>
-                    {session ? "Open YearView" : isDemoPage ? "Sign up" : "Open demo"}
+                    {session ? "Open Year View" : isDemoPage ? "Sign up" : "Open demo"}
                 </button>
                 <div className={`nav-links ${open ? "is-open" : ""}`}>
                     <a
@@ -262,7 +262,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                             <p className="hero-lead">Year View shows your events on a full-year grid, making it easy to spot busy or free periods.</p>
                             <div className="hero-actions">
                                 <button className="button button-primary hero-demo-button" type="button" onClick={() => navigate(session ? "/app" : "/demo")}>
-                                    <Eye aria-hidden="true" /> {session ? "Open YearView" : "Try the demo"}
+                                    <Eye aria-hidden="true" /> {session ? "Open Year View" : "Try the demo"}
                                 </button>
                             </div>
                             <div className="hero-assurance">

@@ -1,0 +1,498 @@
+/* Shared SaaS route chrome. Core calendar surfaces are intentionally excluded. */
+.saas-shell:not(.landing-shell) {
+    --sp-petrol-950: #062f35;
+    --sp-petrol-900: #073e45;
+    --sp-petrol-700: #176c6b;
+    --sp-brass: #c99d4b;
+    --sp-brass-bright: #e6bd67;
+    --sp-ink: #122426;
+    --sp-muted: #627473;
+    --sp-paper: #f5f1e8;
+    --sp-surface: #fffdf7;
+    --sp-line: rgba(18, 36, 38, .15);
+    --sp-shadow: 0 22px 56px rgba(6, 47, 53, .13);
+    min-height: 100vh;
+    color: var(--sp-ink);
+    background: var(--sp-paper);
+    font-family: "Manrope Variable", "Segoe UI", sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+.saas-shell.saas-theme-dark:not(.landing-shell) {
+    --sp-ink: #f3f1e7;
+    --sp-muted: #afbfba;
+    --sp-paper: #082f35;
+    --sp-surface: #0b4147;
+    --sp-line: rgba(237, 239, 226, .18);
+    --sp-shadow: 0 22px 56px rgba(0, 10, 12, .34);
+}
+
+.saas-shell:not(.landing-shell) .site-header,
+.saas-shell:not(.landing-shell) .site-footer {
+    position: relative;
+    z-index: 20;
+    color: var(--sp-ink);
+    border-color: var(--sp-line);
+    background: color-mix(in srgb, var(--sp-paper) 90%, transparent);
+    backdrop-filter: blur(14px);
+}
+
+.saas-shell:not(.landing-shell) .site-header {
+    border-bottom: 1px solid var(--sp-line);
+}
+
+.saas-shell:not(.landing-shell) .nav-shell,
+.saas-shell:not(.landing-shell) .page-width {
+    width: min(1120px, calc(100% - 56px));
+}
+
+.saas-shell:not(.landing-shell) .nav-shell {
+    min-height: 78px;
+}
+
+.saas-shell:not(.landing-shell) .brand,
+.saas-shell:not(.landing-shell) .nav-links > button,
+.saas-shell:not(.landing-shell) .text-link,
+.saas-shell:not(.landing-shell) .footer-grid a {
+    color: var(--sp-ink);
+}
+
+.saas-shell:not(.landing-shell) .brand {
+    gap: 11px;
+    font-size: .96rem;
+    letter-spacing: -.02em;
+}
+
+.saas-shell:not(.landing-shell) .brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--sp-petrol-900);
+}
+
+.saas-shell:not(.landing-shell) .brand-mark img {
+    width: 25px;
+}
+
+.saas-shell:not(.landing-shell) .nav-links {
+    gap: 18px;
+}
+
+.saas-shell:not(.landing-shell) .nav-links > button,
+.saas-shell:not(.landing-shell) .nav-links > a {
+    font-size: .78rem;
+    font-weight: 750;
+}
+
+.saas-shell:not(.landing-shell) .nav-links > button:hover,
+.saas-shell:not(.landing-shell) .nav-links > a:hover,
+.saas-shell:not(.landing-shell) .footer-grid a:hover {
+    color: var(--sp-petrol-700);
+}
+
+.saas-shell.saas-theme-dark:not(.landing-shell) .nav-links > button:hover,
+.saas-shell.saas-theme-dark:not(.landing-shell) .nav-links > a:hover,
+.saas-shell.saas-theme-dark:not(.landing-shell) .footer-grid a:hover {
+    color: var(--sp-brass-bright);
+}
+
+.saas-shell:not(.landing-shell) .icon-button,
+.saas-shell:not(.landing-shell) .button-quiet {
+    border-color: var(--sp-line) !important;
+    color: var(--sp-ink);
+    background: transparent;
+}
+
+.saas-shell:not(.landing-shell) .icon-button {
+    min-width: 42px;
+    min-height: 42px;
+    border-radius: 50%;
+}
+
+.saas-shell:not(.landing-shell) .icon-button:hover,
+.saas-shell:not(.landing-shell) .button-quiet:hover {
+    color: var(--sp-petrol-700);
+    background: var(--sp-surface);
+}
+
+.saas-shell.saas-theme-dark:not(.landing-shell) .icon-button:hover,
+.saas-shell.saas-theme-dark:not(.landing-shell) .button-quiet:hover {
+    color: var(--sp-brass-bright);
+}
+
+.saas-shell:not(.landing-shell) .theme-toggle {
+    order: 2;
+    margin-left: 10px;
+}
+
+.saas-shell:not(.landing-shell) .menu-button {
+    order: 3;
+}
+
+.saas-shell:not(.landing-shell) .nav-demo-link {
+    order: 4;
+    min-height: 44px;
+    margin-left: 8px;
+    border-color: var(--sp-petrol-900) !important;
+    border-radius: 5px;
+    color: #fff !important;
+    background: var(--sp-petrol-900) !important;
+    box-shadow: 0 8px 18px rgba(6, 47, 53, .14);
+}
+
+.saas-shell:not(.landing-shell) .nav-demo-link:hover {
+    background: var(--sp-petrol-700) !important;
+}
+
+.saas-shell:not(.landing-shell) .button {
+    border-radius: 5px;
+    transition: transform 180ms ease, color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.saas-shell:not(.landing-shell) .button:hover {
+    transform: translateY(-2px);
+}
+
+.saas-shell:not(.landing-shell) .button:active {
+    transform: scale(.96);
+}
+
+.saas-shell:not(.landing-shell) .button-primary,
+.saas-shell:not(.landing-shell) .brand-mark,
+.saas-shell:not(.landing-shell) .auth-icon {
+    background: var(--sp-petrol-900);
+}
+
+.saas-shell:not(.landing-shell) .button-primary:hover {
+    background: var(--sp-petrol-700);
+}
+
+.saas-shell:not(.landing-shell) .inner-page,
+.saas-shell:not(.landing-shell) .legal-page,
+.saas-shell:not(.landing-shell) .auth-page,
+.saas-shell:not(.landing-shell) .status-page,
+.saas-shell:not(.landing-shell) .account-page {
+    color: var(--sp-ink);
+}
+
+.saas-shell:not(.landing-shell) .inner-page,
+.saas-shell:not(.landing-shell) .legal-page {
+    padding-block: clamp(72px, 10vw, 132px);
+}
+
+.saas-shell:not(.landing-shell) .page-intro,
+.saas-shell:not(.landing-shell) .legal-page {
+    max-width: 860px;
+}
+
+.saas-shell:not(.landing-shell) .page-intro h1,
+.saas-shell:not(.landing-shell) .legal-page h1,
+.saas-shell:not(.landing-shell) .auth-panel h1,
+.saas-shell:not(.landing-shell) .status-page h1,
+.saas-shell:not(.landing-shell) .account-page > h1,
+.saas-shell:not(.landing-shell) .included h2,
+.saas-shell:not(.landing-shell) .account-section h2,
+.saas-shell:not(.landing-shell) .legal-page h2 {
+    font-family: "Newsreader Variable", Georgia, serif;
+    font-weight: 450;
+    letter-spacing: -.035em;
+}
+
+.saas-shell:not(.landing-shell) .page-intro h1,
+.saas-shell:not(.landing-shell) .legal-page h1 {
+    font-size: clamp(3.8rem, 8vw, 7rem);
+    line-height: .84;
+}
+
+.saas-shell:not(.landing-shell) .page-intro > p:last-child,
+.saas-shell:not(.landing-shell) .legal-intro,
+.saas-shell:not(.landing-shell) .auth-panel > p:not(.kicker):not(.form-error),
+.saas-shell:not(.landing-shell) .account-section p,
+.saas-shell:not(.landing-shell) .account-section small,
+.saas-shell:not(.landing-shell) .included p,
+.saas-shell:not(.landing-shell) .legal-page section p,
+.saas-shell:not(.landing-shell) .status-page p {
+    color: var(--sp-muted);
+}
+
+.saas-shell:not(.landing-shell) .kicker,
+.saas-shell:not(.landing-shell) .back-link,
+.saas-shell:not(.landing-shell) .account-section > svg,
+.saas-shell:not(.landing-shell) .status-page > svg,
+.saas-shell:not(.landing-shell) .included li svg {
+    color: var(--sp-petrol-700);
+}
+
+.saas-shell.saas-theme-dark:not(.landing-shell) .kicker,
+.saas-shell.saas-theme-dark:not(.landing-shell) .back-link,
+.saas-shell.saas-theme-dark:not(.landing-shell) .account-section > svg,
+.saas-shell.saas-theme-dark:not(.landing-shell) .status-page > svg,
+.saas-shell.saas-theme-dark:not(.landing-shell) .included li svg {
+    color: var(--sp-brass-bright);
+}
+
+.saas-shell:not(.landing-shell) .pricing-layout {
+    margin-top: 54px;
+    gap: clamp(44px, 9vw, 116px);
+}
+
+.saas-shell:not(.landing-shell) .price-summary {
+    padding: 34px;
+    border: 1px solid color-mix(in srgb, var(--sp-brass-bright) 45%, transparent);
+    border-radius: 8px;
+    color: #f7f4e9;
+    background: var(--sp-petrol-900);
+    box-shadow: var(--sp-shadow);
+}
+
+.saas-shell:not(.landing-shell) .price-summary > div > strong {
+    font-family: "Newsreader Variable", Georgia, serif;
+    color: var(--sp-brass-bright);
+}
+
+.saas-shell:not(.landing-shell) .pricing-switch {
+    border-color: rgba(255, 255, 255, .3);
+}
+
+.saas-shell:not(.landing-shell) .pricing-switch label:has(input:checked) {
+    color: var(--sp-petrol-950);
+    background: var(--sp-brass-bright);
+}
+
+.saas-shell:not(.landing-shell) .pricing-switch label {
+    color: #c8d8d1;
+}
+
+.saas-shell:not(.landing-shell) .price-summary small {
+    color: #c8d8d1;
+}
+
+.saas-shell:not(.landing-shell) .included {
+    padding-top: 18px;
+}
+
+.saas-shell:not(.landing-shell) .included h2 {
+    margin-bottom: 28px;
+    font-size: 3rem;
+}
+
+.saas-shell:not(.landing-shell) .included li,
+.saas-shell:not(.landing-shell) .account-section,
+.saas-shell:not(.landing-shell) .legal-page section {
+    border-color: var(--sp-line);
+}
+
+.saas-shell:not(.landing-shell) .auth-page {
+    min-height: calc(100vh - 156px);
+    padding-block: 72px;
+    place-items: center;
+}
+
+.saas-shell:not(.landing-shell) .auth-panel {
+    width: min(460px, 100%);
+    padding: clamp(30px, 5vw, 48px);
+    border: 1px solid var(--sp-line);
+    border-radius: 8px;
+    background: var(--sp-surface);
+    box-shadow: var(--sp-shadow);
+}
+
+.saas-shell:not(.landing-shell) .auth-panel h1 {
+    font-size: 3.4rem;
+    line-height: .9;
+}
+
+.saas-shell:not(.landing-shell) .auth-icon {
+    border-radius: 50%;
+}
+
+.saas-shell:not(.landing-shell) .form-error {
+    color: #7c2d1b;
+    background: #f2d5ca;
+}
+
+.saas-shell:not(.landing-shell) .account-page {
+    padding-block: 54px 90px;
+}
+
+.saas-shell:not(.landing-shell) .account-grid {
+    margin-top: 0;
+    border: 1px solid var(--sp-line);
+    box-shadow: var(--sp-shadow);
+}
+
+.saas-shell:not(.landing-shell) .account-section {
+    min-height: 360px;
+    padding: clamp(28px, 5vw, 52px);
+    background: var(--sp-surface);
+}
+
+.saas-shell:not(.landing-shell) .account-section h2 {
+    font-size: 2.5rem;
+}
+
+.saas-shell:not(.landing-shell) .billing-options label,
+.saas-shell:not(.landing-shell) .auth-panel,
+.saas-shell:not(.landing-shell) .account-grid {
+    border-color: var(--sp-line);
+}
+
+.saas-shell:not(.landing-shell) .billing-options label {
+    background: color-mix(in srgb, var(--sp-paper) 75%, transparent);
+}
+
+.saas-shell:not(.landing-shell) .terms-consent,
+.saas-shell:not(.landing-shell) .billing-options label {
+    color: var(--sp-muted);
+}
+
+.saas-shell:not(.landing-shell) .terms-consent a {
+    color: var(--sp-petrol-700);
+}
+
+.saas-shell.saas-theme-dark:not(.landing-shell) .terms-consent a {
+    color: var(--sp-brass-bright);
+}
+
+.saas-shell:not(.landing-shell) .legal-page section {
+    padding-block: 32px;
+}
+
+.saas-shell:not(.landing-shell) .legal-page h2 {
+    font-size: 2.2rem;
+}
+
+.saas-shell:not(.landing-shell) .status-page {
+    min-height: calc(100vh - 156px);
+}
+
+.saas-shell:not(.landing-shell) .status-page h1 {
+    max-width: 760px;
+    font-size: clamp(3rem, 6vw, 5.8rem);
+    line-height: .86;
+}
+
+.saas-shell:not(.landing-shell) .site-footer {
+    padding-block: 24px;
+    border-top: 1px solid var(--sp-line);
+}
+
+.saas-shell:not(.landing-shell) .footer-brand,
+.saas-shell:not(.landing-shell) .footer-grid nav {
+    font-size: .72rem;
+}
+
+.saas-shell:not(.landing-shell) .footer-grid a,
+.saas-shell:not(.landing-shell) .footer-brand span {
+    color: var(--sp-muted);
+}
+
+.saas-shell:not(.landing-shell) button:focus-visible,
+.saas-shell:not(.landing-shell) a:focus-visible,
+.saas-shell:not(.landing-shell) summary:focus-visible {
+    outline: 3px solid var(--sp-brass);
+    outline-offset: 4px;
+}
+
+@media (max-width: 1100px) {
+    .saas-shell:not(.landing-shell) .page-width,
+    .saas-shell:not(.landing-shell) .nav-shell {
+        width: min(100% - 40px, 720px);
+    }
+
+    .saas-shell:not(.landing-shell) .menu-button {
+        display: grid;
+    }
+
+    .saas-shell:not(.landing-shell) .nav-links {
+        right: 20px;
+        top: 66px;
+        width: min(280px, calc(100vw - 40px));
+        padding: 16px;
+        border: 1px solid var(--sp-line);
+        background: var(--sp-surface);
+        box-shadow: var(--sp-shadow);
+    }
+
+    .saas-shell:not(.landing-shell) .nav-links > * {
+        white-space: nowrap;
+    }
+
+    .saas-shell:not(.landing-shell) .pricing-layout {
+        grid-template-columns: 1fr;
+        margin-top: 42px;
+    }
+
+    .saas-shell:not(.landing-shell) .account-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .saas-shell:not(.landing-shell) .page-width,
+    .saas-shell:not(.landing-shell) .nav-shell {
+        width: min(100% - 32px, 560px);
+    }
+
+    .saas-shell:not(.landing-shell) .nav-shell {
+        min-height: 70px;
+    }
+
+    .saas-shell:not(.landing-shell) .nav-demo-link {
+        min-height: 40px;
+        padding-inline: 12px;
+        font-size: .73rem;
+    }
+
+    .saas-shell:not(.landing-shell) .theme-toggle {
+        margin-left: 4px;
+    }
+
+    .saas-shell:not(.landing-shell) .nav-links {
+        right: 16px;
+        top: 62px;
+        width: min(280px, calc(100vw - 32px));
+    }
+
+    .saas-shell:not(.landing-shell) .inner-page,
+    .saas-shell:not(.landing-shell) .legal-page {
+        padding-block: 58px 82px;
+    }
+
+    .saas-shell:not(.landing-shell) .page-intro h1,
+    .saas-shell:not(.landing-shell) .legal-page h1 {
+        font-size: clamp(3.5rem, 16vw, 5.5rem);
+    }
+
+    .saas-shell:not(.landing-shell) .auth-page {
+        min-height: calc(100vh - 140px);
+        padding-block: 48px;
+    }
+
+    .saas-shell:not(.landing-shell) .auth-panel h1 {
+        font-size: 3rem;
+    }
+
+    .saas-shell:not(.landing-shell) .account-page {
+        padding-block: 36px 64px;
+    }
+
+    .saas-shell:not(.landing-shell) .account-section {
+        min-height: 290px;
+    }
+
+    .saas-shell:not(.landing-shell) .footer-grid {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .saas-shell:not(.landing-shell) *,
+    .saas-shell:not(.landing-shell) *::before,
+    .saas-shell:not(.landing-shell) *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}

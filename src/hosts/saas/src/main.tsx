@@ -258,7 +258,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                     <div className="hero-layout page-width">
                         <div className="hero-copy reveal">
                             <p className="eyebrow"><CalendarDays aria-hidden="true" /> Your Google Calendar, at year scale</p>
-                            <h1>See your year <span>at a glance.</span></h1>
+                            <h1>Year View <span>at a glance.</span></h1>
                             <p className="hero-lead">Year View shows your events on a full-year grid, making it easy to spot busy or free periods.</p>
                             <div className="hero-actions">
                                 <button className="button button-primary hero-demo-button" type="button" onClick={() => navigate(session ? "/app" : "/demo")}>

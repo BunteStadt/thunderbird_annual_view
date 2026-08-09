@@ -46,7 +46,8 @@ export async function signInWithGoogle(returnPath: string, prompt = "consent"): 
             redirectTo: callbackUrl.toString(),
             scopes: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar.readonly",
             queryParams: {
-                prompt
+                prompt,
+                access_type: "offline"
             }
         }
     });

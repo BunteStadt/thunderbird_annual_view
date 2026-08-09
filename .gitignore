@@ -12,6 +12,7 @@ node_modules/
 .agents/
 skills-lock.json
 thunderbird_annual_view.code-workspace
+.prod.vars
 
 # OS files
 .DS_Store

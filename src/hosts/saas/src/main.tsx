@@ -3,6 +3,8 @@ import "@fontsource-variable/newsreader";
 import { StrictMode, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import type { Session } from "@supabase/supabase-js";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 import {
     ArrowRight,
     CalendarDays,
@@ -572,34 +574,37 @@ function PricingPage({ navigate, session }: { navigate: Navigate; session: Sessi
     );
 }
 
-function LoginPage({ navigate }: { navigate: Navigate }) {
-    const [pending, setPending] = useState(false);
-    const [error, setError] = useState("");
+function LoginPage() {
+    const supabase = getSupabaseClient();
     const next = safeReturnPath(new URLSearchParams(globalThis.location.search).get("next"));
-
-    const startLogin = async () => {
-        setPending(true);
-        setError("");
-        try {
-            await signInWithGoogle(next);
-        } catch (reason) {
-            setError(reason instanceof Error ? reason.message : "Google sign-in could not start.");
-            setPending(false);
-        }
-    };
 
     return (
         <main className="auth-page page-width">
             <section className="auth-panel">
-                <span className="auth-icon"><CircleUserRound aria-hidden="true" /></span>
-                <p className="kicker">Welcome to Year View</p>
-                <h1>Sign in to see your year.</h1>
-                <p>Google identifies your account and grants separate read-only access to your calendars.</p>
-                <button className="button button-primary button-wide" type="button" disabled={pending} onClick={startLogin}>
-                    <LogIn aria-hidden="true" /> {pending ? "Opening Google…" : "Continue with Google"}
-                </button>
-                {error && <p className="form-error" role="alert">{error}</p>}
-                <button className="back-link" type="button" onClick={() => navigate("/privacy")}>How your data is handled</button>
+                <h1>Sign in</h1>
+                {supabase ? (
+                    <Auth
+                        supabaseClient={supabase}
+                        appearance={{
+                            theme: ThemeSupa,
+                            style: {
+                                button: {
+                                    width: "100%",
+                                    minHeight: "52px",
+                                    fontSize: "1rem",
+                                    fontWeight: 700
+                                }
+                            }
+                        }}
+                        providers={["google"]}
+                        providerScopes={{ google: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar.readonly" }}
+                        queryParams={{ prompt: "consent", access_type: "offline" }}
+                        redirectTo={`${globalThis.location.origin}/auth/callback?next=${encodeURIComponent(next)}`}
+                        view="sign_in"
+                        onlyThirdPartyProviders
+                        showLinks={false}
+                    />
+                ) : <p className="form-error" role="alert">Sign-in is not configured.</p>}
             </section>
         </main>
     );
@@ -773,11 +778,36 @@ function CheckoutSuccess({ session, navigate }: { session: Session; navigate: Na
     return <main className="status-page page-width"><CalendarDays aria-hidden="true" /><h1>Confirming your membership…</h1><p>Stripe is securely updating your account.</p></main>;
 }
 
+function CalendarAccessGate({ session }: { session: Session }) {
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (session.provider_token) {
+            return;
+        }
+
+        void signInWithGoogle("/app").catch((reason) => {
+            setError(reason instanceof Error ? reason.message : "Google Calendar access could not be started.");
+        });
+    }, [session.provider_token]);
+
+    return (
+        <main className="status-page page-width">
+            <CalendarDays aria-hidden="true" />
+            <h1>{error ? "Google Calendar access could not be started." : "Connecting Google Calendar…"}</h1>
+            {error && <p className="form-error" role="alert">{error}</p>}
+        </main>
+    );
+}
+
 function ProtectedApp({ session, navigate }: { session: Session; navigate: Navigate }) {
     const { subscription, loading } = useSubscription(session);
     if (loading) return <main className="status-page page-width"><CalendarDays aria-hidden="true" /><h1>Checking access…</h1></main>;
     if (subscription?.status !== "active") {
         return <main className="status-page page-width"><h1>An active membership is required.</h1><button className="button button-primary" onClick={() => navigate("/account")}>View membership</button></main>;
+    }
+    if (!session.provider_token) {
+        return <CalendarAccessGate session={session} />;
     }
     return <YearView session={session} navigate={navigate} />;
 }
@@ -850,14 +880,14 @@ function App() {
     if (path === "/") page = <LandingPage navigate={navigate} session={session} />;
     else if (path === "/demo") page = <YearView navigate={navigate} demo />;
     else if (path === "/pricing") page = <PricingPage navigate={navigate} session={session} />;
-    else if (path === "/login") page = <LoginPage navigate={navigate} />;
+    else if (path === "/login") page = <LoginPage />;
     else if (path === "/auth/callback") page = <AuthCallback navigate={navigate} />;
     else if (!authReady) page = <main className="status-page page-width"><CalendarDays aria-hidden="true" /><h1>Loading account…</h1></main>;
     else if (path === "/account" && session) page = <AccountPage session={session} navigate={navigate} />;
     else if (path === "/checkout/success" && session) page = <CheckoutSuccess session={session} navigate={navigate} />;
     else if (path === "/checkout/cancel" && session) page = <AccountPage session={session} navigate={navigate} />;
     else if (path === "/app" && session) page = <ProtectedApp session={session} navigate={navigate} />;
-    else if (["/account", "/checkout/success", "/checkout/cancel", "/app"].includes(path)) page = <LoginPage navigate={navigate} />;
+    else if (["/account", "/checkout/success", "/checkout/cancel", "/app"].includes(path)) page = <LoginPage />;
     else if (legalContent[path]) page = <LegalPage path={path} />;
     else page = <NotFound navigate={navigate} />;
 

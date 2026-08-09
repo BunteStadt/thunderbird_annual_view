@@ -2043,18 +2043,22 @@ a:focus-visible {
 }
 
 .auth-page {
-    min-height: calc(100vh - 72px);
     display: grid;
-    place-items: center;
-    padding-block: 60px;
+    place-items: start center;
+    padding-block: 48px;
 }
 
 .auth-panel {
-    width: min(520px, 100%);
-    padding: clamp(28px, 5vw, 54px);
-    border: 1px solid var(--av-grid-line);
+    width: min(440px, 100%);
+    padding: clamp(28px, 5vw, 40px);
+    border: 2px solid var(--av-grid-line);
     background: var(--av-panel);
     border-radius: 6px;
+}
+
+.auth-panel .supabase-auth-ui_ui-container {
+    width: 100%;
+    max-width: none;
 }
 
 .auth-icon {
@@ -2069,8 +2073,9 @@ a:focus-visible {
 }
 
 .auth-panel h1 {
-    font-size: clamp(3rem, 7vw, 5rem);
-    line-height: .9;
+    margin: 0 0 28px;
+    font-size: 2.25rem;
+    line-height: 1.1;
 }
 
 .auth-panel>p:not(.kicker):not(.form-error) {

@@ -11,6 +11,9 @@ export default defineConfig({
     base: "/",
     publicDir: false,
     plugins: [react(), tailwindcss()],
+    resolve: {
+        dedupe: ["react", "react-dom"]
+    },
     build: {
         emptyOutDir: true,
         outDir: resolve(repositoryRoot, "dist/saas")

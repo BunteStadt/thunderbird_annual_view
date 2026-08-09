@@ -259,7 +259,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                         <div className="hero-copy reveal">
                             <p className="eyebrow"><CalendarDays aria-hidden="true" /> Your Google Calendar, at year scale</p>
                             <h1>See your year <span>at a glance.</span></h1>
-                            <p className="hero-lead">See busy periods, open stretches, and important dates across your Google Calendar, without creating another plan to maintain.</p>
+                            <p className="hero-lead">Year View shows your events on a full-year grid, making it easy to spot busy or free periods.</p>
                             <div className="hero-actions">
                                 <button className="button button-primary hero-demo-button" type="button" onClick={() => navigate(session ? "/app" : "/demo")}>
                                     <Eye aria-hidden="true" /> {session ? "Open YearView" : "Try the demo"}
@@ -267,7 +267,7 @@ function LandingPage({ navigate, session }: { navigate: Navigate; session: Sessi
                             </div>
                             <div className="hero-assurance">
                                 <ShieldCheck aria-hidden="true" />
-                                <p><strong>Read-only by design.</strong> Calendar data is never stored on our server.</p>
+                                <p><strong>Read-only Google Calendar access.</strong> No event edits. No calendar data stored on our server.</p>
                             </div>
                         </div>
                         <div className="preview-wrap reveal reveal-late">

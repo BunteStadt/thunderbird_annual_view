@@ -44,7 +44,7 @@ export async function signInWithGoogle(returnPath: string, prompt = "consent"): 
         provider: "google",
         options: {
             redirectTo: callbackUrl.toString(),
-            scopes: "openid email profile https://www.googleapis.com/auth/calendar.readonly",
+            scopes: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar.readonly",
             queryParams: {
                 prompt
             }

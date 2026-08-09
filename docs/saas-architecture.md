@@ -84,11 +84,11 @@ mode. Build and run the Worker on the port matching the example `APP_URL`:
 
 ```sh
 npm run build:saas
-npx wrangler dev --port 8788
+npx wrangler dev --port 8787
 ```
 
-Open `http://localhost:8788`. The independent health check at
-`http://localhost:8788/api/health` should return `{"status":"ok"}`.
+Open `http://localhost:8787`. The independent health check at
+`http://localhost:8787/api/health` should return `{"status":"ok"}`.
 
 For a working end-to-end flow:
 
@@ -96,7 +96,7 @@ For a working end-to-end flow:
    Supabase SQL editor or CLI.
 2. Enable Google in Supabase Auth and configure Google OAuth, the Calendar
    read-only scope, Site URL, and redirect allowlist. Include
-   `http://localhost:8788/auth/callback` for local inspection.
+   `http://localhost:8787/auth/callback` for local inspection.
 3. Create a Stripe test Product with recurring EUR 2 monthly and EUR 12 yearly
    Prices, then set `STRIPE_PRICE_MONTHLY_ID` and `STRIPE_PRICE_ANNUAL_ID` in
    `.dev.vars`.
@@ -104,7 +104,7 @@ For a working end-to-end flow:
 5. Forward Stripe test webhooks locally:
 
 ```sh
-stripe listen --forward-to http://localhost:8788/api/stripe/webhook
+stripe listen --forward-to http://localhost:8787/api/stripe/webhook
 ```
 
 Copy the printed `whsec_...` value into `STRIPE_WEBHOOK_SECRET` in `.dev.vars`,
@@ -263,8 +263,10 @@ protocol-relative paths are rejected to prevent open redirects.
 
 1. The user chooses **Continue with Google**.
 2. The browser calls Supabase `signInWithOAuth` using PKCE.
-3. The request includes `openid`, profile, email, and
-   `https://www.googleapis.com/auth/calendar.readonly` scopes.
+3. The request includes only the Google email scope
+   `https://www.googleapis.com/auth/userinfo.email` and the read-only Calendar
+   scope `https://www.googleapis.com/auth/calendar.readonly`. It does not
+   request the OpenID or Google profile scopes.
 4. Google redirects through Supabase and then to `/auth/callback`.
 5. The callback exchanges the code for a Supabase session and redirects to the
    validated local return path.

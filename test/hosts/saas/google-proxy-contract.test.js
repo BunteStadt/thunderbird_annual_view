@@ -25,6 +25,8 @@ test('SaaS sends the short-lived Google token directly to Google Calendar', () =
 test('OAuth does not request an offline refresh token and Worker has no Google route', () => {
     assert.doesNotMatch(authSource, /access_type:\s*["']offline["']/);
     assert.match(authSource, /prompt = "consent"/);
+    assert.match(authSource, /scopes:\s*["']https:\/\/www\.googleapis\.com\/auth\/userinfo\.email https:\/\/www\.googleapis\.com\/auth\/calendar\.readonly["']/);
+    assert.doesNotMatch(authSource, /openid|\bprofile\b/);
     assert.match(providerSource, /auth\.getSession\(\)/);
     assert.match(providerSource, /auth\.refreshSession\(\)/);
     assert.match(providerSource, /signInWithGoogle\("\/app", "none"\)/);

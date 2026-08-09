@@ -81,6 +81,11 @@ a:focus-visible {
     justify-content: space-between;
 }
 
+.nav-demo-link {
+    order: 4;
+    margin-left: 12px;
+}
+
 .brand {
     display: inline-flex;
     align-items: center;
@@ -111,6 +116,8 @@ a:focus-visible {
 }
 
 .nav-links {
+    order: 3;
+    margin-left: auto;
     display: flex;
     align-items: center;
     gap: 28px;
@@ -1732,7 +1739,7 @@ a:focus-visible {
 }
 
 .account-page {
-    padding-block: clamp(52px, 8vw, 100px);
+    padding-block: 32px 64px;
 }
 
 .account-page>h1 {
@@ -1745,10 +1752,10 @@ a:focus-visible {
 }
 
 .account-grid {
-    margin-top: 60px;
+    margin-top: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    border: 1px solid var(--av-grid-line);
+    border: 2px solid var(--av-grid-line);
 }
 
 .account-section {
@@ -1757,7 +1764,7 @@ a:focus-visible {
     display: flex;
     align-items: flex-start;
     flex-direction: column;
-    border-right: 1px solid var(--av-grid-line);
+    border-right: 2px solid var(--av-grid-line);
 }
 
 .account-section:last-child {
@@ -1807,7 +1814,7 @@ a:focus-visible {
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
-    border: 1px solid var(--av-grid-line);
+    border: 2px solid var(--av-grid-line);
     color: var(--av-weekday-text);
     cursor: pointer;
 }
@@ -2302,11 +2309,14 @@ a:focus-visible {
     }
 
     .nav-links {
+        order: 4;
+        margin-left: 0;
         display: none;
         position: absolute;
-        left: 14px;
         right: 14px;
         top: 64px;
+        width: max-content;
+        max-width: calc(100vw - 28px);
         padding: 16px;
         align-items: stretch;
         flex-direction: column;
@@ -2322,11 +2332,32 @@ a:focus-visible {
 
     .nav-links>button {
         min-height: 44px;
-        text-align: left;
+        text-align: center;
+    }
+
+    .nav-links>.button {
+        justify-content: center;
+    }
+
+    .nav-links>* {
+        white-space: nowrap;
+    }
+
+    .nav-demo-link {
+        order: 4;
+        margin-left: 8px;
+        min-height: 40px;
+        padding-inline: 10px;
+        font-size: .78rem;
+    }
+
+    .menu-button {
+        order: 3;
+        margin-left: auto;
     }
 
     .nav-addon-link {
-        justify-content: flex-start;
+        justify-content: center;
     }
 
     .hero {
@@ -2519,10 +2550,14 @@ a:focus-visible {
         grid-template-columns: 1fr;
     }
 
+    .membership-section {
+        order: -1;
+    }
+
     .account-section {
         min-height: 280px;
         border-right: 0;
-        border-bottom: 1px solid var(--av-grid-line);
+        border-bottom: 2px solid var(--av-grid-line);
     }
 
     .account-section:last-child {

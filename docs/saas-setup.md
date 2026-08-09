@@ -8,6 +8,12 @@ Cloudflare Workers for the application server and static assets.
 The commands below use placeholders. Never commit `.env.local` or `.dev.vars`,
 and never put secret values in documentation, source control, or chat.
 
+## my additons
+
+now tow setups: productin and dev.
+Seperate supabase projectes
+2 google oauth clients in one project.
+
 ## 1. Install dependencies
 
 From the repository root:
@@ -57,11 +63,16 @@ created in Google Cloud.
 3. Open **OAuth consent screen**.
 4. Choose **External** for a normal public web application.
 5. Set the application name and support/contact email addresses.
-6. Add the Calendar read-only scope:
+6. Add only these scopes:
 
    ```text
+   https://www.googleapis.com/auth/userinfo.email
    https://www.googleapis.com/auth/calendar.readonly
    ```
+
+   Do not add the OpenID or Google profile scopes. Year View needs the email
+   address for the account and read-only access to Calendar, but does not need
+   the Google name, profile photo, or other public profile data.
 
 7. Add the Google accounts used for testing as test users.
 8. In **APIs & Services > Credentials**, create an **OAuth client ID** for a
@@ -87,13 +98,13 @@ For local testing, use:
 
 ```text
 Site URL:
-http://localhost:8788
+http://localhost:8787
 ```
 
 Add this redirect URL:
 
 ```text
-http://localhost:8788/auth/callback
+http://localhost:8787/auth/callback
 ```
 
 If using the Vite-only frontend on port 5173, also add:
@@ -148,7 +159,7 @@ STRIPE_SECRET_KEY=<stripe-test-secret-key>
 STRIPE_WEBHOOK_SECRET=<stripe-local-webhook-secret>
 STRIPE_PRICE_MONTHLY_ID=<stripe-monthly-price-id>
 STRIPE_PRICE_ANNUAL_ID=<stripe-annual-price-id>
-APP_URL=http://localhost:8788
+APP_URL=http://localhost:8787
 ```
 
 The service-role key, Stripe secret key, and webhook secret must remain server
@@ -171,19 +182,19 @@ For the complete frontend and Worker API:
 
 ```sh
 npm run build:saas
-npx wrangler dev --port 8788
+npx wrangler dev --port 8787
 ```
 
 Open:
 
 ```text
-http://localhost:8788
+http://localhost:8787
 ```
 
 Check the Worker health endpoint:
 
 ```sh
-curl http://localhost:8788/api/health
+curl http://localhost:8787/api/health
 ```
 
 Expected response:
@@ -203,7 +214,7 @@ stripe login
 In a separate terminal, forward test webhooks to the local Worker:
 
 ```sh
-stripe listen --forward-to http://localhost:8788/api/stripe/webhook
+stripe listen --forward-to http://localhost:8787/api/stripe/webhook
 ```
 
 The CLI prints a temporary webhook signing secret. Put that value in
@@ -212,7 +223,7 @@ listener running during checkout tests.
 
 ## 10. Test login and checkout
 
-1. Open `http://localhost:8788`.
+1. Open `http://localhost:8787`.
 2. Sign in with Google.
 3. Approve the read-only Calendar permission.
 4. Open the subscription page and start checkout.

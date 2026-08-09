@@ -13,8 +13,10 @@ test('billing migration protects subscription writes and webhook events', () => 
     assert.match(source, /alter table public\.subscriptions enable row level security/i);
     assert.match(source, /auth\.uid\(\)\) = user_id/i);
     assert.match(source, /revoke insert, update, delete on public\.subscriptions from anon, authenticated/i);
+    assert.match(source, /grant select, insert, update, delete on public\.subscriptions to service_role/i);
     assert.match(source, /alter table public\.stripe_webhook_events enable row level security/i);
     assert.match(source, /revoke all on public\.stripe_webhook_events from anon, authenticated/i);
+    assert.match(source, /grant select, insert, update, delete on public\.stripe_webhook_events to service_role/i);
 });
 
 test('billing migration constrains all supported Stripe subscription states', () => {

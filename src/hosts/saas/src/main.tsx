@@ -136,6 +136,9 @@ function SiteHeader({ navigate, path, session }: { navigate: Navigate; path: str
                 >
                     {open ? <X /> : <Menu />}
                 </button>
+                <button className="button button-primary nav-demo-link" type="button" onClick={() => closeAndNavigate(session ? "/app" : isDemoPage ? "/login?next=/account" : "/demo")}>
+                    {session ? "Open YearView" : isDemoPage ? "Sign up" : "Open demo"}
+                </button>
                 <div className={`nav-links ${open ? "is-open" : ""}`}>
                     <a
                         className="button button-quiet nav-addon-link"
@@ -148,9 +151,6 @@ function SiteHeader({ navigate, path, session }: { navigate: Navigate; path: str
                     <button type="button" onClick={() => closeAndNavigate("/pricing")}>Pricing</button>
                     <button type="button" className="button button-quiet" onClick={() => closeAndNavigate(session ? "/account" : "/login")}>
                         {session ? <CircleUserRound aria-hidden="true" /> : <LogIn aria-hidden="true" />} {session ? "Account" : "Sign in"}
-                    </button>
-                    <button type="button" className="button button-primary nav-demo-link" onClick={() => closeAndNavigate(session ? "/app" : isDemoPage ? "/login?next=/account" : "/demo")}>
-                        {session ? "Open YearView" : isDemoPage ? "Sign up" : "Open demo"}
                     </button>
                 </div>
             </nav>
@@ -707,10 +707,8 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
 
     return (
         <main className="page-width account-page">
-            <p className="kicker">Your account</p>
-            <h1>Calendar access and billing.</h1>
             <div className="account-grid">
-                <section className="account-section">
+                <section className="account-section account-profile">
                     <CircleUserRound aria-hidden="true" />
                     <h2>Google account</h2>
                     <p>{session.user.email}</p>
@@ -718,7 +716,7 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
                         <LogOut aria-hidden="true" /> {pending === "logout" ? "Signing out…" : "Sign out"}
                     </button>
                 </section>
-                <section className="account-section">
+                <section className="account-section membership-section">
                     <CreditCard aria-hidden="true" />
                     <h2>Membership</h2>
                     <p>{loading ? "Checking subscription…" : cancellationScheduled ? "Cancellation scheduled" : active ? "Active subscription" : "No active subscription"}</p>
@@ -726,7 +724,6 @@ function AccountPage({ session, navigate }: { session: Session; navigate: Naviga
                         <>
                             {subscription?.current_period_end && <small>{cancellationScheduled ? "Access remains available until " : "Current period ends "}{new Date(subscription.current_period_end).toLocaleDateString()}.</small>}
                             <button className="button button-primary" type="button" disabled={!!pending} onClick={() => void run("portal", "/api/stripe/portal")}>Manage billing</button>
-                            <button className="back-link" type="button" onClick={() => navigate("/app")}>Open Year View</button>
                         </>
                     ) : (
                         <>

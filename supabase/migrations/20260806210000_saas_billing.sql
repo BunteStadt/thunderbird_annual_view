@@ -35,6 +35,7 @@ using ((select auth.uid()) = user_id);
 
 revoke insert, update, delete on public.subscriptions from anon, authenticated;
 grant select on public.subscriptions to authenticated;
+grant select, insert, update, delete on public.subscriptions to service_role;
 
 create table public.stripe_webhook_events (
     event_id text primary key,
@@ -46,6 +47,7 @@ create table public.stripe_webhook_events (
 alter table public.stripe_webhook_events enable row level security;
 
 revoke all on public.stripe_webhook_events from anon, authenticated;
+grant select, insert, update, delete on public.stripe_webhook_events to service_role;
 
 comment on table public.stripe_webhook_events is
     'Service-role-only idempotency ledger for verified Stripe webhook events.';

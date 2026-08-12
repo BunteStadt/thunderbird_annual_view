@@ -106,8 +106,9 @@ The view mode can be changed directly in the year view header: select between co
 
 ## Development
 
-For the step-by-step Supabase, Google OAuth, Stripe, and Cloudflare SaaS setup,
-see [docs/saas-setup.md](docs/saas-setup.md).
+For the SaaS development setup, see [docs/saas-setup.md](docs/saas-setup.md) and
+[docs/saas-architecture.md](docs/saas-architecture.md). General contribution and
+testing guidance is in [docs/contributor-workflow.md](docs/contributor-workflow.md).
 
 Use a separate Thunderbird profile.
 

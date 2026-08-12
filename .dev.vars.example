@@ -1,8 +1,4 @@
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_replace_me
-SUPABASE_SERVICE_ROLE_KEY=replace_me
-STRIPE_SECRET_KEY=sk_test_replace_me
-STRIPE_WEBHOOK_SECRET=whsec_replace_me
-STRIPE_PRICE_MONTHLY_ID=price_monthly_replace_me
-STRIPE_PRICE_ANNUAL_ID=price_annual_replace_me
 APP_URL=http://localhost:8787
+CLERK_SECRET_KEY=sk_test_replace_me
+CLERK_PUBLISHABLE_KEY=pk_test_replace_me
+CLERK_JWT_KEY=replace_me

@@ -20,7 +20,3 @@ website:
 #build website with vite and start it
 vweb:
 	npm run dev:saas
-
-#strip local test server
-strip:
-	stripe listen --forward-to http://localhost:8787/api/stripe/webhook

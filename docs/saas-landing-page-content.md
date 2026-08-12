@@ -302,7 +302,6 @@ Suggested copy:
 - Heading: **Ready to see your own year?**
 - Supporting line: **Connect your Google Calendar for EUR 2 per month or EUR 12 annually. Every current view and filter is included. Cancel anytime.**
 - CTA: **Continue with Google**
-- Reassurance: **Read-only access. VAT included. Access continues through the paid period after cancellation.**
 
 This is the first place on the landing page where price should be part of the main conversion message. Do not add an intermediate **See pricing** CTA.
 
@@ -338,7 +337,10 @@ There is no trial. The interactive demo lets visitors use the real interface wit
 
 #### What happens when I cancel?
 
-Access continues until the end of the paid period. Billing is managed securely through Stripe.
+Clerk Billing shows the cancellation effect and the applicable access period in
+the subscription flow. The final wording must match the configured plan and
+legal terms. The interactive demo remains available with sample data without a
+subscription.
 
 ### 11. Footer
 
@@ -350,7 +352,6 @@ Include:
 - GitHub
 - Privacy
 - Terms
-- Cancellation
 - Imprint
 - Sign in
 
@@ -386,7 +387,6 @@ Feature names should never displace the customer outcome from the headline or op
 
 ## Claims and facts to verify before publication
 
-- Confirm that the subscription remains EUR 2 per month or EUR 12 annually with VAT included.
 - Confirm that there is no free trial.
 - Confirm the exact Thunderbird marketplace label for the 114-user metric.
 - Confirm permission to quote and link the public Thunderbird reviews as presented.

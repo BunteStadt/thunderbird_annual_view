@@ -1,171 +1,156 @@
 # SaaS legal and privacy roadmap
 
-Stand: 08.08.2026
+Status: 12.08.2026
 
-This roadmap is a practical launch checklist for the Year View SaaS operated by
-one person as a hobby project. It is not legal advice. Operating without a
-registered company does not by itself remove obligations relating to consumer
-contracts, taxes, privacy, or provider contracts.
+This is a practical launch checklist for the Year View SaaS operated by one person. It is not legal advice. The public legal pages intentionally contain no internal TODO placeholders; facts that depend on the final operator details, provider accounts, tax status, or legal assessment belong here instead of being guessed in website copy.
 
-The public legal pages intentionally contain no internal TODO placeholders. Facts
-that depend on the final provider accounts, tax status, or legal assessment are
-tracked here instead of being guessed in the website text.
+## Current implementation snapshot
 
-## 1. Absolutely necessary before accepting real payments
+The repository currently provides the following legal and data-processing surface:
 
-These items are launch blockers for a public B2C subscription. They can mostly be
-completed with documents and manual procedures; they do not all require new code.
+- Public Privacy, Terms, and Imprint pages are available at `/privacy`, `/terms`, and `/imprint`.
+- The public legal pages currently identify Richard Pergens, Stephanstraße 6, 52064 Aachen, Germany, and `info@yearview.org`.
+- The Privacy Policy and Terms are currently marked effective `08.08.2026`; this roadmap is now updated on `12.08.2026`, so the dates are not yet synchronised.
+- Clerk provides sign-in, account access, and the Billing UI. The pricing page renders Clerk's `PricingTable`; the account page provides subscription management and sign-out, but no in-app account-deletion control.
+- The Worker authenticates protected Google routes with Clerk, obtains the user's Google OAuth token server-side, fetches calendars and events, and returns normalized data to the browser. Google access tokens are not sent to the browser.
+- The Worker does not persist calendar data in an application database or server cache. Browser preferences and demo/imported ICS data may remain in browser storage.
+- The Worker currently has no application-level rate limiting or per-user Google API quota guard. Cloudflare request and error logging behaviour, sampling, access, and retention still require production verification.
+- No local subscription database, direct payment API integration, payment webhook, or payment credential is present in this repository. The actual payment processor configured behind Clerk Billing is not yet recorded in the provider register.
+
+## Before accepting real payments
 
 ### Operator, tax, and website facts
 
-- Confirm the operator's exact name and address, and keep the details consistent
-  across the Imprint, Terms, invoices, Stripe, and payment provider account.
-- Confirm the operator's tax status with the responsible tax office or adviser.
-  Add a VAT identification number only if one actually exists. Do not claim a
-  small-business VAT treatment without checking whether it applies.
-- Confirm whether a separate data protection officer is legally required. If so,
-  publish the required contact details.
-- Identify the competent German data protection supervisory authority and keep its
-  contact details available for privacy requests and complaints.
-- Confirm whether the website contains journalistic-editorial content requiring a
-  separate responsible person under § 18 MStV.
+- Confirm the operator's exact name and address and keep them consistent across the imprint, terms, invoices, Clerk Billing configuration, and support contact.
+- Confirm the operator's tax status with the responsible tax office or adviser. Add a VAT identification number only if one actually exists.
+- Confirm whether a data protection officer or editorially responsible person is required.
+- Identify the competent German data protection supervisory authority and keep its contact details available.
 
 ### Providers, contracts, and transfers
 
-Create a small provider register containing at least:
+Maintain a provider register containing at least:
 
-| Provider | Actual role | Data | Region / sub-processors | Contract / transfer safeguard |
-| --- | --- | --- | --- | --- |
-| Supabase | processor or other role to verify | Auth and subscription records | verify in project settings and DPA | obtain and retain DPA |
-| Cloudflare | hosting/Worker/observability processor where applicable | request metadata and service traffic | verify account configuration and logs | obtain and retain DPA |
-| Stripe | role differs by processing purpose | customer, subscription, billing and tax data | verify Stripe account setup | retain applicable DPA/terms |
-| Google | separate provider/controller for Google account and API processing | OAuth and Calendar API data | verify Google terms and project setup | document transfer basis |
+| Provider | Role to verify | Data involved | Review items |
+| --- | --- | --- | --- |
+| Clerk | Authentication, account management, and configured Billing services | account identity, authentication state, subscription/customer data | DPA/terms, subprocessors, regions, transfer safeguards, Billing configuration |
+| Payment processor configured through Clerk | Payment processing and transaction records; exact provider not yet recorded | payment, billing, tax, refund, dispute, and subscription data | Provider identity, controller/processor roles, DPA/terms, subprocessors, regions, transfer safeguards, retention, refunds, tax records |
+| Cloudflare | Hosting, Worker/static assets, and configured observability | request metadata and service traffic | DPA, logs, retention, regions, subprocessors |
+| Google | Independent provider/controller for Google's account and API processing; Year View remains responsible for its own requested display processing | OAuth authorization, calendar lists, and event data | Google terms, OAuth consent configuration, transfer basis, scope, revocation |
 
 Before launch:
 
-- Accept or sign the applicable AVV/DPA for each provider that acts as a
-  processor.
-- Record the provider's sub-processors, processing locations, transfer mechanism,
-  and the date of the last review.
-- Keep a short transfer assessment for every provider with non-EEA access or
-  processing. Use an adequacy decision or SCC-based safeguards where applicable.
-- Do not describe a provider as an Art. 28 processor if its relevant processing is
-  actually independent-controller processing.
+- Accept or retain the applicable DPA/terms for each provider that acts as a processor.
+- Record subprocessors, processing locations, transfer mechanisms, and the date of the last review.
+- Keep a short transfer assessment for providers with non-EEA access or processing.
+- Do not describe an independent provider as an Article 28 processor for processing where it acts as its own controller.
 
-### Minimum accountability documents
+### Accountability documents
 
 Keep these documents privately, even if they are not all published:
 
-- a short Verzeichnis von Verarbeitungstätigkeiten (VVT),
-- a TOM document covering access control, transport encryption, secrets, logging,
-  backups, incident response, and deletion,
-- a retention schedule for account, billing, support, security, and webhook data,
-- a provider/DPA register,
+- a short record of processing activities,
+- a technical and organizational measures document,
+- a retention schedule for account, billing, support, security, and operational data,
+- a provider and DPA register,
 - an incident and data-breach response checklist,
 - a simple record of privacy requests and their completion.
 
 ### Manual rights and deletion process
 
-An automated export is not required for the first hobby release. The following
-manual process is sufficient as an initial operating procedure if it is actually
-usable:
+An automated export is not required for the first hobby release if a usable manual process exists:
 
 1. Receive requests at `info@yearview.org` and verify the requester's identity.
-2. Export or describe the account and subscription data held by Year View.
+2. Export or describe the account and subscription data held by Year View or its configured providers.
 3. Handle deletion, restriction, correction, or objection requests.
-4. Delete the Supabase user and associated subscription record where permitted.
-5. Ask Stripe about deletion limits and retain only legally required billing data.
-6. Revoke or remove Google access where the operator controls a relevant token or
-   integration record.
+4. Use Clerk's account-management and deletion capabilities where applicable.
+5. Ask the configured Billing provider about accounting, tax, dispute, and retention limits.
+6. Explain that the SaaS Worker fetches Google Calendar data using the user's Clerk-managed Google OAuth grant, returns normalized display data, and provides a supported revocation path.
 7. Record the request, response date, and any statutory retention reason.
 
-Publish a realistic response channel and do not promise immediate deletion where
-accounting, tax, fraud-prevention, dispute, or security retention applies.
+Do not promise immediate deletion where accounting, tax, fraud-prevention, dispute, or security retention applies.
 
 ### Consumer checkout and withdrawal
 
 Before the first B2C payment:
 
-- Verify that the final checkout shows product, price, VAT treatment, billing
-  interval, cancellation effect, payment method, and the required legal links.
-- Verify that the final order button uses an unambiguous payment wording.
-- Keep the Terms and Privacy Policy available for saving before checkout.
-- Provide a durable order/contract confirmation after checkout.
-- If service delivery begins during the withdrawal period, collect the required
-  express request and acknowledgement in a legally suitable way. The current
-  consent checkbox is not by itself proof that this specific withdrawal
-  acknowledgement has been collected.
-- Keep the model withdrawal instructions and email contact working.
+- Add application-level rate limiting and abuse monitoring for authenticated Google routes, with a documented per-user or equivalent quota policy.
+- Verify that Clerk Billing shows the product, price, currency, tax treatment, billing interval, cancellation effect, payment method, and required legal links.
+- Verify that the final order action uses unambiguous payment wording.
+- Keep the Terms and Privacy Policy available before checkout.
+- Provide durable order/contract confirmation through the configured Billing flow.
+- If service delivery begins during a withdrawal period, collect the legally required request and acknowledgement in a suitable way.
+- Keep withdrawal instructions and the email contact working.
+- Record the configured payment processor and retain evidence of a successful checkout, confirmation, cancellation, and withdrawal test.
 
-## 2. Recommended but optional for the hobby project
+## Recommended improvements
 
-These improvements reduce manual work or operational risk but do not need to
-block a small initial launch if the manual process above is reliable.
-
-### Product and engineering improvements
-
-- Add an authenticated account-deletion endpoint and UI.
-- Add a self-service data export in JSON or another documented machine-readable
-  format.
-- Store a version, timestamp, and user identifier for the accepted Terms and
-  Privacy Policy, subject to the final data-minimisation decision.
-- Configure Stripe Checkout `consent_collection` and explicit legal URLs if this
-  matches the final checkout and consumer-law design.
-- Add an export/deletion status page or support ticket workflow.
-- Add rate limiting and abuse monitoring to public Worker endpoints.
-- Reduce Cloudflare log sampling and retention to the minimum needed for
-  operations, and document the resulting setting.
-- Add automated browser tests for legal links, consent gating, checkout return,
-  account access, and mobile presentation.
-
-### Operational improvements
-
+- Add an authenticated account-deletion path if the Clerk-hosted account controls do not cover the required process.
+- Add a documented machine-readable export process for Year View account data where applicable.
+- Store the version and acceptance time of legal documents only if the final data-minimisation assessment supports it.
+- Add browser tests for legal links, Clerk auth states, Billing return behavior, account access, mobile layout, and keyboard use.
+- Review Cloudflare log sampling, retention, access permissions, and error/request metadata periodically.
 - Schedule a quarterly provider, subprocessor, transfer, and legal-text review.
-- Keep a dated change log for legal pages and provider contract changes.
-- Run a restore test for any production backup available through Supabase or
-  another provider.
-- Add a lightweight security review for OAuth token handling and secret rotation.
-- Obtain a one-time review of the Terms, Privacy Policy, withdrawal flow, and tax
-  setup from a German lawyer or tax adviser before scaling beyond the hobby use
-  case.
+- Obtain a one-time review of the Terms, Privacy Policy, withdrawal flow, and tax setup before scaling beyond the hobby use case.
 
-## 3. Data Act and cloud switching question
+## Current open items
 
-The applicability of the Data Act's rules for switching between data processing
-services should be checked for this specific SaaS before relying on them. The
-cloud skill used for this review contains several 2026 implementation claims
-marked for verification; those claims are not treated as settled facts here.
+- final operator and tax facts,
+- provider DPA and transfer register,
+- exact payment processor and its contractual/data-protection documentation,
+- records of processing, TOM, retention, and incident documents,
+- manual privacy-request and deletion procedure,
+- application-level rate limiting and abuse-monitoring policy,
+- final Clerk Billing checkout and withdrawal verification,
+- synchronised legal-document versions and effective dates,
+- production Clerk, Google OAuth, and Cloudflare configuration review.
+
+## Data Act and cloud switching question
+
+Check whether the Data Act rules for switching between data processing services
+apply to this specific SaaS before relying on them. The applicability and any
+provider-specific duties should be confirmed against the actual Clerk,
+Cloudflare, and payment-provider contracts; do not treat the provider register
+alone as that assessment.
 
 If the Data Act applies, document at least:
 
-- what data can be exported,
+- what Year View and provider data can be exported,
 - the export format and interface,
 - the transition period and support,
 - any switching charges and their legal basis,
 - deletion at the end of the switch.
 
-For the initial hobby service, a documented manual export and deletion process is
-the lowest-complexity starting point. A technical migration API is optional until
-there is a real customer or provider-switching need, unless a legal review finds
-that the Data Act requires more.
+For the initial hobby service, a documented manual export and deletion process
+is the lowest-complexity starting point. A technical migration API is optional
+until there is a real customer or provider-switching need, unless a legal review
+finds that the Data Act requires more.
 
-## 4. Current status
+## Current status
 
-Completed in the website text:
+Completed or present in the website and repository:
 
-- Removed internal launch instructions from the Imprint and Privacy Policy.
-- Removed the unverified VAT placeholder from the Imprint.
-- Added a clear privacy contact.
-- Replaced the placeholder supervisory-authority wording with a neutral rights
-  statement.
-- Updated the effective date of the legal pages to 08.08.2026.
-- Clarified that withdrawal can be exercised by an unambiguous statement and that
-  the model wording is optional.
+- Public Privacy, Terms, and Imprint pages are available.
+- The public legal pages identify the current operator, address, and privacy
+ contact, with no internal TODO placeholders.
+- The public Privacy Policy and Terms are marked effective `08.08.2026`.
+- Clerk sign-in, account access, PricingTable, and subscription management are
+ wired into the SaaS shell.
+- Google Calendar access is read-only, handled through Clerk OAuth, and fetched
+ server-side by the Worker; Google access tokens are not sent to the browser.
+- Calendar data is not persisted in a Year View application database or server
+ cache. Browser preferences and demo/imported ICS data may remain in browser
+ storage.
 
 Still open and required before real payments:
 
-- final operator/tax facts,
-- provider DPA and transfer register,
-- VVT, TOM, retention and incident documents,
-- manual privacy-request and deletion procedure,
-- final checkout and withdrawal verification.
+- final operator and tax facts,
+- provider DPA, subprocessor, transfer, and role register,
+- exact payment processor and its contractual/data-protection documentation,
+- VVT, TOM, retention, and incident documents,
+- manual privacy-request, export, deletion, and Google-access-revocation
+ procedure,
+- application-level rate limiting and abuse-monitoring policy for Google routes,
+- final Clerk Billing checkout, confirmation, cancellation, and withdrawal
+ verification,
+- synchronised legal-document versions and effective dates,
+- production Clerk, Google OAuth, Cloudflare logging, and security review.

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Session } from "@supabase/supabase-js";
+import { useAuth } from "@clerk/react";
 import { ArrowLeft, CircleUserRound } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { YearView as CoreYearView } from "../../../core/ui/annual-view";
@@ -55,16 +55,18 @@ function createSaasHeaderAction(slot: "header-leading" | "header-actions", navig
     };
 }
 
-export function YearView({ session, navigate, demo = false }: { session?: Session; navigate: (path: string) => void; demo?: boolean }) {
+export function YearView({ navigate, demo = false }: { navigate: (path: string) => void; demo?: boolean }) {
     const [ready, setReady] = useState(false);
+    const { getToken } = useAuth();
+    const [googleProvider] = useState(() => createSaasGoogleProvider(getToken));
 
     useEffect(() => {
-        const provider = demo ? new EmptyCalendarProvider() : createSaasGoogleProvider(session!);
+        const provider = demo ? new EmptyCalendarProvider() : googleProvider;
         setStorageAdapter(createWebHostStorageAdapter());
-        registerProviderFactory("saas-google", () => provider);
+        registerProviderFactory(demo ? "saas-demo" : "saas-google", () => provider);
         setCalendarProvider(provider);
         setReady(true);
-    }, [session]);
+    }, [demo, googleProvider]);
 
     return (
         <main className={`year-view-page${demo ? "" : " app-page"}`}>

@@ -3,15 +3,10 @@
 // Runtime types generated with workerd@1.20260801.1 2026-08-06 nodejs_compat
 interface __BaseEnv_Env {
 	ASSETS: Fetcher;
-	SUPABASE_URL: string;
-	SUPABASE_PUBLISHABLE_KEY: string;
-	SUPABASE_SERVICE_ROLE_KEY: string;
-	STRIPE_SECRET_KEY: string;
-	STRIPE_WEBHOOK_SECRET: string;
-	STRIPE_PRICE_ID: string;
-    STRIPE_PRICE_MONTHLY_ID: string;
-    STRIPE_PRICE_ANNUAL_ID: string;
 	APP_URL: string;
+    CLERK_SECRET_KEY: string;
+    CLERK_PUBLISHABLE_KEY: string;
+    CLERK_JWT_KEY: string;
 }
 declare namespace Cloudflare {
 	interface GlobalProps {
@@ -24,7 +19,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-    interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "SUPABASE_URL" | "SUPABASE_PUBLISHABLE_KEY" | "SUPABASE_SERVICE_ROLE_KEY" | "STRIPE_SECRET_KEY" | "STRIPE_WEBHOOK_SECRET" | "STRIPE_PRICE_ID" | "STRIPE_PRICE_MONTHLY_ID" | "STRIPE_PRICE_ANNUAL_ID" | "APP_URL">> {}
+    interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "APP_URL">> {}
 }
 
 // Begin runtime types

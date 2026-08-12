@@ -209,6 +209,13 @@ without platform-specific coupling.
   - Google auth setup (`google-standalone-auth.js`, client ID configuration) — calendars are fetched directly from Google APIs in the browser; OAuth tokens never leave the client
   - web-only UI modules mounted into core slots
 
+- `src/hosts/saas/` — the authenticated SaaS website shell:
+  - React/Vite public pages and lightweight pathname routing
+  - Clerk authentication and Clerk Billing UI
+  - SaaS-specific Google Calendar adapter and connect control
+  - page components in `src/hosts/saas/src/pages/` and shared site components in `src/hosts/saas/src/components/`
+  - static assets and `/api/health` served through the Cloudflare Worker
+
 ### 6.2 Ports (host-provided interfaces)
 
 Each host shell supplies these ports to `core/app.js` at startup:
@@ -238,13 +245,20 @@ Element assignment:
 - ICS imports and preferences are persisted client-side only. Preferences use `localStorage`; uploaded ICS content uses IndexedDB (size limits make cookies unsuitable, and without a backend cookies would only add request overhead). Both sit behind the same StoragePort so the core does not see the difference.
 - All user data stays in the user's browser. The landing page should state this, and the web options should offer a "clear data" action (wipe client storage, Google logout).
 
-### 6.5 Architectural rules
+### 6.5 SaaS constraints
+
+- Clerk provides account authentication and protects `/account` and `/app`.
+- Clerk Billing provides the pricing table and subscription-management controls; the repository has no local subscription database or direct payment API routes.
+- The SaaS Worker serves assets and health checks but does not proxy or persist Google Calendar events.
+- The SaaS demo remains available without an account.
+
+### 6.6 Architectural rules
 
 - `src/core/` must never import from `src/hosts/`.
 - No `browser.*` / `messenger.*` usage inside `src/core/` — such access goes through ports.
 - Any code that depends on Thunderbird APIs, browser extension APIs, or web-runtime specifics stays behind the port/adapter interfaces. Shared logic works with plain data objects and generic input/output contracts.
 
-### 6.6 Data contracts
+### 6.7 Data contracts
 
 The core defines stable contracts for:
 

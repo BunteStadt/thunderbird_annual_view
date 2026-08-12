@@ -1794,39 +1794,6 @@ a:focus-visible {
     color: #657069;
 }
 
-.billing-options {
-    width: 100%;
-    margin: 0 0 24px;
-    padding: 0;
-    display: grid;
-    gap: 8px;
-    border: 0;
-}
-
-.billing-options legend {
-    margin-bottom: 8px;
-    font-size: .9rem;
-    font-weight: 760;
-}
-
-.billing-options label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border: 2px solid var(--av-grid-line);
-    color: var(--av-weekday-text);
-    cursor: pointer;
-}
-
-.billing-options input {
-    accent-color: var(--av-accent-strong);
-}
-
-.billing-options strong {
-    color: var(--av-text);
-}
-
 .terms-consent {
     display: flex;
     gap: 10px;
@@ -2054,11 +2021,6 @@ a:focus-visible {
     border: 2px solid var(--av-grid-line);
     background: var(--av-panel);
     border-radius: 6px;
-}
-
-.auth-panel .supabase-auth-ui_ui-container {
-    width: 100%;
-    max-width: none;
 }
 
 .auth-icon {
@@ -2553,10 +2515,6 @@ a:focus-visible {
 
     .account-grid {
         grid-template-columns: 1fr;
-    }
-
-    .membership-section {
-        order: -1;
     }
 
     .account-section {

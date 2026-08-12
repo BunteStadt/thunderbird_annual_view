@@ -23,6 +23,23 @@ and open `http://localhost:5173/?dummy=1` for dummy data. Google login is always
 available in the web header; `?google=1` remains a compatibility alias. Configure
 the OAuth client ID in `src/hosts/web/google-client-id.js`.
 
+### SaaS development
+
+The SaaS shell is a separate React/Vite host. It uses Clerk for authentication
+and Clerk Billing for pricing and subscription controls;
+See [saas-setup.md](saas-setup.md) for
+provider configuration and [saas-architecture.md](saas-architecture.md) for
+the host boundaries.
+
+```sh
+npm run dev:saas
+npm run typecheck:saas
+npm run build:saas
+```
+
+The `/demo` route works without external credentials. Testing `/login`,
+`/pricing`, `/account`, and `/app` requires a configured Clerk publishable key;
+
 ## 3. GitHub workflows and CI
 
 The repository uses GitHub Actions for build, test, lint, and add-on release automation:

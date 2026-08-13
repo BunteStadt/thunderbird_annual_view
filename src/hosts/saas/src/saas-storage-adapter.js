@@ -1,8 +1,8 @@
-// Composite storage adapter for the web host: preferences live in
-// localStorage, while (potentially large) uploaded ICS content is stored in
+// Composite storage adapter for the SaaS host: preferences live in
+// localStorage, while potentially large uploaded ICS content is stored in
 // IndexedDB. Both sides implement the StoragePort interface.
 
-import { createWebStorageAdapter } from "../../core/storage-port.js";
+import { createWebStorageAdapter } from "../../../core/storage-port.js";
 
 const ICS_STORAGE_KEY = "icsCalendars";
 const DB_NAME = "annual-view";
@@ -55,31 +55,27 @@ function createIndexedDbAdapter() {
     };
 }
 
-export function deleteWebHostDatabase() {
+export function deleteSaasDatabase() {
     if (!globalThis.indexedDB) {
         return Promise.resolve();
     }
     return requestToPromise(globalThis.indexedDB.deleteDatabase(DB_NAME)).catch((err) => {
-        console.error("[web-storage] delete database failed", err);
+        console.error("[saas-storage] delete database failed", err);
     });
 }
 
-// Routes the uploaded-ICS descriptor key to IndexedDB and every other key to
-// the localStorage-backed web adapter. Falls back to localStorage entirely
-// when IndexedDB is unavailable.
-export function createWebHostStorageAdapter({ icsKey = ICS_STORAGE_KEY } = {}) {
+export function createSaasStorageAdapter({ icsKey = ICS_STORAGE_KEY } = {}) {
     const preferenceAdapter = createWebStorageAdapter();
     const legacyPreferenceAdapter = createWebStorageAdapter({ prefix: LEGACY_PREFIX });
 
     if (!globalThis.indexedDB) {
-        console.error("[web-storage] IndexedDB unavailable, falling back to localStorage");
+        console.error("[saas-storage] IndexedDB unavailable, falling back to localStorage");
         return preferenceAdapter;
     }
 
     const icsAdapter = createIndexedDbAdapter();
     let migrated = false;
 
-    // Silent migration: move a legacy localStorage ICS entry into IndexedDB.
     async function migrateLegacyIcsValue() {
         if (migrated) {
             return;
@@ -97,7 +93,7 @@ export function createWebHostStorageAdapter({ icsKey = ICS_STORAGE_KEY } = {}) {
                 globalThis.localStorage?.removeItem?.(`${LEGACY_PREFIX}${icsKey}`);
             }
         } catch (err) {
-            console.error("[web-storage] ICS migration failed", err);
+            console.error("[saas-storage] ICS migration failed", err);
         }
     }
 

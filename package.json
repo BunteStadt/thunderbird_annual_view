@@ -9,7 +9,6 @@
   "scripts": {
     "test": "node --test",
     "test:e2e:saas": "node test/e2e/saas-demo-playwright.mjs",
-    "build:web": "vite build --mode web",
     "build:thunderbird": "vite build --mode thunderbird",
     "build:xpi": "assets/scripts/build-xpi.sh",
     "lint:thunderbird": "assets/scripts/lint-thunderbird.sh",
@@ -17,7 +16,6 @@
     "cf-typegen": "wrangler types worker-configuration.d.ts",
     "deploy:saas": "npm run build:saas && wrangler deploy",
     "dev": "vite --config vite.saas.config.ts",
-    "dev:web": "vite",
     "dev:saas": "vite --config vite.saas.config.ts",
     "dev:saas:full": "npm run build:saas && wrangler dev",
     "preview:saas": "vite preview --config vite.saas.config.ts",

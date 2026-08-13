@@ -16,13 +16,6 @@ Recommended setup:
 
 Use a dedicated profile and install the add-on from a generated XPI package or from a local unpacked extension when supported by your setup.
 
-### Standalone HTML development
-
-The web shell can be used for faster iteration and debugging. Run `npm run dev:web`
-and open `http://localhost:5173/?dummy=1` for dummy data. Google login is always
-available in the web header; `?google=1` remains a compatibility alias. Configure
-the OAuth client ID in `src/hosts/web/google-client-id.js`.
-
 ### SaaS development
 
 The SaaS shell is a separate React/Vite host. It uses Clerk for authentication
@@ -68,8 +61,7 @@ The repository uses GitHub Actions for build, test, lint, and add-on release aut
 - [linter.yml](../.github/workflows/linter.yml) builds the XPI, runs the Thunderbird web extension linter, and publishes the report.
 - [release.yml](../.github/workflows/release.yml) builds the XPI, generates sample images, and publishes a draft release when a version tag is pushed.
 
-The Pages workflow is currently commented out. Web deployment is not active
-until that workflow is enabled and its generated `dist/web` paths are verified.
+The SaaS website is built and deployed through the Cloudflare Worker workflow.
 
 When changing manifest behavior, release packaging, or any shared calendar logic, verify the relevant workflow expectations and, where possible, test locally before pushing.
 
@@ -115,7 +107,7 @@ GitHub Actions.  The test suite covers:
 | `test/core/event-store.test.js` | Event store filtering and caching |
 | `test/core/storage-theme.test.js` | Storage and theme helpers |
 | `test/core/core-boundaries.test.js` | Core imports and host API boundary |
-| `test/hosts/web/web-storage-adapter.test.js` | Web storage routing and fallback behavior |
+| `test/hosts/saas/saas-storage-adapter.test.js` | SaaS storage routing and fallback behavior |
 
 The Google and Clerk-related tests do not contact external services and do not
 require credentials. They mock the Clerk token callback, Worker responses, and

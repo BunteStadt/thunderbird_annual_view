@@ -50,10 +50,10 @@ jobs:
       - name: Generate sample images
         env:
           RELEASE_TAG: ${{ github.ref_name }}
-          YEAR_VIEW_URL: http://127.0.0.1:8000/dist/web/index.html
+          YEAR_VIEW_URL: http://127.0.0.1:8000/demo
         run: |
-          npm run build:web
-          python3 -m http.server 8000 >/tmp/calendar-screenshots-http.log 2>&1 &
+          npm run build:saas
+          npm run preview:saas -- --host 127.0.0.1 --port 8000 >/tmp/calendar-screenshots-http.log 2>&1 &
           SERVER_PID=$!
           trap "kill $SERVER_PID" EXIT
           node assets/scripts/generate-sample-images.mjs

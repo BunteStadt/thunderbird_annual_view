@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { YearView as CoreYearView } from "../../../core/ui/annual-view";
 import { EmptyCalendarProvider, registerProviderFactory, setCalendarProvider } from "../../../core/providers/calendar-service.js";
 import { setStorageAdapter } from "../../../core/storage-port.js";
-import { createWebHostStorageAdapter } from "../../web/web-storage-adapter.js";
+import { createSaasStorageAdapter } from "./saas-storage-adapter.js";
 import { createSaasGoogleProvider } from "./saas-google-provider";
 import holidaysCalendar from "../../../../assets/demo_calendar/holidays-calendar.ics?raw";
 import personalCalendar from "../../../../assets/demo_calendar/personal-calendar.ics?raw";
@@ -62,7 +62,7 @@ export function YearView({ navigate, demo = false }: { navigate: (path: string) 
 
     useEffect(() => {
         const provider = demo ? new EmptyCalendarProvider() : googleProvider;
-        setStorageAdapter(createWebHostStorageAdapter());
+        setStorageAdapter(createSaasStorageAdapter());
         registerProviderFactory(demo ? "saas-demo" : "saas-google", () => provider);
         setCalendarProvider(provider);
         setReady(true);

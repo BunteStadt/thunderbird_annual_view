@@ -21,7 +21,10 @@ import "./styles.css";
 type Session = { user: { email: string | null } };
 
 function usePathname(): [string, Navigate] {
-    const [pathname, setPathname] = useState(globalThis.location.pathname);
+    const initialPath = new URLSearchParams(globalThis.location.search).get("demo") === "1"
+        ? "/demo"
+        : globalThis.location.pathname;
+    const [pathname, setPathname] = useState(initialPath);
 
     useEffect(() => {
         const onPopState = () => setPathname(globalThis.location.pathname);

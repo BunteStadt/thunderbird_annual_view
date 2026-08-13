@@ -31,7 +31,7 @@ test('React view shell does not force dark mode before theme preferences load', 
 
 test('view shell contains every data-ui-slot the host bootstraps mount into', () => {
     const slots = new Set();
-    for (const mainPath of ['src/hosts/web/main.js', 'src/hosts/thunderbird/main.js']) {
+    for (const mainPath of ['src/hosts/thunderbird/main.js', 'src/hosts/saas/src/year-view.tsx']) {
         const source = fs.readFileSync(path.join(repoRoot, mainPath), 'utf8');
         for (const match of source.matchAll(/slot:\s*["']([^"']+)["']/g)) {
             slots.add(match[1]);
@@ -68,8 +68,6 @@ test('Vite builds the one core HTML page with a host selected at compile time', 
     assert.match(entrySource, /from "@calendar-host"/);
     assert.match(entrySource, /mountYearView/);
     assert.match(viteConfig, /src\/hosts\/thunderbird\/main\.js/);
-    assert.match(viteConfig, /src\/hosts\/web\/main\.js/);
     assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'year-view.html')));
-    assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'web', 'index.html')));
     assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'host-bootstrap.js')));
 });

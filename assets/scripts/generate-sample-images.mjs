@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
 const releaseTag = process.env.RELEASE_TAG || process.env.GITHUB_REF_NAME || "local";
 const outputDir = path.join(repoRoot, "media", "generated", releaseTag);
-const yearViewUrl = process.env.YEAR_VIEW_URL || pathToFileURL(path.join(repoRoot, "src", "hosts", "web", "index.html")).href;
+const yearViewUrl = process.env.YEAR_VIEW_URL || "http://127.0.0.1:4173/demo";
 
 const baseScenarios = [
     { mode: "linear", theme: "light" },
@@ -85,7 +85,7 @@ async function captureScenario(browser, scenario) {
 
     await context.addInitScript(({ storageState }) => {
         globalThis.ENABLE_DUMMY_CALENDARS = true;
-        // Seed the web host's localStorage-backed preferences.
+        // Seed the SaaS host's localStorage-backed preferences.
         for (const [key, value] of Object.entries(storageState || {})) {
             globalThis.localStorage.setItem(`yearView.storage.${key}`, JSON.stringify(value));
         }

@@ -4,7 +4,7 @@
 
 The SaaS host is a React/Vite website around the shared Year View calendar. It provides public product pages, a no-sign-in demo, Clerk authentication, Clerk Billing UI, account management, legal pages, and a protected Google Calendar view.
 
-The Thunderbird add-on and standalone web host remain separate hosts. They reuse the platform-neutral calendar core but keep their own bootstraps and integrations.
+The Thunderbird add-on and SaaS website are separate hosts. They reuse the platform-neutral calendar core but keep their own bootstraps and integrations.
 
 ## Runtime layers
 
@@ -23,8 +23,7 @@ The Thunderbird add-on and standalone web host remain separate hosts. They reuse
 
 3. **Platform hosts**
    - `src/hosts/thunderbird/` supplies Thunderbird APIs and extension wiring.
-   - `src/hosts/web/` supplies the standalone browser host and client-side storage.
-   - `src/hosts/saas/` supplies the authenticated website shell and Worker API client.
+   - `src/hosts/saas/` supplies the authenticated website shell, browser storage, and Worker API client.
 
 ## SaaS page structure
 

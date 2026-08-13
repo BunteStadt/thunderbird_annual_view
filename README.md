@@ -63,21 +63,12 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 
 Alternatively, install directly from the [Thunderbird Add-ons site](https://addons.thunderbird.net/en-US/thunderbird/addon/calendar-annual-view/) using the ID: `GlamorousPotato.calendar-annual-view@addons.thunderbird.net`.
 
-## Web Demo
+## SaaS Demo
 
-The repository root contains a landing page (`index.html`). Build the web shell
-first with `npm run build:web`; the landing page links to the generated
-`dist/web/index.html` demo. The GitHub Pages workflow is present but currently
-disabled, so Pages deployment remains open work.
-
-- Landing page: `https://buntestadt.github.io/thunderbird_annual_view/`
-- Dummy demo button target after a build (opens in a new tab): `dist/web/index.html?dummy=1`
-- Embedded demo target after a build (inside an iframe): `dist/web/index.html?dummy=1`
-
-The web app is a static client-side deployment. It has no backend or database:
-Google calendars are read directly in the browser, while uploaded ICS content
-and preferences stay in local browser storage. Use the web app's clear-data
-control to remove local data and sign out of Google.
+The SaaS website includes a credential-free `/demo` route backed by the shared
+calendar core. Run `npm run dev:saas` and open `http://localhost:5173/demo`.
+The authenticated `/app` route uses Clerk and the Worker-backed Google Calendar
+provider.
 
 ## Usage
 
@@ -125,40 +116,13 @@ Use `just tb` or:
 Vite is used to merge htmls and build the stuff.
 
 ```bash
-npm run dev:web
-npm run build:web
+npm run dev:saas
+npm run build:saas
 npm run build:thunderbird
 ```
 
 ### Dummy Data
-Run `npm run dev:web`, then open `http://localhost:5173/?dummy=1` to load the built-in sample calendars and events.
-Or use the commented out code in main.js.
-
-### Google Calendar Data
-
-Run the year-view page as a local website with Google Calendar integration:
-
-1. Run `npm run dev:web`.
-2. Open `http://localhost:5173/?google=1`.
-3. Set your OAuth client ID in `src/hosts/web/google-client-id.js`.
-4. Click `Connect to Google` and complete the Google login/consent flow.
-5. The button switches to `Log out` when connected.
-6. The year view then loads your Google calendars and events.
-
-Google setup requirements:
-
-- In Google Cloud Console, create an OAuth Web Client.
-- Add your local origin (for example `http://localhost:4173`) to **Authorized JavaScript origins**.
-- Use scope `https://www.googleapis.com/auth/calendar.readonly`.
-- This integration is read-only.
-
-### Build standalone html
-
-Work without Thunderbird - see the thunderbird tab in the browser - faster for development and debugging.
-
-1. Run `npm run build:web`.
-2. Serve `dist/web/` with a static web server.
-3. Open `index.html?dummy=1` to load the built-in sample calendars and events.
+Run `npm run dev:saas`, then open `http://localhost:5173/demo` to load the built-in sample calendars and events.
 
 ### Run in Thunderbird
 
@@ -207,7 +171,7 @@ To create an `.xpi` file manually:
 
 Web release automation is still open: enable and verify
 `.github/workflows/deploy-pages.yml`, then deploy the landing page and the
-`dist/web` build from `main`.
+`dist/saas` build from `main`.
 
 ## License
 

@@ -6,9 +6,7 @@ import { defineConfig } from "vite";
 const repositoryRoot = import.meta.dirname;
 const uiRoot = resolve(repositoryRoot, "src/core/ui");
 
-export default defineConfig(({ mode }) => {
-    const thunderbird = mode === "thunderbird";
-
+export default defineConfig(() => {
     return {
         root: uiRoot,
         base: "./",
@@ -16,13 +14,13 @@ export default defineConfig(({ mode }) => {
         plugins: [react(), tailwindcss()],
         resolve: {
             alias: {
-                "@calendar-host": resolve(repositoryRoot, thunderbird ? "src/hosts/thunderbird/main.js" : "src/hosts/web/main.js")
+                "@calendar-host": resolve(repositoryRoot, "src/hosts/thunderbird/main.js")
             }
         },
         build: {
             emptyOutDir: true,
-            outDir: resolve(repositoryRoot, thunderbird ? "dist/package" : "dist/web"),
-            minify: thunderbird ? false : "esbuild",
+            outDir: resolve(repositoryRoot, "dist/package"),
+            minify: false,
             rollupOptions: {
                 input: {
                     index: resolve(uiRoot, "index.html")

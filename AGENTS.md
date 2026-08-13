@@ -57,7 +57,7 @@ The add-on currently provides:
 The shared layer should eventually own the calendar domain, filtering rules, view modes, and event layout logic. The platform-specific layers should only handle:
 
 - Thunderbird integration and manifest wiring
-- browser/web hosting, routing, and shell UI
+- SaaS hosting, routing, and shell UI
 - storage and environment differences
 
 ## Detailed specifications

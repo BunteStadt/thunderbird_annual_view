@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 
 async function loadAdapterModule() {
-    const modulePath = path.resolve(__dirname, '../../../src/hosts/web/web-storage-adapter.js');
+    const modulePath = path.resolve(__dirname, '../../../src/hosts/saas/src/saas-storage-adapter.js');
     return import(`file://${modulePath.replace(/\\/g, '/')}`);
 }
 
@@ -30,7 +30,6 @@ function installFakeLocalStorage() {
 }
 
 function installFakeIndexedDb() {
-    // Minimal promise-friendly fake of the tiny indexedDB surface the adapter uses.
     const stores = new Map();
 
     function makeRequest(executor) {
@@ -93,7 +92,7 @@ function installFakeIndexedDb() {
     return stores;
 }
 
-test('web host adapter routes the ICS key to IndexedDB and preferences to localStorage', async (t) => {
+test('SaaS adapter routes the ICS key to IndexedDB and preferences to localStorage', async (t) => {
     const localData = installFakeLocalStorage();
     const idbStores = installFakeIndexedDb();
     t.after(() => {
@@ -101,8 +100,8 @@ test('web host adapter routes the ICS key to IndexedDB and preferences to localS
         delete globalThis.indexedDB;
     });
 
-    const { createWebHostStorageAdapter } = await loadAdapterModule();
-    const adapter = createWebHostStorageAdapter();
+    const { createSaasStorageAdapter } = await loadAdapterModule();
+    const adapter = createSaasStorageAdapter();
 
     await adapter.set('viewMode', 'linear');
     assert.equal(localData.get('yearView.storage.viewMode'), JSON.stringify('linear'));
@@ -110,7 +109,7 @@ test('web host adapter routes the ICS key to IndexedDB and preferences to localS
 
     const icsValue = [{ id: 'ics-a', content: 'BEGIN:VCALENDAR\nEND:VCALENDAR' }];
     await adapter.set('icsCalendars', icsValue);
-    assert.equal(localData.has('yearView.storage.icsCalendars'), false, 'ICS content must not land in localStorage');
+    assert.equal(localData.has('yearView.storage.icsCalendars'), false);
     assert.deepEqual(await adapter.get('icsCalendars'), icsValue);
     assert.deepEqual(idbStores.get('annual-view')?.get('icsCalendars'), icsValue);
 
@@ -118,7 +117,7 @@ test('web host adapter routes the ICS key to IndexedDB and preferences to localS
     assert.equal(await adapter.get('icsCalendars'), undefined);
 });
 
-test('web host adapter migrates a legacy localStorage ICS entry into IndexedDB', async (t) => {
+test('SaaS adapter migrates a legacy localStorage ICS entry into IndexedDB', async (t) => {
     const localData = installFakeLocalStorage();
     const idbStores = installFakeIndexedDb();
     t.after(() => {
@@ -129,15 +128,15 @@ test('web host adapter migrates a legacy localStorage ICS entry into IndexedDB',
     const legacyValue = [{ id: 'ics-legacy', content: 'BEGIN:VCALENDAR\nEND:VCALENDAR' }];
     localData.set('annualView.storage.icsCalendars', JSON.stringify(legacyValue));
 
-    const { createWebHostStorageAdapter } = await loadAdapterModule();
-    const adapter = createWebHostStorageAdapter();
+    const { createSaasStorageAdapter } = await loadAdapterModule();
+    const adapter = createSaasStorageAdapter();
 
     assert.deepEqual(await adapter.get('icsCalendars'), legacyValue);
-    assert.equal(localData.has('annualView.storage.icsCalendars'), false, 'legacy entry removed after migration');
+    assert.equal(localData.has('annualView.storage.icsCalendars'), false);
     assert.deepEqual(idbStores.get('annual-view')?.get('icsCalendars'), legacyValue);
 });
 
-test('web host adapter falls back to localStorage when IndexedDB is unavailable', async (t) => {
+test('SaaS adapter falls back to localStorage when IndexedDB is unavailable', async (t) => {
     const localData = installFakeLocalStorage();
     delete globalThis.indexedDB;
     const errors = [];
@@ -148,8 +147,8 @@ test('web host adapter falls back to localStorage when IndexedDB is unavailable'
         console.error = originalError;
     });
 
-    const { createWebHostStorageAdapter } = await loadAdapterModule();
-    const adapter = createWebHostStorageAdapter();
+    const { createSaasStorageAdapter } = await loadAdapterModule();
+    const adapter = createSaasStorageAdapter();
 
     await adapter.set('icsCalendars', [{ id: 'ics-a', content: 'X' }]);
     assert.equal(localData.has('yearView.storage.icsCalendars'), true);

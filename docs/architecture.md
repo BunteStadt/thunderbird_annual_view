@@ -48,7 +48,7 @@ provider, and host-specific UI modules through the bootstrap.
   - coordinates the event store and grid view
 
 - [src/hosts/thunderbird/main.js](../src/hosts/thunderbird/main.js) and
-  [src/hosts/web/main.js](../src/hosts/web/main.js)
+  [src/hosts/saas/src/year-view.tsx](../src/hosts/saas/src/year-view.tsx)
   - configure the host storage adapter and calendar provider
   - register host-specific UI modules before calling `initApp()`
 
@@ -64,9 +64,6 @@ provider, and host-specific UI modules through the bootstrap.
   - handles Google OAuth token flow (Google Identity Services)
   - queries Google Calendar list/events endpoints in read-only mode
   - maps Google payloads into the shared event shape
-
-- [src/hosts/web/google-client-id.js](../src/hosts/web/google-client-id.js)
-  - stores the Google OAuth web client ID used by standalone Google mode
 
 - [src/core/providers/ics-calendar-provider.js](../src/core/providers/ics-calendar-provider.js)
   - platform-agnostic provider that reads events from in-memory ICS (iCalendar) content
@@ -106,9 +103,8 @@ provider, and host-specific UI modules through the bootstrap.
   - shared Tailwind entry and dense annual-grid styles based on the original
     add-on design
 
-- [src/hosts/web/ui](../src/hosts/web/ui)
-  - contains Google authentication, empty-state, and clear-data UI modules
-  - these modules are mounted only by the web bootstrap
+- [src/hosts/saas/src](../src/hosts/saas/src)
+  - contains the authenticated website shell and SaaS calendar integration
 
 ## 3. Core domain concepts
 
@@ -203,16 +199,11 @@ without platform-specific coupling.
   - storage adapter backed by `browser.storage.local`
   - Thunderbird-only UI modules mounted into core slots
 
-- `src/hosts/web/` — the website shell (static hosting on GitHub Pages, **no backend, no database**):
-  - web entry point (HTML page deployed to Pages)
-  - storage adapter backed by client-side storage (`localStorage` for preferences, IndexedDB for uploaded ICS content)
-  - Google auth setup (`google-standalone-auth.js`, client ID configuration) — calendars are fetched directly from Google APIs in the browser; OAuth tokens never leave the client
-  - web-only UI modules mounted into core slots
-
 - `src/hosts/saas/` — the authenticated SaaS website shell:
   - React/Vite public pages and lightweight pathname routing
   - Clerk authentication and Clerk Billing UI
   - SaaS-specific Google Calendar adapter and connect control
+  - browser storage adapter backed by `localStorage` and IndexedDB
   - page components in `src/hosts/saas/src/pages/` and shared site components in `src/hosts/saas/src/components/`
   - static assets and `/api/health` served through the Cloudflare Worker
 

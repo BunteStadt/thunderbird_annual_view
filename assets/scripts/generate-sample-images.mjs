@@ -84,7 +84,6 @@ async function captureScenario(browser, scenario) {
     });
 
     await context.addInitScript(({ storageState }) => {
-        globalThis.ENABLE_DUMMY_CALENDARS = true;
         // Seed the SaaS host's localStorage-backed preferences.
         for (const [key, value] of Object.entries(storageState || {})) {
             globalThis.localStorage.setItem(`yearView.storage.${key}`, JSON.stringify(value));

@@ -11,11 +11,23 @@ async function loadEventStoreModule() {
     return import(`file://${modulePath.replace(/\\/g, '/')}`);
 }
 
+async function setFixtureCalendars(calendarService) {
+    const fixturePath = (name) => path.resolve(__dirname, '../fixtures', name);
+    const readFixture = (name) => fs.readFile(fixturePath(name), 'utf8');
+    calendarService.setIcsCalendars([
+        { id: 'ics-work', name: 'Work', content: await readFixture('work-calendar.ics') },
+        { id: 'ics-personal', name: 'Personal', content: await readFixture('personal-calendar.ics') },
+        { id: 'ics-project', name: 'Project', content: await readFixture('project-calendar.ics') },
+        { id: 'ics-holidays', name: 'Holidays', content: await readFixture('holidays-calendar.ics') }
+    ]);
+}
+
 test('EventStore caches years and applies filters without refetching', async (t) => {
     const calendarServicePath = path.resolve(__dirname, '../../src/core/providers/calendar-service.js');
     const calendarService = await import(`file://${calendarServicePath.replace(/\\/g, '/')}`);
-    calendarService.setCalendarProvider(calendarService.createCalendarProvider('dummy'));
+    await setFixtureCalendars(calendarService);
     t.after(() => {
+        calendarService.setIcsCalendars([]);
         calendarService.setCalendarProvider(null);
     });
 
@@ -23,7 +35,7 @@ test('EventStore caches years and applies filters without refetching', async (t)
     const store = new EventStore();
 
     const filters = {
-        calendarIds: ['dummy-work', 'dummy-personal', 'dummy-project', 'dummy-holidays'],
+        calendarIds: ['ics-work', 'ics-personal', 'ics-project', 'ics-holidays'],
         allDayOnly: false,
         calendarAllDayModes: {},
         getMinDurationMs: () => 0
@@ -37,10 +49,10 @@ test('EventStore caches years and applies filters without refetching', async (t)
     // Calendar filter applies on read from the same cache.
     const workOnly = await store.getFilteredEvents(2026, 2026, {
         ...filters,
-        calendarIds: ['dummy-work']
+        calendarIds: ['ics-work']
     });
     assert.ok(workOnly.events.length > 0);
-    assert.ok(workOnly.events.every((ev) => ev.calendarId === 'dummy-work'));
+    assert.ok(workOnly.events.every((ev) => ev.calendarId === 'ics-work'));
 
     // Duration filter reports filtered-out counts.
     const longOnly = await store.getFilteredEvents(2026, 2026, {
@@ -70,9 +82,12 @@ test('EventStore caches years and applies filters without refetching', async (t)
 });
 
 test('EventStore deduplicates events that span a year boundary', async (t) => {
-    globalThis.ENABLE_DUMMY_CALENDARS = true;
+    const calendarServicePath = path.resolve(__dirname, '../../src/core/providers/calendar-service.js');
+    const calendarService = await import(`file://${calendarServicePath.replace(/\\/g, '/')}`);
+    await setFixtureCalendars(calendarService);
     t.after(() => {
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
+        calendarService.setIcsCalendars([]);
+        calendarService.setCalendarProvider(null);
     });
 
     const { EventStore } = await loadEventStoreModule();
@@ -84,10 +99,10 @@ test('EventStore deduplicates events that span a year boundary', async (t) => {
 });
 
 test('EventStore returns nothing when no calendars are selected', async (t) => {
-    globalThis.ENABLE_DUMMY_CALENDARS = true;
-    t.after(() => {
-        delete globalThis.ENABLE_DUMMY_CALENDARS;
-    });
+    const calendarServicePath = path.resolve(__dirname, '../../src/core/providers/calendar-service.js');
+    const calendarService = await import(`file://${calendarServicePath.replace(/\\/g, '/')}`);
+    calendarService.setIcsCalendars([]);
+    calendarService.setCalendarProvider(null);
 
     const { EventStore } = await loadEventStoreModule();
     const store = new EventStore();

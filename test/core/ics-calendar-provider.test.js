@@ -94,7 +94,7 @@ test('IcsCalendarProvider returns only events overlapping the requested year', a
 });
 
 // ---------------------------------------------------------------------------
-// Fixture files mirroring the dummy calendar data
+// Fixture files used by the built-in ICS demo data
 // ---------------------------------------------------------------------------
 
 test('IcsCalendarProvider fetchCalendars returns all calendars from fixture files', async () => {
@@ -149,6 +149,22 @@ test('IcsCalendarProvider returns events from all fixture calendars for 2026', a
     assert.ok(calIds.has('ics-personal'), 'expected personal events');
     assert.ok(calIds.has('ics-project'), 'expected project events');
     assert.ok(calIds.has('ics-holidays'), 'expected holiday events');
+});
+
+test('built-in demo calendars include events through 2030', async () => {
+    const { IcsCalendarProvider } = await loadIcsProviderModule();
+    const names = ['holidays', 'personal', 'project', 'work'];
+    const calendars = await Promise.all(names.map(async (name) => ({
+        id: `demo-${name}`,
+        name,
+        content: await fs.readFile(path.resolve(__dirname, '../../assets/demo_calendar', `${name}-calendar.ics`), 'utf8')
+    })));
+    const provider = new IcsCalendarProvider(calendars);
+
+    for (const calendar of calendars) {
+        const events = await provider.fetchCalendarEvents(2030, { calendarIds: [calendar.id] });
+        assert.ok(events.length > 0, `expected ${calendar.name} demo events in 2030`);
+    }
 });
 
 test('IcsCalendarProvider filters events by calendarIds', async () => {

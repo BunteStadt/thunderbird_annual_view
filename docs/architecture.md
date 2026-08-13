@@ -57,7 +57,7 @@ provider, and host-specific UI modules through the bootstrap.
   - creates providers through explicit kinds or registered host factories
   - keeps uploaded `.ics` calendars in a dedicated `IcsCalendarProvider` instance
   - merges `IcsCalendarProvider` calendars/events with the active provider output in `fetchCalendars()` and `fetchCalendarEvents()`
-  - exports `IcsCalendarProvider`, `GoogleCalendarProvider`, `ThunderbirdCalendarProvider`, `DummyCalendarProvider`, and `EmptyCalendarProvider`
+  - exports `IcsCalendarProvider` and `EmptyCalendarProvider`
   - keeps provider selection out of the renderer
 
 - [src/core/providers/google-calendar-provider.js](../src/core/providers/google-calendar-provider.js)
@@ -155,7 +155,7 @@ The user can change:
 ## 4. Current data flow
 
 1. The host bootstrap installs a storage adapter and chooses a provider
-  (Thunderbird APIs, Google web APIs, dummy data, or empty).
+  (Thunderbird APIs, Google web APIs, built-in ICS demo data, or empty).
 2. The core UI initializes and loads persisted preferences.
 3. The event store requests events for the needed year range.
 4. The store caches normalized events and filters them according to current settings.
@@ -189,7 +189,7 @@ without platform-specific coupling.
 
 - `src/core/` — platform-neutral. No `browser.*`/`messenger.*` calls, no direct access to host storage, no host detection.
   - `core/domain/` — `date-utils`, `event-store`, filter rules, event/calendar schema
-  - `core/providers/` — provider base class, `ics-`, `google-`, `dummy-`, `empty-provider`, and `calendar-service` (merge logic only, no auto-detection)
+  - `core/providers/` — provider base class, `ics-`, `google-`, `empty-provider`, and `calendar-service` (merge logic only, no auto-detection)
   - `core/ui/` — `grid-view`, `theme`, header/sidebar scaffolding, shared CSS
   - `core/app.js` — the orchestration currently living in `main.js`, initialized with injected ports
 
@@ -212,7 +212,7 @@ without platform-specific coupling.
 Each host shell supplies these ports to `core/app.js` at startup:
 
 - **StoragePort** — async `get(key)` / `set(key, value)` / `remove(key)` for preferences and uploaded ICS data. Replaces the direct `browser.storage.local` coupling in `storage.js` and the `ensureBrowserStorageBridge()` workaround in `main.js`.
-- **CalendarSourcePort** — the host decides which provider is the default (Thunderbird provider, Google provider, dummy, or empty). The core never feature-detects the platform.
+- **CalendarSourcePort** — the host decides which provider is the default (Thunderbird provider, Google provider, or empty); built-in demo calendars use the ICS integration. The core never feature-detects the platform.
 - **HostPort** — theme detection hooks, refresh triggers, and navigation behavior where hosts differ.
 
 ### 6.3 UI extension points (host-specific UI elements)

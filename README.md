@@ -16,7 +16,7 @@ The add-on automatically detects your Thunderbird calendars, applies their confi
 - **Multi-Calendar Support**: Show events from multiple calendars at once.
 - **Automatic Calendar Detection**: Pulls calendars and colors from Thunderbird's settings.
 - **ICS Upload and Removal**: Add one or more `.ics` files from the options sidebar and remove uploaded calendars individually with the `✕` button.
-- **Merged Calendar Sources**: Uploaded `.ics` calendars are merged with the active provider (Thunderbird, Google standalone, or dummy mode) instead of replacing it.
+- **Merged Calendar Sources**: Uploaded `.ics` calendars are merged with the active provider (Thunderbird or Google standalone) instead of replacing it.
 - **Configurable Filters**:
   - Enable/disable specific calendars.
   - Set each calendar's all-day-only mode to on, off, or follow the global setting.
@@ -122,8 +122,8 @@ npm run build:thunderbird
 npm run check:thunderbird
 ```
 
-### Dummy Data
-Run `npm run dev`, then open `http://localhost:5173/demo` to load the built-in sample calendars and events.
+### Demo Calendars
+Run `npm run dev`, then open `http://localhost:5173/demo` to load the built-in sample `.ics` calendars and events.
 
 ### Run in Thunderbird
 

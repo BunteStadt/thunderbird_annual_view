@@ -1,6 +1,11 @@
 import { loadOnboardingCompleted, persistOnboardingCompleted } from "../storage.js";
 
 const TOUR_EVENT = "year-view:restart-tour";
+const calendarRequiredStep = {
+    target: "upload-ics",
+    title: "Import a calendar to begin",
+    text: "Upload an .ics file to add a calendar before continuing with the year view tour."
+};
 
 const steps = [
     { target: "calendar-list", title: "Choose calendars", text: "Click a calendar name to include or remove it from the year view." },
@@ -36,7 +41,7 @@ function positionCallout(callout, target) {
     callout.dataset.placement = below ? "below" : "above";
 }
 
-export function setupOnboardingTour({ root } = {}) {
+export function setupOnboardingTour({ root, hasCalendars = () => true } = {}) {
     if (!root) return { destroy() { } };
 
     const documentRoot = root.ownerDocument || document;
@@ -49,6 +54,7 @@ export function setupOnboardingTour({ root } = {}) {
     let currentStep = 0;
     let activeTarget = null;
     let running = false;
+    let waitingForCalendar = false;
 
     function stop() {
         running = false;
@@ -58,7 +64,7 @@ export function setupOnboardingTour({ root } = {}) {
     }
 
     function render() {
-        const step = steps[currentStep];
+        const step = waitingForCalendar ? calendarRequiredStep : steps[currentStep];
         const target = getTarget(root, step.target);
         activeTarget?.classList.remove("onboarding-tour-target");
         activeTarget = target;
@@ -71,7 +77,9 @@ export function setupOnboardingTour({ root } = {}) {
 
         const stepLabel = document.createElement("p");
         stepLabel.className = "onboarding-tour-step";
-        stepLabel.textContent = `Step ${currentStep + 1} of ${steps.length}`;
+        stepLabel.textContent = waitingForCalendar
+            ? "Before the tour"
+            : `Step ${currentStep + 1} of ${steps.length}`;
         card.appendChild(stepLabel);
 
         const title = document.createElement("h2");
@@ -105,7 +113,8 @@ export function setupOnboardingTour({ root } = {}) {
         nextButton.type = "button";
         nextButton.className = "btn onboarding-tour-next";
         nextButton.dataset.tourAction = "next";
-        nextButton.textContent = currentStep === steps.length - 1 ? "Done" : "Next";
+        nextButton.disabled = waitingForCalendar;
+        nextButton.textContent = waitingForCalendar ? "Import a calendar" : currentStep === steps.length - 1 ? "Done" : "Next";
         actions.appendChild(nextButton);
         card.appendChild(actions);
         tour.replaceChildren(card);
@@ -123,8 +132,17 @@ export function setupOnboardingTour({ root } = {}) {
         const toggle = root.querySelector("#toggleCalendars");
         if (toggle?.getAttribute("aria-expanded") !== "true") toggle?.click();
         currentStep = 0;
+        waitingForCalendar = !hasCalendars();
         running = true;
         render();
+    }
+
+    function notifyCalendarStateChanged() {
+        if (running && waitingForCalendar && hasCalendars()) {
+            waitingForCalendar = false;
+            currentStep = 0;
+            render();
+        }
     }
 
     function onAction(event) {
@@ -155,6 +173,7 @@ export function setupOnboardingTour({ root } = {}) {
     });
 
     return {
+        notifyCalendarStateChanged,
         destroy() {
             stop();
             tour.removeEventListener("click", onAction);

@@ -47,7 +47,7 @@ async function createCalendarDescriptors(files) {
     );
 }
 
-export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initialCalendars = null, readOnly = false } = {}) {
+export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initialCalendars = null, readOnly = false, demoMode = false } = {}) {
     let calendars = [];
 
     const fileInput = globalThis.document?.createElement?.("input") ?? null;
@@ -98,6 +98,18 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initial
         const buttonRow = globalThis.document.createElement("div");
         buttonRow.className = "select-buttons";
         buttonRow.appendChild(uploadButton);
+
+        if (demoMode) {
+            const restoreButton = globalThis.document.createElement("button");
+            restoreButton.className = "btn";
+            restoreButton.dataset.size = "compact";
+            restoreButton.type = "button";
+            restoreButton.textContent = "Restore demo calendars";
+            restoreButton.addEventListener("click", () => {
+                void updateCalendars(initialCalendars || []);
+            });
+            buttonRow.appendChild(restoreButton);
+        }
 
         const tourButton = globalThis.document.createElement("button");
         if (tourButton !== uploadButton) {

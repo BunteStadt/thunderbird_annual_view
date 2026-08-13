@@ -20,7 +20,7 @@ The add-on currently provides:
 - manual upload and per-calendar removal of stored `.ics` calendars from the sidebar
 - optional local-website loading from Google Calendar APIs through OAuth sign-in (client ID configured in source)
 - calendar filtering, all-day filtering, minimum-duration filtering, and theme preferences
-- a standalone HTML debug surface for local development via dummy data
+- a standalone HTML debug surface for local development via built-in ICS demo data
 
 ## Repository shape
 

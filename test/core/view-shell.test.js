@@ -9,6 +9,9 @@ const appSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'app.js'), 
 const storageSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'storage.js'), 'utf8');
 const onboardingSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'onboarding-tour.js'), 'utf8');
 const icsSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ics-calendar-integration.js'), 'utf8');
+const demoCalendarsSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'demo-calendars.js'), 'utf8');
+const coreHostSource = fs.readFileSync(path.join(repoRoot, 'src', 'hosts', 'core', 'main.js'), 'utf8');
+const saasYearViewSource = fs.readFileSync(path.join(repoRoot, 'src', 'hosts', 'saas', 'src', 'year-view.tsx'), 'utf8');
 
 // The view shell in core is the single source of truth for the app markup.
 // These guards make it impossible for app.js, the host bootstraps, or the
@@ -58,7 +61,10 @@ test('view shell exposes the core onboarding targets and expanded options by def
     assert.match(onboardingSource, /global-all-day/);
     assert.match(onboardingSource, /specific-all-day/);
     assert.match(onboardingSource, /specific-duration/);
-    assert.match(onboardingSource, /upload-ics/);
+    assert.match(onboardingSource, /waitingForCalendar/);
+    assert.match(onboardingSource, /target: "upload-ics"/);
+    assert.match(appSource, /hasCalendars: \(\) => availableCalendars\.length > 0/);
+    assert.match(appSource, /notifyCalendarStateChanged/);
 });
 
 test('Vite builds the one core HTML page with a host selected at compile time', () => {
@@ -70,4 +76,15 @@ test('Vite builds the one core HTML page with a host selected at compile time', 
     assert.match(viteConfig, /src\/hosts\/thunderbird\/main\.js/);
     assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'thunderbird', 'year-view.html')));
     assert.ok(!fs.existsSync(path.join(repoRoot, 'src', 'hosts', 'host-bootstrap.js')));
+});
+
+test('demo hosts load calendars through the removable ICS integration', () => {
+    assert.match(coreHostSource, /demoCalendars/);
+    assert.match(coreHostSource, /new EmptyCalendarProvider/);
+    assert.match(coreHostSource, /demoMode: true/);
+    assert.match(demoCalendarsSource, /id: "ics-demo-/);
+    assert.match(saasYearViewSource, /icsCalendars: demo \? demoCalendars/);
+    assert.match(saasYearViewSource, /demoMode: demo/);
+    assert.match(saasYearViewSource, /icsReadOnly: false/);
+    assert.match(icsSource, /Restore demo calendars/);
 });

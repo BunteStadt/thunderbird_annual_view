@@ -28,8 +28,8 @@ async function createCustomSpace() {
         {
 
             "defaultIcons": {
-                "16": "assets/icons/annual_view_prefers-color.svg",
-                "32": "assets/icons/annual_view_prefers-color.svg"
+                "16": "assets/icons/Yearview_logo.svg",
+                "32": "assets/icons/Yearview_logo.svg"
             }
         }
 

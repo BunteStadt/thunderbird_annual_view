@@ -39,7 +39,7 @@ test('background script loads and click handler executes without console errors'
 
     const availableResources = new Set([
         'moz-extension://test/index.html',
-        'moz-extension://test/assets/icons/annual_view_prefers-color.svg'
+        'moz-extension://test/assets/icons/Yearview_logo.svg'
     ]);
 
     const context = vm.createContext({

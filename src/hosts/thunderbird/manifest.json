@@ -20,15 +20,15 @@
         ]
     },
     "icons": {
-        "16": "assets/icons/annual_view_prefers-color.svg",
-        "32": "assets/icons/annual_view_prefers-color.svg"
+        "16": "assets/icons/Yearview_logo.svg",
+        "32": "assets/icons/Yearview_logo.svg"
     },
     "action": {
         "allowed_spaces": [],
         "default_title": "Open Year View",
         "default_icon": {
-            "16": "assets/icons/annual_view_prefers-color.svg",
-            "32": "assets/icons/annual_view_prefers-color.svg"
+            "16": "assets/icons/Yearview_logo.svg",
+            "32": "assets/icons/Yearview_logo.svg"
         }
     },
     "experiment_apis": {

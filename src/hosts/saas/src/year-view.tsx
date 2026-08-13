@@ -7,17 +7,7 @@ import { EmptyCalendarProvider, registerProviderFactory, setCalendarProvider } f
 import { setStorageAdapter } from "../../../core/storage-port.js";
 import { createSaasStorageAdapter } from "./saas-storage-adapter.js";
 import { createSaasGoogleProvider } from "./saas-google-provider";
-import holidaysCalendar from "../../../../assets/demo_calendar/holidays-calendar.ics?raw";
-import personalCalendar from "../../../../assets/demo_calendar/personal-calendar.ics?raw";
-import projectCalendar from "../../../../assets/demo_calendar/project-calendar.ics?raw";
-import workCalendar from "../../../../assets/demo_calendar/work-calendar.ics?raw";
-
-const demoCalendars = [
-    { id: "demo-holidays", name: "Holidays", color: "#d66b5d", content: holidaysCalendar },
-    { id: "demo-personal", name: "Personal", color: "#4c8d80", content: personalCalendar },
-    { id: "demo-project", name: "Project", color: "#c3914a", content: projectCalendar },
-    { id: "demo-work", name: "Work", color: "#5b77a8", content: workCalendar }
-];
+import { demoCalendars } from "../../../core/demo-calendars.js";
 
 function createSaasHeaderAction(slot: "header-leading" | "header-actions", navigate: (path: string) => void) {
     return {
@@ -72,7 +62,8 @@ export function YearView({ navigate, demo = false }: { navigate: (path: string) 
         <main className={`year-view-page${demo ? "" : " app-page"}`}>
             {ready && <CoreYearView config={{
                 icsCalendars: demo ? demoCalendars : undefined,
-                icsReadOnly: demo,
+                icsReadOnly: false,
+                demoMode: demo,
                 selectAllCalendars: demo,
                 embeddedDemo: demo && new URLSearchParams(globalThis.location.search).get("embed") === "1",
                 uiModules: demo ? [] : [

@@ -10,7 +10,7 @@ The Thunderbird add-on and SaaS website are separate hosts. They reuse the platf
 
 1. **Shared calendar core** in `src/core/`
    - calendar provider contracts and service
-   - Google, Thunderbird, dummy, empty, and ICS providers
+   - Google, Thunderbird, empty, and ICS providers
    - event normalization, caching, filtering, and date utilities
    - annual grid and shared UI slots
 

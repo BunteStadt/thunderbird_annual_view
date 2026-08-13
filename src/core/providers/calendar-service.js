@@ -1,5 +1,4 @@
 import { CalendarProvider, EmptyCalendarProvider } from "./calendar-provider.js";
-import { DummyCalendarProvider } from "./dummy-calendar-provider.js";
 import { IcsCalendarProvider } from "./ics-calendar-provider.js";
 
 let activeCalendarProvider = null;
@@ -7,7 +6,6 @@ let activeIcsProvider = new IcsCalendarProvider([]);
 
 export {
     CalendarProvider,
-    DummyCalendarProvider,
     EmptyCalendarProvider,
     IcsCalendarProvider
 };
@@ -37,12 +35,7 @@ export function createCalendarProvider(kind) {
     if (factory) {
         return factory();
     }
-    switch (kind) {
-        case "dummy":
-            return new DummyCalendarProvider();
-        default:
-            return new EmptyCalendarProvider();
-    }
+    return new EmptyCalendarProvider();
 }
 
 export async function fetchCalendars() {

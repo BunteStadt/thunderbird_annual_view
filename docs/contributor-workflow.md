@@ -99,7 +99,7 @@ test suite covers:
 | --- | --- |
 | `test/hosts/thunderbird/addon-integration.test.js` | Manifest integrity and XPI build |
 | `test/hosts/thunderbird/background-runtime.test.js` | Background script click handler |
-| `test/core/calendar-service.test.js` | Calendar service with dummy and injected providers |
+| `test/core/calendar-service.test.js` | Calendar service with ICS and injected providers |
 | `test/hosts/thunderbird/thunderbird-provider.test.js` | `ThunderbirdCalendarProvider` with mocked `browser.calendar.*` APIs and NRW ICS data |
 | `test/worker/google-calendar.test.js` | Google Calendar Worker mapping, pagination, filtering, and API errors with mocked `fetch` |
 | `test/hosts/saas/saas-google-provider.test.js` | SaaS Google provider token handling, filtering, sign-in state, and safe error handling with mocked Worker responses |
@@ -176,7 +176,7 @@ for full instructions.
 
 - prefer regression tests for shared domain logic
 - verify UI behavior manually in the browser or Thunderbird
-- validate filter and rendering changes with dummy data first
+- validate filter and rendering changes with the built-in ICS demo first
 - update the table above when adding a new test file
 
 ## 6. Coding standards

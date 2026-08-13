@@ -460,6 +460,7 @@ export async function initApp(config = {}) {
 
         renderCalendarList(availableCalendars);
         await persistSelection(selectedCalendarIds);
+        onboardingTour?.notifyCalendarStateChanged?.();
     }
 
     // ---------------------------------------------------------------------------
@@ -578,6 +579,7 @@ export async function initApp(config = {}) {
             mount: uiSlots.get("sidebar-sections") ?? null,
             initialCalendars: config.icsCalendars,
             readOnly: config.icsReadOnly === true,
+            demoMode: config.demoMode === true,
             onCalendarsChanged: async () => {
                 eventStore.invalidate();
                 await loadCalendars();
@@ -705,6 +707,9 @@ export async function initApp(config = {}) {
 
     await init();
     mountedUiModules.forEach((mounted) => mounted?.update?.());
-    onboardingTour = setupOnboardingTour({ root });
+    onboardingTour = setupOnboardingTour({
+        root,
+        hasCalendars: () => availableCalendars.length > 0
+    });
     return appApi;
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CircleUserRound, LogIn, Menu, X } from "lucide-react";
 import { SiThunderbird } from "react-icons/si";
-import yearViewIcon from "../../../../../assets/icons/annual_view_inverted.svg";
+import yearViewLogo from "../../../../../assets/icons/Yearview_logo.svg";
 import { Link, type Navigate } from "./Link";
 
 type Session = { user: { email: string | null } } | null;
@@ -18,7 +18,7 @@ export function SiteHeader({ navigate, path, session }: { navigate: Navigate; pa
         <header className="site-header">
             <nav className="page-width nav-shell" aria-label="Primary navigation">
                 <Link to="/" navigate={navigate} className="brand" aria-label="Year View home">
-                    <span className="brand-mark"><img src={yearViewIcon} alt="" /></span>
+                    <img className="brand-logo" src={yearViewLogo} alt="" />
                     <span>Year View</span>
                 </Link>
                 <button type="button" className="icon-button menu-button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>

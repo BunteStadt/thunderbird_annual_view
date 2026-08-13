@@ -95,24 +95,11 @@ a:focus-visible {
     font-weight: 780;
 }
 
-.brand-mark {
-    width: 34px;
-    height: 34px;
-    display: grid;
-    place-items: center;
-    color: #fff;
-    background: var(--av-accent-strong);
-    border-radius: 6px;
-}
-
-.brand-mark svg {
-    width: 19px;
-}
-
-.brand-mark img {
-    width: 24px;
-    height: 24px;
+.brand-logo {
+    width: 38px;
+    height: 38px;
     object-fit: contain;
+    border-radius: 6px;
 }
 
 .nav-links {
@@ -2627,7 +2614,6 @@ a:focus-visible {
     color: var(--av-weekday-text);
 }
 
-.brand-mark,
 .pricing-band,
 .price-summary,
 .auth-icon {

@@ -35,10 +35,15 @@ the host boundaries.
 npm run dev:saas
 npm run typecheck:saas
 npm run build:saas
+npm run test:e2e:saas
 ```
 
 The `/demo` route works without external credentials. Testing `/login`,
 `/pricing`, `/account`, and `/app` requires a configured Clerk publishable key;
+
+The credential-free SaaS browser smoke test uses Playwright and `/demo` only. It
+does not contact Clerk or Google. Install the browser once with
+`npx playwright install --with-deps chromium` before running it locally.
 
 ### Thunderbird linter
 
@@ -104,11 +109,29 @@ GitHub Actions.  The test suite covers:
 | `test/hosts/thunderbird/background-runtime.test.js` | Background script click handler |
 | `test/core/calendar-service.test.js` | Calendar service with dummy and injected providers |
 | `test/hosts/thunderbird/thunderbird-provider.test.js` | `ThunderbirdCalendarProvider` with mocked `browser.calendar.*` APIs and NRW ICS data |
+| `test/worker/google-calendar.test.js` | Google Calendar Worker mapping, pagination, filtering, and API errors with mocked `fetch` |
+| `test/hosts/saas/saas-google-provider.test.js` | SaaS Google provider token handling, filtering, sign-in state, and safe error handling with mocked Worker responses |
 | `test/core/date-utils.test.js` | Date utility functions |
 | `test/core/event-store.test.js` | Event store filtering and caching |
 | `test/core/storage-theme.test.js` | Storage and theme helpers |
 | `test/core/core-boundaries.test.js` | Core imports and host API boundary |
 | `test/hosts/web/web-storage-adapter.test.js` | Web storage routing and fallback behavior |
+
+The Google and Clerk-related tests do not contact external services and do not
+require credentials. They mock the Clerk token callback, Worker responses, and
+Google API responses. Real authentication, billing, and Google consent flows
+still require a separately configured manual or browser test environment.
+
+The SaaS browser smoke test is run separately in CI with Playwright:
+
+```sh
+npx playwright install --with-deps chromium
+npm run test:e2e:saas
+```
+
+It opens `/demo` without Clerk or Google credentials and verifies that the
+calendar, demo calendars, year navigation, view mode, theme control, and
+collapsible options render and respond without browser console errors.
 
 The `thunderbird-provider.test.js` file simulates the exact API shape that
 Thunderbird exposes to the add-on background and verifies that

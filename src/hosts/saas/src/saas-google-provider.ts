@@ -43,8 +43,10 @@ export function createSaasGoogleProvider(getToken: GetToken) {
 
 class SaasGoogleCalendarProvider {
     private connected = false;
+    private readonly getToken: GetToken;
 
-    constructor(private readonly getToken: GetToken) {
+    constructor(getToken: GetToken) {
+        this.getToken = getToken;
     }
 
     getAuthState() {
@@ -99,8 +101,7 @@ class SaasGoogleCalendarProvider {
             headers: { Authorization: `Bearer ${token}` }
         });
         if (!response.ok) {
-            const body = await response.json<{ error?: string }>().catch(() => ({ error: undefined }));
-            throw new Error(body.error || `Worker Google Calendar request failed (${response.status})`);
+            throw new Error(`Worker Google Calendar request failed (${response.status})`);
         }
         return response.json<T>();
     }

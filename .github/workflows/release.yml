@@ -44,10 +44,8 @@ jobs:
         run: |
           cp dist/calendar-annual-view.xpi dist/calendar-annual-view-${{ github.ref_name }}.xpi
 
-      - name: Install Playwright
-        run: |
-          npm install --no-save --package-lock=false playwright
-          npx playwright install --with-deps chromium
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Generate sample images
         env:

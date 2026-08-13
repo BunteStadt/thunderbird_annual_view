@@ -7,6 +7,9 @@ This repository is the foundation for a calendar-centric product family. Today i
 - a Thunderbird add-on experience
 - a browser-based website experience that runs the same annual calendar view
 
+## Additions
+Never execute the e2e test script locally.
+
 ## Current product scope
 
 The add-on currently provides:

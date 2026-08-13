@@ -40,6 +40,19 @@ From the repository root:
 The script takes roughly 30 seconds (25 seconds of which is waiting for
 Thunderbird's UI to fully render before taking the screenshot).
 
+The SaaS demo has a separate credential-free Playwright smoke test. It runs in
+Chromium against the Vite SaaS host and does not require Clerk or Google
+credentials:
+
+```sh
+npx playwright install --with-deps chromium
+npm run test:e2e:saas
+```
+
+That test verifies the rendered demo calendar, four demo calendars, year
+navigation, view mode, theme control, option collapse, and browser console
+errors. Playwright is not used for the native Thunderbird window test below.
+
 ## Output artifacts
 
 All artifacts are written to `test-results/` (gitignored):

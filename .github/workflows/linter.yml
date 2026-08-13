@@ -68,8 +68,10 @@ jobs:
               markdown_lines.append("- No findings reported.")
 
           summary_text = "\n".join(markdown_lines) + "\n"
-          Path("test-results/thunderbird-linter/linter-feedback-summary.md").write_text(summary_text, encoding="utf-8")
-          with Path("test-results/thunderbird-linter/linter-feedback-summary.md").open("r", encoding="utf-8") as fh:
+          summary_path = Path("test-results/thunderbird-linter/linter-feedback-summary.md")
+          summary_path.parent.mkdir(parents=True, exist_ok=True)
+          summary_path.write_text(summary_text, encoding="utf-8")
+          with summary_path.open("r", encoding="utf-8") as fh:
             print(fh.read())
           PY
           cat test-results/thunderbird-linter/linter-feedback-summary.md >> "$GITHUB_STEP_SUMMARY"

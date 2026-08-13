@@ -137,7 +137,7 @@ fi
 
 # Build the package layout first because manifest resource URLs are relative
 # to the XPI root, not to the source host directory.
-just -f "$REPO_ROOT/justfile" build-xpi >/dev/null
+npm --prefix "$REPO_ROOT" run build:xpi >/dev/null
 echo "$REPO_ROOT/dist/package" > \
     "$PROFILE_TMP/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net"
 log "Extension proxy → $REPO_ROOT"

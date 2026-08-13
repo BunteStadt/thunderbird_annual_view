@@ -76,7 +76,6 @@ Do not place Clerk secret keys, Google client secrets, payment credentials, or l
 ## Verification
 
 ```sh
-npm run typecheck:saas
 npm run build:saas
 npm test
 ```

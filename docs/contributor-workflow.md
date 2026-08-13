@@ -25,8 +25,7 @@ provider configuration and [saas-architecture.md](saas-architecture.md) for
 the host boundaries.
 
 ```sh
-npm run dev:saas
-npm run typecheck:saas
+npm run dev
 npm run build:saas
 npm run test:e2e:saas
 ```
@@ -43,14 +42,14 @@ does not contact Clerk or Google. Install the browser once with
 Run the same XPI build and `webext-linter` check used by CI locally:
 
 ```sh
-npm run lint:thunderbird
-# or: just lint-thunderbird
+npm run check:thunderbird
 ```
 
-The command rebuilds `dist/calendar-annual-view.xpi` and writes text and JSON
-reports to `test-results/thunderbird-linter/`. The report directory is ignored
-by Git. Dependencies are installed with the normal `npm install` or `npm ci`
-workflow.
+The command builds the Thunderbird Vite output, assembles
+`dist/calendar-annual-view.xpi`, and runs `webext-linter`. It writes text and
+JSON reports to `test-results/thunderbird-linter/`. The report directory is
+ignored by Git. Dependencies are installed with the normal `npm install` or
+`npm ci` workflow.
 
 ## 3. GitHub workflows and CI
 

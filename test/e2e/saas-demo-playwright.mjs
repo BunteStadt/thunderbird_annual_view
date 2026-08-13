@@ -33,8 +33,6 @@ function waitForServer(server) {
 async function main() {
     const server = spawn(process.execPath, [
         "node_modules/vite/bin/vite.js",
-        "--config",
-        "vite.saas.config.ts",
         "--host",
         host,
         "--port",

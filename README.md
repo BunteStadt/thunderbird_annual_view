@@ -66,7 +66,7 @@ Alternatively, install directly from the [Thunderbird Add-ons site](https://addo
 ## SaaS Demo
 
 The SaaS website includes a credential-free `/demo` route backed by the shared
-calendar core. Run `npm run dev:saas` and open `http://localhost:5173/demo`.
+calendar core. Run `npm run dev` and open `http://localhost:5173/demo`.
 The authenticated `/app` route uses Clerk and the Worker-backed Google Calendar
 provider.
 
@@ -116,13 +116,14 @@ Use `just tb` or:
 Vite is used to merge htmls and build the stuff.
 
 ```bash
-npm run dev:saas
+npm run dev
 npm run build:saas
 npm run build:thunderbird
+npm run check:thunderbird
 ```
 
 ### Dummy Data
-Run `npm run dev:saas`, then open `http://localhost:5173/demo` to load the built-in sample calendars and events.
+Run `npm run dev`, then open `http://localhost:5173/demo` to load the built-in sample calendars and events.
 
 ### Run in Thunderbird
 
@@ -136,8 +137,9 @@ Run `npm run dev:saas`, then open `http://localhost:5173/demo` to load the built
 
 | Command | Description |
 | --------- | ------------- |
-| `just build-xpi` | Builds the `.xpi` release package into `dist/` |
 | `just tag` | Creates a Git tag from the version in `src/hosts/thunderbird/manifest.json` and pushes it to `origin`. Only runs on `main` when the working tree is clean and the branch is in sync with `origin/main`. |
+| `just tb` | Starts Thunderbird with the `addon-test` profile |
+| `just website` | Builds and starts the SaaS website with Wrangler |
 
 #### Building the Experiment Package
 
@@ -157,7 +159,7 @@ Pages deployment is not active yet. The add-on release remains tag-driven: updat
 To create an `.xpi` file manually:
 
 1. Clone or download the repository.
-2. Run `just build-xpi` (or `assets/scripts/build-xpi.sh`) to assemble `dist/package/` and create the XPI.
+2. Run `npm run build:xpi` (or `assets/scripts/build-xpi.sh`) to assemble `dist/package/` and create the XPI.
 
 ### Releasing the Add-on
 

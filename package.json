@@ -7,19 +7,16 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node --test",
+    "test": "node --test && tsc -p tsconfig.json",
     "test:e2e:saas": "node test/e2e/saas-demo-playwright.mjs",
-    "build:thunderbird": "vite build --mode thunderbird",
+    "build:thunderbird": "vite build --config vite.thunderbird.config.mjs",
     "build:xpi": "assets/scripts/build-xpi.sh",
-    "lint:thunderbird": "assets/scripts/lint-thunderbird.sh",
-    "build:saas": "vite build --config vite.saas.config.ts",
+    "check:thunderbird": "assets/scripts/lint-thunderbird.sh",
+    "build:saas": "vite build",
     "cf-typegen": "wrangler types worker-configuration.d.ts",
     "deploy:saas": "npm run build:saas && wrangler deploy",
-    "dev": "vite --config vite.saas.config.ts",
-    "dev:saas": "vite --config vite.saas.config.ts",
-    "dev:saas:full": "npm run build:saas && wrangler dev",
-    "preview:saas": "vite preview --config vite.saas.config.ts",
-    "typecheck:saas": "tsc -p tsconfig.saas.json"
+    "dev": "vite",
+    "dev:saas:full": "npm run build:saas && wrangler dev"
   },
   "repository": {
     "type": "git",

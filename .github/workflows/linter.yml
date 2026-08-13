@@ -32,7 +32,7 @@ jobs:
       - name: Run webext-linter
         id: linter
         continue-on-error: true
-        run: npm run lint:thunderbird
+        run: npm run check:thunderbird
 
       - name: Publish lint feedback summary
         if: always()

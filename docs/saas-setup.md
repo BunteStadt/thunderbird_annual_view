@@ -61,9 +61,8 @@ written to a Year View database.
 ## Commands
 
 ```bash
-npm run typecheck:saas
 npm run build:saas
-npm run dev:saas
+npm run dev
 ```
 
 Use the demo route to verify the annual view without authentication. Use `/login`, `/pricing`, `/account`, and `/app` to verify the Clerk flows with a configured development instance.

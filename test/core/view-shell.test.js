@@ -63,7 +63,7 @@ test('view shell exposes the core onboarding targets and expanded options by def
 
 test('Vite builds the one core HTML page with a host selected at compile time', () => {
     const entrySource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'entry.tsx'), 'utf8');
-    const viteConfig = fs.readFileSync(path.join(repoRoot, 'vite.config.mjs'), 'utf8');
+    const viteConfig = fs.readFileSync(path.join(repoRoot, 'vite.thunderbird.config.mjs'), 'utf8');
 
     assert.match(entrySource, /from "@calendar-host"/);
     assert.match(entrySource, /mountYearView/);

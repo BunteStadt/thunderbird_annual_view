@@ -26,6 +26,6 @@
     "src/core/ui/**/*.d.ts",
     "worker",
     "worker-configuration.d.ts",
-    "vite.saas.config.ts"
+    "vite.config.mjs"
   ]
 }

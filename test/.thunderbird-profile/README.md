@@ -32,7 +32,7 @@ Then open <http://localhost:5800> in a browser to see the Thunderbird GUI.
 Build the package before starting Docker:
 
 ```sh
-just build-xpi
+npm run build:xpi
 docker compose -f docker/docker-compose.yml up
 ```
 
@@ -61,7 +61,7 @@ Thunderbird fetches the files from `file:///workspace/assets/`.
 3. Update the extension proxy file content to match your local path:
 
    ```sh
-   just build-xpi
+   npm run build:xpi
    echo "/your/path/to/thunderbird_annual_view/dist/package" \
    > test/.thunderbird-profile/extensions/GlamorousPotato.calendar-annual-view@addons.thunderbird.net
    ```

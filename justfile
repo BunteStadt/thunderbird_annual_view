@@ -3,7 +3,10 @@ default:
 
 # Builds the XPI and assembled package for release
 build-xpi:
-	assets/scripts/build-xpi.sh
+	npm run build:xpi
+# Build the XPI and run the Thunderbird web extension linter
+lint-thunderbird:
+	npm run lint:thunderbird
 # Creates a tag from the manifest.json version and pushes it to origin
 # Only runs on the main branch when it is in sync with origin/main.
 tag:

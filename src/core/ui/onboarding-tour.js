@@ -37,7 +37,7 @@ function positionCallout(callout, target) {
 }
 
 export function setupOnboardingTour({ root } = {}) {
-    if (!root) return { destroy() {} };
+    if (!root) return { destroy() { } };
 
     const documentRoot = root.ownerDocument || document;
     const tour = documentRoot.createElement("section");
@@ -63,7 +63,52 @@ export function setupOnboardingTour({ root } = {}) {
         activeTarget?.classList.remove("onboarding-tour-target");
         activeTarget = target;
         activeTarget.classList.add("onboarding-tour-target");
-        tour.innerHTML = `<div class="onboarding-tour-card" role="dialog" aria-modal="false" aria-labelledby="onboarding-tour-title"><p class="onboarding-tour-step">Step ${currentStep + 1} of ${steps.length}</p><h2 id="onboarding-tour-title">${step.title}</h2><p>${step.text}</p><div class="onboarding-tour-actions"><button type="button" class="btn" data-tour-action="skip">Skip tour</button><span class="onboarding-tour-spacer"></span><button type="button" class="btn" data-tour-action="back"${currentStep === 0 ? " disabled" : ""}>Back</button><button type="button" class="btn onboarding-tour-next" data-tour-action="next">${currentStep === steps.length - 1 ? "Done" : "Next"}</button></div></div>`;
+        const card = document.createElement("div");
+        card.className = "onboarding-tour-card";
+        card.setAttribute("role", "dialog");
+        card.setAttribute("aria-modal", "false");
+        card.setAttribute("aria-labelledby", "onboarding-tour-title");
+
+        const stepLabel = document.createElement("p");
+        stepLabel.className = "onboarding-tour-step";
+        stepLabel.textContent = `Step ${currentStep + 1} of ${steps.length}`;
+        card.appendChild(stepLabel);
+
+        const title = document.createElement("h2");
+        title.id = "onboarding-tour-title";
+        title.textContent = step.title;
+        card.appendChild(title);
+
+        const description = document.createElement("p");
+        description.textContent = step.text;
+        card.appendChild(description);
+
+        const actions = document.createElement("div");
+        actions.className = "onboarding-tour-actions";
+        const skipButton = document.createElement("button");
+        skipButton.type = "button";
+        skipButton.className = "btn";
+        skipButton.dataset.tourAction = "skip";
+        skipButton.textContent = "Skip tour";
+        actions.appendChild(skipButton);
+        const spacer = document.createElement("span");
+        spacer.className = "onboarding-tour-spacer";
+        actions.appendChild(spacer);
+        const backButton = document.createElement("button");
+        backButton.type = "button";
+        backButton.className = "btn";
+        backButton.dataset.tourAction = "back";
+        backButton.disabled = currentStep === 0;
+        backButton.textContent = "Back";
+        actions.appendChild(backButton);
+        const nextButton = document.createElement("button");
+        nextButton.type = "button";
+        nextButton.className = "btn onboarding-tour-next";
+        nextButton.dataset.tourAction = "next";
+        nextButton.textContent = currentStep === steps.length - 1 ? "Done" : "Next";
+        actions.appendChild(nextButton);
+        card.appendChild(actions);
+        tour.replaceChildren(card);
         tour.hidden = false;
         positionCallout(tour.firstElementChild, activeTarget);
         tour.querySelector("[data-tour-action='next']")?.focus();

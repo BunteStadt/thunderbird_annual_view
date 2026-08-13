@@ -36,7 +36,7 @@ jobs:
       - name: Build XPI
         id: build-xpi
         run: |
-          assets/scripts/build-xpi.sh
+          npm run build:xpi
           echo "xpi-path=dist/calendar-annual-view.xpi" >> "$GITHUB_OUTPUT"
 
       - name: Upload XPI artifact

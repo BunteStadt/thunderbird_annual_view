@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
         build: {
             emptyOutDir: true,
             outDir: resolve(repositoryRoot, thunderbird ? "dist/package" : "dist/web"),
+            minify: thunderbird ? false : "esbuild",
             rollupOptions: {
                 input: {
                     index: resolve(uiRoot, "index.html")

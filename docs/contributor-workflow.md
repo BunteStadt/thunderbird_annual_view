@@ -40,6 +40,20 @@ npm run build:saas
 The `/demo` route works without external credentials. Testing `/login`,
 `/pricing`, `/account`, and `/app` requires a configured Clerk publishable key;
 
+### Thunderbird linter
+
+Run the same XPI build and `webext-linter` check used by CI locally:
+
+```sh
+npm run lint:thunderbird
+# or: just lint-thunderbird
+```
+
+The command rebuilds `dist/calendar-annual-view.xpi` and writes text and JSON
+reports to `test-results/thunderbird-linter/`. The report directory is ignored
+by Git. Dependencies are installed with the normal `npm install` or `npm ci`
+workflow.
+
 ## 3. GitHub workflows and CI
 
 The repository uses GitHub Actions for build, test, lint, and add-on release automation:

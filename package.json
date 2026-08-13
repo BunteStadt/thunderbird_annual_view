@@ -9,6 +9,8 @@
   "scripts": {
     "build:web": "vite build --mode web",
     "build:thunderbird": "vite build --mode thunderbird",
+    "build:xpi": "assets/scripts/build-xpi.sh",
+    "lint:thunderbird": "assets/scripts/lint-thunderbird.sh",
     "build:saas": "vite build --config vite.saas.config.ts",
     "cf-typegen": "wrangler types worker-configuration.d.ts",
     "deploy:saas": "npm run build:saas && wrangler deploy",
@@ -35,6 +37,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
+    "webext-linter": "https://codeload.github.com/thunderbird/webext-linter/tar.gz/fb6bc3f387d99d693a9c15dd618b29de3dd2289d",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.2.1",

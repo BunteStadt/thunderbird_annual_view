@@ -9,12 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Reuse the shared build workflow
-  build:
-    uses: ./.github/workflows/build.yml
-
   lint:
-    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -28,30 +23,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Download XPI artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: calendar-annual-view-xpi
-          path: dist/
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
 
-      - name: Install webext-linter
-        run: npm install --no-save github:thunderbird/webext-linter
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run webext-linter
         id: linter
         continue-on-error: true
-        run: |
-          set +e
-          npx webext-linter dist/calendar-annual-view.xpi --allow-experiments --eslint --report-format text --report-out /tmp/linter-report.txt
-          text_exit_code=$?
-          npx webext-linter dist/calendar-annual-view.xpi --allow-experiments --eslint --report-format json --report-out /tmp/linter-report.json
-          json_exit_code=$?
-          if [ "$text_exit_code" -ne 0 ]; then
-            exit "$text_exit_code"
-          fi
-          if [ "$json_exit_code" -ne 0 ]; then
-            exit "$json_exit_code"
-          fi
+        run: npm run lint:thunderbird
 
       - name: Publish lint feedback summary
         if: always()
@@ -60,7 +41,7 @@ jobs:
           import json
           from pathlib import Path
 
-          json_report = Path("/tmp/linter-report.json")
+          json_report = Path("test-results/thunderbird-linter/linter-report.json")
           markdown_lines = ["## webext-linter feedback", ""]
 
           if not json_report.exists():
@@ -87,11 +68,11 @@ jobs:
               markdown_lines.append("- No findings reported.")
 
           summary_text = "\n".join(markdown_lines) + "\n"
-          Path("/tmp/linter-feedback-summary.md").write_text(summary_text, encoding="utf-8")
-          with Path("/tmp/linter-feedback-summary.md").open("r", encoding="utf-8") as fh:
+          Path("test-results/thunderbird-linter/linter-feedback-summary.md").write_text(summary_text, encoding="utf-8")
+          with Path("test-results/thunderbird-linter/linter-feedback-summary.md").open("r", encoding="utf-8") as fh:
             print(fh.read())
           PY
-          cat /tmp/linter-feedback-summary.md >> "$GITHUB_STEP_SUMMARY"
+          cat test-results/thunderbird-linter/linter-feedback-summary.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload linter report
         if: always()
@@ -99,9 +80,9 @@ jobs:
         with:
           name: linter-report
           path: |
-            /tmp/linter-report.txt
-            /tmp/linter-report.json
-            /tmp/linter-feedback-summary.md
+            test-results/thunderbird-linter/linter-report.txt
+            test-results/thunderbird-linter/linter-report.json
+            test-results/thunderbird-linter/linter-feedback-summary.md
 
       - name: Check linter exit code
         if: steps.linter.outcome == 'failure'

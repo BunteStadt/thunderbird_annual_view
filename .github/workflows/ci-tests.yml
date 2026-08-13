@@ -65,7 +65,9 @@ jobs:
           sudo apt-get install -y xvfb scrot xdotool
 
       - name: Run e2e test
-        run: ./test/e2e/run-e2e-test.sh
+        run: |
+          chmod +x ./test/e2e/run-e2e-test.sh
+          ./test/e2e/run-e2e-test.sh
 
       - name: Upload test results
         if: always()

@@ -16,6 +16,7 @@
     "cf-typegen": "wrangler types worker-configuration.d.ts",
     "deploy:saas": "npm run build:saas && wrangler deploy",
     "dev": "vite",
+    "dev:core": "vite --config vite.core.config.mjs",
     "dev:saas:full": "npm run build:saas && wrangler dev"
   },
   "repository": {

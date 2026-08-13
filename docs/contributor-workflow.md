@@ -57,7 +57,7 @@ workflow.
 The repository uses GitHub Actions for build, test, lint, and add-on release automation:
 
 - [build.yml](../.github/workflows/build.yml) builds the XPI package and uploads it as a workflow artifact.
-- [ci-tests.yml](../.github/workflows/ci-tests.yml) runs the repository test suite with Node.js via `node --test`.
+- [ci-tests.yml](../.github/workflows/ci-tests.yml) runs all tests with `npm test` after installing the Playwright Chromium dependency used by the SaaS browser smoke test.
 - [linter.yml](../.github/workflows/linter.yml) builds the XPI, runs the Thunderbird web extension linter, and publishes the report.
 - [release.yml](../.github/workflows/release.yml) builds the XPI, generates sample images, and publishes a draft release when a version tag is pushed.
 
@@ -92,8 +92,9 @@ The repository uses two complementary layers of automated and manual testing.
 
 ### Automated tests (CI)
 
-All tests in `test/` are run with `node --test` and execute on every push via
-GitHub Actions.  The test suite covers:
+All tests execute on every push via GitHub Actions. The SaaS browser smoke test
+requires the Playwright browser installation performed by the test job. The
+test suite covers:
 
 | File | Coverage |
 | --- | --- |

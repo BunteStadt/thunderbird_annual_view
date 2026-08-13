@@ -78,7 +78,7 @@ Do not place Clerk secret keys, Google client secrets, payment credentials, or l
 ```sh
 npm run typecheck:saas
 npm run build:saas
-node --test test/core/*.test.js test/hosts/**/*.test.js
+npm test
 ```
 
 A configured Clerk instance and Google OAuth application are required to verify the real sign-in, Billing, and Calendar consent flows. The `/demo` route remains useful without those external services.

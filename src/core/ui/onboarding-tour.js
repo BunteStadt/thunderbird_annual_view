@@ -11,8 +11,8 @@ const steps = [
     { target: "calendar-list", title: "Choose calendars", text: "Click a calendar name to include or remove it from the year view." },
     { target: "global-all-day", title: "Global All-day filter", text: "Show only events marked as all-day. All-day is an event flag, not simply an event lasting from 00:00 to 24:00." },
     { target: "global-duration", title: "Global duration filter", text: "Set the minimum event duration used by calendars that follow the global setting." },
-    { target: "specific-all-day", title: "Per-calendar All-day filter", text: "Use the first calendar's All-day control as a pattern for each calendar. A checkmark shows only all-day events; an x also shows timed events; a dash follows the global setting." },
-    { target: "specific-duration", title: "Per-calendar duration filter", text: "Set a calendar-specific minimum duration. Use -1 to follow the global duration filter." },
+    { target: "specific-all-day", title: "Per-calendar All-day filter", text: "Expand a calendar to set its own All-day setting. Reset the row to follow the global setting." },
+    { target: "specific-duration", title: "Per-calendar duration filter", text: "Expand a calendar to set its own minimum duration. Reset the row to follow the global setting." },
     { target: "duration-filter", title: "Turn filtering on or off", text: "The global Duration filter switch overrides both global and per-calendar All-day and duration settings." },
     { target: "display-options", title: "Adjust the display", text: "Show week numbers, gray out past days, or highlight today to make the year easier to scan." },
     { target: "view-mode", title: "Select a view", text: "Choose compact, aligned, or a week-row layout to change how the year is arranged." },
@@ -21,7 +21,7 @@ const steps = [
 
 const targetSelectors = {
     "calendar-list": ".calendar-select-chip",
-    "specific-all-day": ".calendar-mode-toggle",
+    "specific-all-day": ".calendar-row-details .cal-chip-toggle",
     "specific-duration": ".calendar-duration-input"
 };
 

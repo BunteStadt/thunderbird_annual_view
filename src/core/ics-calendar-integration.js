@@ -111,18 +111,6 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initial
             buttonRow.appendChild(restoreButton);
         }
 
-        const tourButton = globalThis.document.createElement("button");
-        if (tourButton !== uploadButton) {
-            tourButton.className = "btn";
-            tourButton.dataset.size = "compact";
-            tourButton.type = "button";
-            tourButton.textContent = "Redo tour";
-            tourButton.addEventListener("click", () => {
-                (mount.ownerDocument || globalThis.document)?.dispatchEvent(new CustomEvent("year-view:restart-tour"));
-            });
-            buttonRow.appendChild(tourButton);
-        }
-
         mount.replaceChildren(separator, fileInput, buttonRow);
     }
 

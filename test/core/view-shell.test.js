@@ -50,6 +50,9 @@ test('view shell contains every data-ui-slot the host bootstraps mount into', ()
 });
 
 test('view shell exposes the core onboarding targets and expanded options by default', () => {
+    assert.match(shellSource, /id="viewSettingsToggle"/);
+    assert.match(shellSource, /id="viewSettingsMenu"/);
+    assert.match(shellSource, /id="restartTourButton"/);
     assert.match(shellSource, /data-tour="calendar-list"/);
     assert.match(shellSource, /data-tour="global-all-day"/);
     assert.match(shellSource, /data-tour="global-duration"/);
@@ -63,8 +66,12 @@ test('view shell exposes the core onboarding targets and expanded options by def
     assert.match(onboardingSource, /specific-duration/);
     assert.match(onboardingSource, /waitingForCalendar/);
     assert.match(onboardingSource, /target: "upload-ics"/);
+    assert.match(onboardingSource, /step\.target === "display-options" \|\| step\.target === "view-mode"/);
+    assert.match(onboardingSource, /menu\.hidden = false/);
     assert.match(appSource, /hasCalendars: \(\) => availableCalendars\.length > 0/);
     assert.match(appSource, /notifyCalendarStateChanged/);
+    assert.match(appSource, /restartOnboardingTour\(rootDocument\)/);
+    assert.doesNotMatch(icsSource, /textContent = "Redo tour"/);
 });
 
 test('Vite builds the one core HTML page with a host selected at compile time', () => {

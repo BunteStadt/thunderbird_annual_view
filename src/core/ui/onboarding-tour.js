@@ -65,6 +65,14 @@ export function setupOnboardingTour({ root, hasCalendars = () => true } = {}) {
 
     function render() {
         const step = waitingForCalendar ? calendarRequiredStep : steps[currentStep];
+        if (step.target === "display-options" || step.target === "view-mode") {
+            const menu = root.querySelector("#viewSettingsMenu");
+            const toggle = root.querySelector("#viewSettingsToggle");
+            if (menu?.hidden) {
+                menu.hidden = false;
+                toggle?.setAttribute("aria-expanded", "true");
+            }
+        }
         const target = getTarget(root, step.target);
         activeTarget?.classList.remove("onboarding-tour-target");
         activeTarget = target;

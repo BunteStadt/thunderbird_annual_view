@@ -28,7 +28,7 @@ import {
     persistViewMode
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./ui/theme.js";
-import { setupOnboardingTour } from "./ui/onboarding-tour.js";
+import { restartOnboardingTour, setupOnboardingTour } from "./ui/onboarding-tour.js";
 
 // Builds a map of slot name -> container element from [data-ui-slot] markers.
 export function resolveUiSlots(rootDocument) {
@@ -61,6 +61,7 @@ export function mountUiModules(modules, slots, appApi) {
 // (storage adapter, calendar provider, host UI modules) and calls initApp.
 export async function initApp(config = {}) {
     const root = config.root ?? document;
+    const rootDocument = root.ownerDocument ?? root;
     const findById = (id) => root.querySelector?.(`#${id}`) ?? null;
     const lifecycle = new AbortController();
     const listenerOptions = { signal: lifecycle.signal };
@@ -92,6 +93,9 @@ export async function initApp(config = {}) {
     const grayPastDaysInput = findById("grayPastDays");
     const highlightCurrentDayInput = findById("highlightCurrentDay");
     const viewModeSelect = findById("viewMode");
+    const viewSettingsToggle = findById("viewSettingsToggle");
+    const viewSettingsMenu = findById("viewSettingsMenu");
+    const restartTourButton = findById("restartTourButton");
     const yearButtons = root.querySelectorAll?.("[data-year-step]") ?? [];
 
     const YEAR_MIN = Number(yearInput.min) || 1900;
@@ -444,6 +448,12 @@ export async function initApp(config = {}) {
         persistPanelState(expanded);
     }
 
+    function setViewSettingsVisible(visible) {
+        if (!viewSettingsToggle || !viewSettingsMenu) return;
+        viewSettingsMenu.hidden = !visible;
+        viewSettingsToggle.setAttribute("aria-expanded", String(visible));
+    }
+
     async function loadCalendars() {
         availableCalendars = await fetchCalendars();
         const { ids: persistedIds, found } = await loadPersistedSelection();
@@ -660,6 +670,27 @@ export async function initApp(config = {}) {
             await persistHighlightCurrentDay(highlightCurrentDayEnabled);
             gridView.rebuild();
         });
+
+        onClick(viewSettingsToggle, () => {
+            const isVisible = viewSettingsToggle.getAttribute("aria-expanded") === "true";
+            setViewSettingsVisible(!isVisible);
+        });
+        onClick(restartTourButton, () => {
+            setViewSettingsVisible(false);
+            restartOnboardingTour(rootDocument);
+        });
+        rootDocument.addEventListener("click", (event) => {
+            if (event.target?.closest?.(".onboarding-tour")) return;
+            if (!viewSettingsMenu?.hidden && !viewSettingsMenu?.contains(event.target) && !viewSettingsToggle?.contains(event.target)) {
+                setViewSettingsVisible(false);
+            }
+        }, listenerOptions);
+        rootDocument.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && !viewSettingsMenu?.hidden) {
+                setViewSettingsVisible(false);
+                viewSettingsToggle?.focus();
+            }
+        }, listenerOptions);
 
         if (toggleCalendarsBtn) {
             onClick(toggleCalendarsBtn, () => {

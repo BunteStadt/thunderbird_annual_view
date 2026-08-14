@@ -277,6 +277,40 @@ input[type="number"] {
   text-align: start;
 }
 
+.view-settings {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.view-settings-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-width: 15rem;
+  padding: 0.75rem;
+  border: 1px solid var(--grid-line);
+  border-radius: 10px;
+  background: var(--panel-strong);
+  box-shadow: var(--shadow);
+}
+
+.view-settings-menu[hidden] {
+  display: none;
+}
+
+.view-settings-menu .view-mode-label {
+  justify-content: space-between;
+}
+
+.view-settings-menu .display-options {
+  width: auto;
+  flex-direction: column;
+}
+
 .btn,
 .year-btn,
 .cal-action-btn {

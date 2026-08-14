@@ -68,6 +68,7 @@ async function main() {
             throw new Error("Year navigation did not update the selected year.");
         }
 
+        await page.locator("#viewSettingsToggle").click();
         await page.locator("#viewMode").selectOption("two-week-rows");
         if (await page.locator("#viewMode").inputValue() !== "two-week-rows") {
             throw new Error("View mode control did not update.");

@@ -6,7 +6,7 @@ It displays all 12 months in various formats (compact linear, day-aligned, 4-wee
 
 Calendar Year View adds a full-year calendar layout to Thunderbird with multiple view modes: compact linear grid (each row is a month), day-aligned layout, or 4/2/1-week row formats. It is designed for fast yearly planning and conflict spotting.
 
-The add-on automatically detects your Thunderbird calendars, applies their configured colors, and lets you filter what is shown (per-calendar visibility, per-calendar all-day overrides, minimum event duration, all-day events only, week numbers, past day graying, and current day highlighting). The year view is intentionally read-only, so event editing remains in Thunderbird's standard day/week/month views.
+The add-on automatically detects your Thunderbird calendars, applies their configured colors, and lets you filter what is shown (per-calendar visibility, per-calendar all-day overrides, minimum event duration, all-day events only, week numbers, past day graying, and current day highlighting). The year view is intentionally read-only, so event editing remains in Thunderbird's standard day/week/month views.a
 
 ## Features
 

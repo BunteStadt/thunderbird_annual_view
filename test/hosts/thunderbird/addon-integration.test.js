@@ -63,6 +63,6 @@ test('addon package builds from the Vite Thunderbird output', () => {
     assert.match(list.stdout, /manifest\.json/);
     assert.match(list.stdout, /src\/hosts\/thunderbird\/background\.js/);
     assert.match(list.stdout, /index\.html/);
-    assert.match(list.stdout, /assets\/index\.js/);
+    assert.match(list.stdout, /assets\/src\/core\/app\.js/);
     assert.match(list.stdout, /experiments\/calendar\/ext-calendar-utils\.sys\.mjs/);
 });

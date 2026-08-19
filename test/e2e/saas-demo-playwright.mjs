@@ -55,6 +55,10 @@ async function main() {
 
         await page.goto(`${baseUrl}/demo?embed=1`, { waitUntil: "networkidle" });
         await page.locator("#gridRows .event").first().waitFor({ state: "visible" });
+        const skipTourButton = page.getByRole("button", { name: "Skip tour" });
+        if (await skipTourButton.isVisible()) {
+            await skipTourButton.click();
+        }
 
         const eventCount = await page.locator("#gridRows .event").count();
         if (eventCount === 0) throw new Error("Demo rendered no calendar events.");
@@ -62,21 +66,22 @@ async function main() {
             throw new Error("Demo did not render all four demo calendars.");
         }
 
-        await page.locator("#yearInput").fill("2027");
-        await page.locator("#yearInput").press("Enter");
-        if (await page.locator("#yearInput").inputValue() !== "2027") {
+        await page.locator("#yearInput").click();
+        await page.locator('[data-year="2027"]').click();
+        if (await page.locator("#yearInput").textContent() !== "2027") {
             throw new Error("Year navigation did not update the selected year.");
         }
 
         await page.locator("#viewSettingsToggle").click();
-        await page.locator("#viewMode").selectOption("two-week-rows");
-        if (await page.locator("#viewMode").inputValue() !== "two-week-rows") {
+        await page.locator("#viewMode").click();
+        await page.getByRole("option", { name: "two-week-row" }).click();
+        if (!(await page.locator("#viewMode").textContent()).includes("two-week-row")) {
             throw new Error("View mode control did not update.");
         }
 
         await page.locator("#themeToggle").click();
-        await page.locator("#toggleCalendars").click();
-        if (await page.locator("#calendarFilters").isVisible()) {
+        await page.locator('[data-sidebar="trigger"]').click();
+        if (await page.locator("#calendarFilters").getAttribute("data-state") !== "collapsed") {
             throw new Error("Calendar options did not collapse.");
         }
 

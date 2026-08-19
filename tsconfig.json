@@ -16,6 +16,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
+      "@/*": ["./src/core/ui/*"],
       "@calendar-host": ["./src/hosts/thunderbird/main.js"]
     },
     "types": ["node", "vite/client"]

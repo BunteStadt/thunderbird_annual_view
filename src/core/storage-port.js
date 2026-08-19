@@ -18,17 +18,17 @@ export function getStorageAdapter() {
 export function createWebExtensionStorageAdapter() {
     return {
         async get(key) {
-            const stored = await globalThis.browser.storage.local.get(key);
+            const stored = await browser.storage.local.get(key);
             if (!Object.prototype.hasOwnProperty.call(stored, key)) {
                 return undefined;
             }
             return stored[key];
         },
         async set(key, value) {
-            await globalThis.browser.storage.local.set({ [key]: value });
+            await browser.storage.local.set({ [key]: value });
         },
         async remove(key) {
-            await globalThis.browser.storage.local.remove(key);
+            await browser.storage.local.remove(key);
         }
     };
 }

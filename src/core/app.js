@@ -13,13 +13,13 @@ import {
     persistCalendarAllDayModes,
     loadCalendarMinDurationHours,
     persistCalendarMinDurationHours,
-    loadPanelState,
-    persistPanelState,
     loadThemePreference,
     persistTheme,
     loadWeekNumbersPreference,
     persistWeekNumbersPreference,
     loadRefreshSettings,
+    loadPanelState,
+    persistPanelState,
     loadGrayPastDays,
     persistGrayPastDays,
     loadHighlightCurrentDay,
@@ -28,7 +28,7 @@ import {
     persistViewMode
 } from "./storage.js";
 import { applyTheme, detectSystemMode } from "./ui/theme.js";
-import { restartOnboardingTour, setupOnboardingTour } from "./ui/onboarding-tour.js";
+import { restartOnboardingTour } from "./ui/onboarding-tour-events.js";
 
 // Builds a map of slot name -> container element from [data-ui-slot] markers.
 export function resolveUiSlots(rootDocument) {
@@ -62,6 +62,7 @@ export function mountUiModules(modules, slots, appApi) {
 export async function initApp(config = {}) {
     const root = config.root ?? document;
     const rootDocument = root.ownerDocument ?? root;
+    const isAborted = () => config.signal?.aborted === true;
     const findById = (id) => root.querySelector?.(`#${id}`) ?? null;
     const lifecycle = new AbortController();
     const listenerOptions = { signal: lifecycle.signal };
@@ -69,56 +70,12 @@ export async function initApp(config = {}) {
     // DOM references
     // ---------------------------------------------------------------------------
 
-    const yearInput = findById("yearInput");
     const gridViewport = findById("gridViewport");
     const gridHeader = findById("gridHeader");
     const gridRows = findById("gridRows");
-    const calendarList = findById("calendarList");
-    const calendarFilters = findById("calendarFilters");
-    const yearLayout = findById("yearLayout");
-    const allDayOnlyInput = findById("allDayOnly");
-    const showWeekNumbersInput = findById("showWeekNumbers");
-    const minDurationInput = findById("minDurationHours");
-    const minDurationDownBtn = findById("minDurationDown");
-    const minDurationUpBtn = findById("minDurationUp");
-    const durationFilterToggleBtn = findById("durationFilterToggle");
-    const durationFiltersNotice = findById("durationFiltersNotice");
-    const selectAllBtn = findById("selectAllCals");
-    const deselectAllBtn = findById("deselectAllCals");
-    const toggleCalendarsBtn = findById("toggleCalendars");
-    const selectedSummary = findById("selectedSummary");
-    const themeToggleBtn = findById("themeToggle");
-    const refreshButton = findById("refreshButton");
-    const todayButton = findById("todayButton");
-    const grayPastDaysInput = findById("grayPastDays");
-    const highlightCurrentDayInput = findById("highlightCurrentDay");
-    const viewModeSelect = findById("viewMode");
-    const viewSettingsToggle = findById("viewSettingsToggle");
-    const viewSettingsMenu = findById("viewSettingsMenu");
-    const restartTourButton = findById("restartTourButton");
-    const yearButtons = root.querySelectorAll?.("[data-year-step]") ?? [];
 
-    if (calendarList && selectAllBtn && deselectAllBtn) {
-        const actionGroup = selectAllBtn.parentElement;
-        const listContainer = rootDocument.createElement("section");
-        listContainer.className = "calendar-list-container";
-        listContainer.setAttribute("aria-label", "Calendars");
-        const toolbar = rootDocument.createElement("div");
-        toolbar.className = "calendar-list-toolbar";
-        const heading = rootDocument.createElement("h2");
-        heading.textContent = "Calendars";
-        toolbar.appendChild(heading);
-        toolbar.appendChild(actionGroup);
-        listContainer.appendChild(toolbar);
-        calendarList.parentElement?.insertBefore(listContainer, calendarList);
-        listContainer.appendChild(calendarList);
-    }
-
-    const YEAR_MIN = Number(yearInput.min) || 1900;
-    const YEAR_MAX = Number(yearInput.max) || 2999;
-
-    const onClick = (el, handler) => el?.addEventListener("click", handler, listenerOptions);
-    const onChange = (el, handler) => el?.addEventListener("change", handler, listenerOptions);
+    const YEAR_MIN = 1900;
+    const YEAR_MAX = 2999;
 
     // ---------------------------------------------------------------------------
     // State
@@ -137,10 +94,40 @@ export async function initApp(config = {}) {
     let autoRefreshTimer = null;
     let refreshSettings = { autoRefreshEnabled: true, autoRefreshInterval: 300000 };
     let isRefreshing = false;
+    let showWeekNumbersEnabled = true;
     let grayPastDaysEnabled = false;
     let highlightCurrentDayEnabled = false;
     let viewMode = "linear";
+    let globalMinDurationHours = 0;
     let icsRemoveCalendar = null;
+    let panelExpanded = false;
+
+    function getUiState() {
+        return {
+            calendars: availableCalendars,
+            selectedCalendarIds,
+            calendarAllDayModes,
+            calendarMinDurationHours,
+            expandedCalendarIds,
+            allDayOnlyEnabled,
+            durationFilteringEnabled,
+            globalMinDurationHours,
+            filteredOut: lastFilterStats.filteredOut,
+            totalEvents: lastFilterStats.total,
+            currentYear,
+            viewMode,
+            showWeekNumbersEnabled,
+            grayPastDaysEnabled,
+            highlightCurrentDayEnabled,
+            themeMode,
+            isRefreshing,
+            panelExpanded
+        };
+    }
+
+    function notifyUiState() {
+        config.onUiStateChange?.(getUiState());
+    }
 
     const eventStore = new EventStore();
     const gridView = new GridView({
@@ -149,18 +136,14 @@ export async function initApp(config = {}) {
         rowsContainer: gridRows,
         eventStore,
         getOptions: () => ({
-            showWeekNumbers: showWeekNumbersInput?.checked ?? true,
+            showWeekNumbers: showWeekNumbersEnabled,
             grayPastDays: grayPastDaysEnabled,
             highlightCurrentDay: highlightCurrentDayEnabled,
             filters: getFilters()
         }),
         onYearChange: (year) => {
             currentYear = year;
-            // Don't clobber the input while the user is typing a year.
-            const activeElement = root.getRootNode?.().activeElement ?? document.activeElement;
-            if (activeElement !== yearInput) {
-                yearInput.value = year;
-            }
+            notifyUiState();
             updateFilterStats();
             config.onYearChange?.(year);
         }
@@ -197,8 +180,7 @@ export async function initApp(config = {}) {
     }
 
     function getGlobalMinDurationHours() {
-        const val = Number(minDurationInput?.value);
-        return Number.isFinite(val) && val >= 0 ? val : 0;
+        return globalMinDurationHours;
     }
 
     function getEffectiveMinDurationMs(calendarId) {
@@ -208,53 +190,6 @@ export async function initApp(config = {}) {
         const overrideHours = getCalendarMinDurationHours(calendarId);
         const effectiveHours = overrideHours >= 0 ? overrideHours : getGlobalMinDurationHours();
         return effectiveHours > 0 ? effectiveHours * 60 * 60 * 1000 : 0;
-    }
-
-    function updateDurationFilterToggleLabel() {
-        if (!durationFilterToggleBtn) return;
-        const stateLabel = durationFilteringEnabled ? "On" : "Off";
-        durationFilterToggleBtn.textContent = `⏱ Duration filter: ${stateLabel}`;
-        durationFilterToggleBtn.setAttribute("aria-pressed", String(durationFilteringEnabled));
-        durationFilterToggleBtn.title = durationFilteringEnabled
-            ? "Disable duration and all-day filtering"
-            : "Enable duration and all-day filtering";
-    }
-
-    function updateDurationFilterControlsState() {
-        const filtersInactive = !durationFilteringEnabled;
-        durationFiltersNotice?.toggleAttribute("hidden", !filtersInactive);
-
-        const globalDurationControl = minDurationInput?.closest(".cal-chip");
-        const globalAllDayControl = allDayOnlyInput?.closest(".cal-chip-toggle");
-
-        if (globalDurationControl) {
-            globalDurationControl.classList.toggle("filter-overridden", filtersInactive);
-            globalDurationControl.setAttribute("aria-disabled", String(filtersInactive));
-        }
-        if (globalAllDayControl) {
-            globalAllDayControl.classList.toggle("filter-overridden", filtersInactive);
-            globalAllDayControl.setAttribute("aria-disabled", String(filtersInactive));
-        }
-
-        if (allDayOnlyInput) allDayOnlyInput.disabled = filtersInactive;
-        if (minDurationInput) minDurationInput.disabled = filtersInactive;
-        if (minDurationDownBtn) minDurationDownBtn.disabled = filtersInactive;
-        if (minDurationUpBtn) minDurationUpBtn.disabled = filtersInactive;
-
-        calendarList?.classList.toggle("duration-filters-inactive", filtersInactive);
-        calendarList?.querySelectorAll(".calendar-row-details input, .calendar-row-details button:not(.calendar-reset-button)").forEach((control) => {
-            control.disabled = filtersInactive;
-        });
-        calendarList?.querySelectorAll(".calendar-duration-control").forEach((control) => {
-            control.classList.toggle("filter-overridden", filtersInactive);
-            control.setAttribute("aria-disabled", String(filtersInactive));
-        });
-        calendarList?.querySelectorAll(".calendar-duration-input").forEach((input) => {
-            input.disabled = filtersInactive;
-        });
-        calendarList?.querySelectorAll(".calendar-duration-step").forEach((button) => {
-            button.disabled = filtersInactive;
-        });
     }
 
     function getFilters() {
@@ -273,7 +208,7 @@ export async function initApp(config = {}) {
         const { stats } = await eventStore.getFilteredEvents(year, year, getFilters());
         if (year !== currentYear) return; // Stale; a newer call is in flight.
         lastFilterStats = stats;
-        updateSelectedSummary();
+        notifyUiState();
     }
 
     // Called whenever any event-affecting filter changes.
@@ -298,237 +233,88 @@ export async function initApp(config = {}) {
     // Calendar sidebar
     // ---------------------------------------------------------------------------
 
-    function createCalendarChip(cal) {
-        const chip = document.createElement("button");
-        chip.type = "button";
-        const calendarName = cal.name || "(unnamed)";
-        const isSelected = selectedCalendarIds.has(cal.id);
-        chip.className = `cal-chip calendar-select-chip${isSelected ? " selected" : ""}`;
-        chip.textContent = calendarName;
-        chip.title = calendarName;
-        chip.setAttribute("aria-label", calendarName);
-        chip.setAttribute("aria-pressed", String(isSelected));
-        chip.addEventListener("click", () => {
-            if (selectedCalendarIds.has(cal.id)) {
-                selectedCalendarIds.delete(cal.id);
-            } else {
-                selectedCalendarIds.add(cal.id);
-            }
-            persistSelection(selectedCalendarIds);
-            renderCalendarList(availableCalendars);
-            applyFilterChange();
-        }, listenerOptions);
-        return chip;
-    }
-
     const expandedCalendarIds = new Set();
 
-    function createOverrideDurationControl(cal) {
-        const calendarName = cal.name || "(unnamed)";
-        const durationControl = document.createElement("div");
-        durationControl.className = "calendar-duration-control";
-        const durationInput = document.createElement("input");
-        durationInput.type = "number";
-        durationInput.min = "0";
-        durationInput.step = "1";
-        durationInput.className = "input calendar-duration-input";
-        durationInput.value = String(getCalendarMinDurationHours(cal.id));
-        durationInput.setAttribute("aria-label", `${calendarName}: minimum event length in hours`);
-
-        const applyCalendarDuration = async () => {
-            durationInput.value = String(setCalendarMinDurationHours(cal.id, durationInput.value));
-            await persistCalendarMinDurationHours(calendarMinDurationHours);
-            renderCalendarList(availableCalendars);
-            applyFilterChange();
-        };
-        durationInput.addEventListener("blur", applyCalendarDuration, listenerOptions);
-        durationInput.addEventListener("change", applyCalendarDuration, listenerOptions);
-
-        const makeStepButton = (delta) => {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "btn calendar-duration-step";
-            btn.dataset.size = "compact";
-            btn.textContent = delta > 0 ? "+" : "-";
-            btn.setAttribute("aria-label", `${calendarName}: ${delta > 0 ? "increase" : "decrease"} minimum event length by one hour`);
-            btn.addEventListener("click", async () => {
-                const current = Number(durationInput.value);
-                durationInput.value = String(Math.max(0, (Number.isFinite(current) ? Math.round(current) : getGlobalMinDurationHours()) + delta));
-                await applyCalendarDuration();
-            }, listenerOptions);
-            return btn;
-        };
-
-        durationControl.append(makeStepButton(-1), durationInput, makeStepButton(1));
-        return durationControl;
+    function toggleCalendar(calendar, selected) {
+        if (selected) selectedCalendarIds.add(calendar.id);
+        else selectedCalendarIds.delete(calendar.id);
+        void persistSelection(selectedCalendarIds);
+        notifyUiState();
+        applyFilterChange();
     }
 
-    function createRemoveButton(cal) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "btn calendar-remove-btn";
-        btn.dataset.size = "compact";
-        btn.textContent = "✕";
-        btn.title = `Remove ${cal.name || "(unnamed)"}`;
-        btn.setAttribute("aria-label", `Remove calendar ${cal.name || "(unnamed)"}`);
-        btn.addEventListener("click", () => icsRemoveCalendar?.(cal.id), listenerOptions);
-        return btn;
+    function toggleCalendarExpanded(calendar) {
+        if (expandedCalendarIds.has(calendar.id)) expandedCalendarIds.delete(calendar.id);
+        else expandedCalendarIds.add(calendar.id);
+        notifyUiState();
     }
 
-    function renderCalendarList(calendars) {
-        calendarList.innerHTML = "";
-        calendars.forEach((cal) => {
-            const calendarName = cal.name || "(unnamed)";
-            const isIcs = cal.id.startsWith("ics-");
-            const hasOverride = hasCalendarOverride(cal.id);
-            const expanded = expandedCalendarIds.has(cal.id);
-            const row = document.createElement("article");
-            row.className = `calendar-row${expanded ? " is-expanded" : ""}`;
-            const header = document.createElement("div");
-            header.className = "calendar-row-header";
-            const visibility = document.createElement("input");
-            visibility.type = "checkbox";
-            visibility.checked = selectedCalendarIds.has(cal.id);
-            visibility.className = "calendar-visibility-input";
-            visibility.setAttribute("aria-label", `Show ${calendarName} in year view`);
-            visibility.addEventListener("change", () => {
-                if (visibility.checked) selectedCalendarIds.add(cal.id);
-                else selectedCalendarIds.delete(cal.id);
-                persistSelection(selectedCalendarIds);
-                updateSelectedSummary();
-                applyFilterChange();
-            }, listenerOptions);
-            const dot = document.createElement("span");
-            dot.className = "calendar-color-dot";
-            dot.style.backgroundColor = cal.color || "var(--accent)";
-            dot.setAttribute("aria-hidden", "true");
-            const name = document.createElement("span");
-            name.className = "calendar-name";
-            name.textContent = calendarName;
-            const expandButton = document.createElement("button");
-            expandButton.type = "button";
-            expandButton.className = `btn calendar-override-pill${hasOverride ? " is-custom" : ""}`;
-            expandButton.textContent = hasOverride ? "Custom" : "Default";
-            expandButton.setAttribute("aria-expanded", String(expanded));
-            expandButton.setAttribute("aria-label", `${calendarName}: ${expanded ? "collapse" : "expand"} filter overrides`);
-            expandButton.addEventListener("click", () => {
-                if (expanded) expandedCalendarIds.delete(cal.id);
-                else expandedCalendarIds.add(cal.id);
-                renderCalendarList(availableCalendars);
-            }, listenerOptions);
-            header.append(visibility, dot, name, expandButton);
-            row.appendChild(header);
-            if (expanded) {
-                const details = document.createElement("div");
-                details.className = "calendar-row-details";
-                const allDayLabel = document.createElement("label");
-                allDayLabel.className = "btn cal-chip-toggle";
-                allDayLabel.dataset.tour = "specific-all-day";
-                const allDayInput = document.createElement("input");
-                allDayInput.type = "checkbox";
-                allDayInput.checked = getCalendarAllDayMode(cal.id);
-                allDayInput.setAttribute("aria-label", `${calendarName}: all-day only`);
-                allDayInput.addEventListener("change", () => {
-                    calendarAllDayModes[cal.id] = allDayInput.checked ? "yes" : "no";
-                    persistCalendarAllDayModes(calendarAllDayModes);
-                    renderCalendarList(availableCalendars);
-                    applyFilterChange();
-                }, listenerOptions);
-                allDayLabel.append(allDayInput, document.createElement("span"));
-                allDayLabel.lastChild.className = "chip-indicator";
-                const allDayText = document.createElement("span");
-                allDayText.className = "chip-text";
-                allDayText.textContent = "All-day only";
-                allDayLabel.append(allDayText);
-                const durationLabel = document.createElement("label");
-                durationLabel.className = "calendar-min-length-field";
-                durationLabel.dataset.tour = "specific-duration";
-                durationLabel.append("Min length", createOverrideDurationControl(cal));
-                details.append(allDayLabel, durationLabel);
-                if (hasOverride) {
-                    const resetButton = document.createElement("button");
-                    resetButton.type = "button";
-                    resetButton.className = "calendar-reset-button";
-                    resetButton.textContent = "↻ Reset to default";
-                    resetButton.setAttribute("aria-label", `${calendarName}: reset filters to default`);
-                    resetButton.addEventListener("click", () => {
-                        delete calendarAllDayModes[cal.id];
-                        delete calendarMinDurationHours[cal.id];
-                        expandedCalendarIds.delete(cal.id);
-                        persistCalendarAllDayModes(calendarAllDayModes);
-                        persistCalendarMinDurationHours(calendarMinDurationHours);
-                        renderCalendarList(availableCalendars);
-                        applyFilterChange();
-                    }, listenerOptions);
-                    details.appendChild(resetButton);
-                }
-                row.appendChild(details);
-            }
-            if (isIcs) header.appendChild(createRemoveButton(cal));
-            calendarList.appendChild(row);
-        });
-        updateDurationFilterControlsState();
-        updateSelectedSummary();
+    function setCalendarAllDay(calendar, enabled) {
+        calendarAllDayModes[calendar.id] = enabled ? "yes" : "no";
+        void persistCalendarAllDayModes(calendarAllDayModes);
+        notifyUiState();
+        applyFilterChange();
+    }
+
+    async function setCalendarDuration(calendar, value) {
+        setCalendarMinDurationHours(calendar.id, value);
+        await persistCalendarMinDurationHours(calendarMinDurationHours);
+        notifyUiState();
+        applyFilterChange();
+    }
+
+    async function stepCalendarDuration(calendar, delta) {
+        const current = getCalendarMinDurationHours(calendar.id);
+        setCalendarMinDurationHours(calendar.id, current + delta);
+        await persistCalendarMinDurationHours(calendarMinDurationHours);
+        notifyUiState();
+        applyFilterChange();
+    }
+
+    function resetCalendarFilters(calendar) {
+        delete calendarAllDayModes[calendar.id];
+        delete calendarMinDurationHours[calendar.id];
+        expandedCalendarIds.delete(calendar.id);
+        void persistCalendarAllDayModes(calendarAllDayModes);
+        void persistCalendarMinDurationHours(calendarMinDurationHours);
+        notifyUiState();
+        applyFilterChange();
     }
 
     function setAllCalendars(selected) {
         if (!availableCalendars.length) return;
         selectedCalendarIds = selected ? new Set(availableCalendars.map((c) => c.id)) : new Set();
-        renderCalendarList(availableCalendars);
-        persistSelection(selectedCalendarIds);
+        void persistSelection(selectedCalendarIds);
+        notifyUiState();
         applyFilterChange();
-    }
-
-    function updateSelectedSummary() {
-        if (!selectedSummary) return;
-        const selected = availableCalendars.filter((c) => selectedCalendarIds.has(c.id));
-        const filterText = lastFilterStats.filteredOut > 0
-            ? `Filtered out ${lastFilterStats.filteredOut} of ${lastFilterStats.total}`
-            : "";
-
-        if (!selected.length) {
-            selectedSummary.textContent = "No calendars selected";
-            selectedSummary.title = "No calendars selected";
-            return;
-        }
-
-        const base = `Showing ${selected.length} of ${availableCalendars.length} calendars`;
-        selectedSummary.textContent = filterText ? `${base} · ${filterText}` : base;
-        selectedSummary.title = selected.map((c) => c.name || "(unnamed)").join(", ");
-    }
-
-    function setCalendarPanelVisible(expanded) {
-        if (!calendarFilters || !toggleCalendarsBtn) return;
-        calendarFilters.classList.toggle("collapsed", !expanded);
-        yearLayout?.classList.toggle("sidebar-collapsed", !expanded);
-        toggleCalendarsBtn.setAttribute("aria-expanded", String(expanded));
-        toggleCalendarsBtn.textContent = expanded ? "Hide options" : "Show options";
-        persistPanelState(expanded);
-    }
-
-    function setViewSettingsVisible(visible) {
-        if (!viewSettingsToggle || !viewSettingsMenu) return;
-        viewSettingsMenu.hidden = !visible;
-        viewSettingsToggle.setAttribute("aria-expanded", String(visible));
     }
 
     async function loadCalendars() {
         availableCalendars = await fetchCalendars();
+        if (isAborted()) return;
         const { ids: persistedIds, found } = await loadPersistedSelection();
         const { modes } = await loadCalendarAllDayModes();
         const { hours } = await loadCalendarMinDurationHours();
+        if (isAborted()) return;
 
-        selectedCalendarIds = config.selectAllCalendars
-            ? new Set(availableCalendars.map((calendar) => calendar.id))
-            : found
-                ? new Set(availableCalendars.filter((c) => persistedIds.has(c.id)).map((c) => c.id))
-                : new Set(availableCalendars.map((c) => c.id));
+        if (availableCalendars.length > 0) {
+            selectedCalendarIds = config.selectAllCalendars
+                ? new Set(availableCalendars.map((calendar) => calendar.id))
+                : found
+                    ? new Set(availableCalendars.filter((c) => persistedIds.has(c.id)).map((c) => c.id))
+                    : new Set(availableCalendars.map((c) => c.id));
+        } else if (found) {
+            selectedCalendarIds = new Set(persistedIds);
+        } else {
+            selectedCalendarIds = new Set();
+        }
         calendarAllDayModes = modes;
         calendarMinDurationHours = hours;
 
-        renderCalendarList(availableCalendars);
-        await persistSelection(selectedCalendarIds);
-        onboardingTour?.notifyCalendarStateChanged?.();
+        if (availableCalendars.length > 0 && !isAborted() && config.demoMode !== true && !found) {
+            await persistSelection(selectedCalendarIds);
+        }
+        notifyUiState();
     }
 
     // ---------------------------------------------------------------------------
@@ -538,7 +324,7 @@ export async function initApp(config = {}) {
     async function refreshCalendarData() {
         if (isRefreshing) return;
         isRefreshing = true;
-        refreshButton?.classList.add("refreshing");
+        notifyUiState();
         try {
             eventStore.invalidate();
             await loadCalendars();
@@ -547,7 +333,7 @@ export async function initApp(config = {}) {
             console.error("[refresh] Refresh failed", err);
         } finally {
             isRefreshing = false;
-            refreshButton?.classList.remove("refreshing");
+            notifyUiState();
             mountedUiModules.forEach((mounted) => mounted?.update?.());
         }
     }
@@ -604,13 +390,8 @@ export async function initApp(config = {}) {
     function applyResolvedTheme() {
         const resolved = themeMode === "auto" ? detectSystemMode() : themeMode;
         applyTheme(resolved, config.themeRoot);
-        if (themeToggleBtn) {
-            const label = themeMode === "auto" ? `Theme: Auto (${resolved})` : `Theme: ${resolved}`;
-            const next = themeMode === "auto" ? "Light" : themeMode === "light" ? "Dark" : "Auto";
-            themeToggleBtn.setAttribute("aria-label", `${label}. Change to ${next}`);
-            themeToggleBtn.setAttribute("title", `${label}. Change to ${next}`);
-            themeToggleBtn.dataset.themeMode = themeMode;
-        }
+        gridView.updateEventColors();
+        notifyUiState();
     }
 
     // ---------------------------------------------------------------------------
@@ -618,33 +399,17 @@ export async function initApp(config = {}) {
     // ---------------------------------------------------------------------------
 
     async function adjustMinDuration(deltaHours) {
-        if (!minDurationInput) return;
-        const current = Number(minDurationInput.value);
-        const next = Math.max(0, (Number.isNaN(current) ? 0 : current) + deltaHours);
-        minDurationInput.value = String(Math.round(next * 100) / 100);
-        await persistMinDurationPreference(next);
+        globalMinDurationHours = Math.max(0, Math.round((globalMinDurationHours + deltaHours) * 100) / 100);
+        await persistMinDurationPreference(globalMinDurationHours);
+        notifyUiState();
         applyFilterChange();
     }
 
     async function init() {
-        onChange(yearInput, () => {
-            const nextYear = Number(yearInput.value);
-            if (Number.isFinite(nextYear)) {
-                jumpToYear(nextYear);
-            }
-        });
-        yearButtons.forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const step = Number(btn.dataset.yearStep) || 0;
-                jumpToYear(currentYear + step);
-            }, listenerOptions);
-        });
-        onClick(todayButton, () => gridView.showToday());
-
         setThemeMode(await loadThemePreference());
         refreshSettings = await loadRefreshSettings();
         const icsCalendarIntegration = setupIcsCalendarIntegration({
-            mount: uiSlots.get("sidebar-sections") ?? null,
+            mount: uiSlots.get("sidebar-footer") ?? null,
             initialCalendars: config.icsCalendars,
             readOnly: config.icsReadOnly === true,
             demoMode: config.demoMode === true,
@@ -657,25 +422,13 @@ export async function initApp(config = {}) {
         });
         icsRemoveCalendar = (id) => icsCalendarIntegration.removeCalendar(id);
 
-        if (minDurationInput) {
-            minDurationInput.value = String(Math.round(await loadMinDurationPreference()));
-        }
+        globalMinDurationHours = Math.round(await loadMinDurationPreference());
         allDayOnlyEnabled = await loadAllDayOnlyPreference();
-        if (allDayOnlyInput) {
-            allDayOnlyInput.checked = allDayOnlyEnabled;
-            allDayOnlyInput.closest(".cal-chip-toggle")?.querySelector(".chip-text")?.replaceChildren("Show all-day events only");
-        }
-        if (showWeekNumbersInput) {
-            showWeekNumbersInput.checked = await loadWeekNumbersPreference();
-        }
+        showWeekNumbersEnabled = await loadWeekNumbersPreference();
         viewMode = await loadViewMode();
-        if (viewModeSelect) {
-            viewModeSelect.value = viewMode;
-        }
         grayPastDaysEnabled = await loadGrayPastDays();
         highlightCurrentDayEnabled = await loadHighlightCurrentDay();
-        if (grayPastDaysInput) grayPastDaysInput.checked = grayPastDaysEnabled;
-        if (highlightCurrentDayInput) highlightCurrentDayInput.checked = highlightCurrentDayEnabled;
+        panelExpanded = await loadPanelState();
         await icsCalendarIntegration.initialize();
 
         await loadCalendars();
@@ -683,103 +436,16 @@ export async function initApp(config = {}) {
         if (Number.isFinite(config.initialYear)) {
             currentYear = clampYear(config.initialYear);
         }
-        yearInput.value = currentYear;
         gridView.setMode(viewMode, { anchorYear: currentYear });
-        updateFilterStats();
+        await updateFilterStats();
         setupAutoRefresh();
         setupTabFocusRefresh();
-
-        onChange(viewModeSelect, async () => {
-            viewMode = viewModeSelect?.value || "linear";
-            await persistViewMode(viewMode);
-            gridView.setMode(viewMode);
-        });
-
-        onChange(allDayOnlyInput, async () => {
-            allDayOnlyEnabled = allDayOnlyInput?.checked || false;
-            await persistAllDayOnlyPreference(allDayOnlyEnabled);
-            applyFilterChange();
-        });
-        onChange(minDurationInput, async () => {
-            await persistMinDurationPreference(getGlobalMinDurationHours());
-            applyFilterChange();
-        });
-        minDurationInput?.addEventListener("blur", async () => {
-            minDurationInput.value = String(Math.max(0, Math.round(Number.isFinite(Number(minDurationInput.value)) ? Number(minDurationInput.value) : 0)));
-            await persistMinDurationPreference(getGlobalMinDurationHours());
-            applyFilterChange();
-        }, listenerOptions);
-        onClick(minDurationDownBtn, () => adjustMinDuration(-1));
-        onClick(minDurationUpBtn, () => adjustMinDuration(1));
-        onClick(durationFilterToggleBtn, () => {
-            durationFilteringEnabled = !durationFilteringEnabled;
-            updateDurationFilterToggleLabel();
-            updateDurationFilterControlsState();
-            applyFilterChange();
-        });
-        onClick(selectAllBtn, () => setAllCalendars(true));
-        onClick(deselectAllBtn, () => setAllCalendars(false));
-        if (deselectAllBtn) deselectAllBtn.textContent = "None";
-
-        onChange(showWeekNumbersInput, () => {
-            persistWeekNumbersPreference(showWeekNumbersInput.checked);
-            gridView.rebuild();
-        });
-        onChange(grayPastDaysInput, async () => {
-            grayPastDaysEnabled = grayPastDaysInput?.checked || false;
-            await persistGrayPastDays(grayPastDaysEnabled);
-            gridView.rebuild();
-        });
-        onChange(highlightCurrentDayInput, async () => {
-            highlightCurrentDayEnabled = highlightCurrentDayInput?.checked || false;
-            await persistHighlightCurrentDay(highlightCurrentDayEnabled);
-            gridView.rebuild();
-        });
-
-        onClick(viewSettingsToggle, () => {
-            const isVisible = viewSettingsToggle.getAttribute("aria-expanded") === "true";
-            setViewSettingsVisible(!isVisible);
-        });
-        onClick(restartTourButton, () => {
-            setViewSettingsVisible(false);
-            restartOnboardingTour(rootDocument);
-        });
-        rootDocument.addEventListener("click", (event) => {
-            if (event.target?.closest?.(".onboarding-tour")) return;
-            if (!viewSettingsMenu?.hidden && !viewSettingsMenu?.contains(event.target) && !viewSettingsToggle?.contains(event.target)) {
-                setViewSettingsVisible(false);
-            }
-        }, listenerOptions);
-        rootDocument.addEventListener("keydown", (event) => {
-            if (event.key === "Escape" && !viewSettingsMenu?.hidden) {
-                setViewSettingsVisible(false);
-                viewSettingsToggle?.focus();
-            }
-        }, listenerOptions);
-
-        if (toggleCalendarsBtn) {
-            onClick(toggleCalendarsBtn, () => {
-                const isExpanded = toggleCalendarsBtn.getAttribute("aria-expanded") === "true";
-                setCalendarPanelVisible(!isExpanded);
-            });
-            setCalendarPanelVisible(await loadPanelState());
-        }
-
-        onClick(refreshButton, () => refreshCalendarData());
-
-        onClick(themeToggleBtn, () => {
-            const modes = ["auto", "light", "dark"];
-            setThemeMode(modes[(modes.indexOf(themeMode) + 1) % modes.length]);
-        });
-
-        updateDurationFilterToggleLabel();
-        updateDurationFilterControlsState();
+        notifyUiState();
     }
 
 
     const uiSlots = resolveUiSlots(root);
     let mountedUiModules = [];
-    let onboardingTour = null;
     const appApi = {
         getCalendarProvider,
         refreshCalendars: refreshCalendarData,
@@ -787,6 +453,68 @@ export async function initApp(config = {}) {
         eventStore,
         listCalendars: () => availableCalendars,
         jumpToYear,
+        stepYear: (step) => jumpToYear(currentYear + step),
+        showToday: () => gridView.showToday(),
+        setViewMode: async (value) => {
+            if (!value) return;
+            viewMode = value;
+            gridView.setMode(value);
+            await persistViewMode(value);
+            notifyUiState();
+        },
+        setDisplayOption: async (option, checked) => {
+            if (option === "showWeekNumbers") {
+                showWeekNumbersEnabled = checked === true;
+                await persistWeekNumbersPreference(showWeekNumbersEnabled);
+            } else if (option === "grayPastDays") {
+                grayPastDaysEnabled = checked === true;
+                await persistGrayPastDays(grayPastDaysEnabled);
+            } else if (option === "highlightCurrentDay") {
+                highlightCurrentDayEnabled = checked === true;
+                await persistHighlightCurrentDay(highlightCurrentDayEnabled);
+            } else {
+                return;
+            }
+            gridView.updateDisplayOptions();
+            notifyUiState();
+        },
+        setAllDayOnly: async (enabled) => {
+            allDayOnlyEnabled = enabled === true;
+            await persistAllDayOnlyPreference(allDayOnlyEnabled);
+            notifyUiState();
+            applyFilterChange();
+        },
+        setGlobalMinDuration: async (value) => {
+            const next = Math.max(0, Number.isFinite(Number(value)) ? Number(value) : 0);
+            globalMinDurationHours = Math.round(next * 100) / 100;
+            await persistMinDurationPreference(globalMinDurationHours);
+            notifyUiState();
+            applyFilterChange();
+        },
+        adjustMinDuration,
+        toggleDurationFiltering: () => {
+            durationFilteringEnabled = !durationFilteringEnabled;
+            notifyUiState();
+            applyFilterChange();
+        },
+        toggleTheme: () => {
+            const modes = ["auto", "light", "dark"];
+            setThemeMode(modes[(modes.indexOf(themeMode) + 1) % modes.length]);
+        },
+        restartTour: () => restartOnboardingTour(rootDocument),
+        toggleCalendar,
+        toggleCalendarExpanded,
+        setCalendarAllDay,
+        setCalendarDuration,
+        stepCalendarDuration,
+        resetCalendarFilters,
+        removeCalendar: (calendar) => icsRemoveCalendar?.(calendar.id),
+        setAllCalendars,
+        setPanelExpanded: async (expanded) => {
+            panelExpanded = expanded === true;
+            await persistPanelState(panelExpanded);
+            notifyUiState();
+        },
         getCurrentYear: () => currentYear,
         destroy: () => {
             lifecycle.abort();
@@ -796,16 +524,11 @@ export async function initApp(config = {}) {
             }
             gridView.destroy?.();
             mountedUiModules.forEach((mounted) => mounted?.destroy?.());
-            onboardingTour?.destroy?.();
         }
     };
     mountedUiModules = mountUiModules(config.uiModules, uiSlots, appApi);
 
     await init();
     mountedUiModules.forEach((mounted) => mounted?.update?.());
-    onboardingTour = setupOnboardingTour({
-        root,
-        hasCalendars: () => availableCalendars.length > 0
-    });
     return appApi;
 }

@@ -8,7 +8,6 @@ import { YearView } from "./year-view";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
 import type { Navigate } from "./components/Link";
-import { AccountPage } from "./pages/AccountPage";
 import { LandingPage } from "./pages/LandingPage";
 import { ImprintPage } from "./pages/ImprintPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -54,15 +53,22 @@ function App() {
         return () => documentClasses.forEach((element) => element.classList.remove("embedded-demo-document"));
     }, [isEmbeddedDemo]);
 
+    useEffect(() => {
+        if (isLoaded && path === "/account") {
+            navigate(isSignedIn ? "/app" : "/login?next=/app");
+        } else if (isLoaded && !isSignedIn && path === "/app") {
+            navigate(`/login?next=${encodeURIComponent(path)}`);
+        }
+    }, [isLoaded, isSignedIn, navigate, path]);
+
     let page: ReactNode;
-    if (path === "/") page = <LandingPage navigate={navigate} session={session} />;
+    if (path === "/") page = <LandingPage navigate={navigate} session={session} authLoaded={isLoaded} />;
     else if (path === "/demo") page = <YearView navigate={navigate} demo />;
     else if (path === "/login") page = <LoginPage />;
     else if (path === "/pricing") page = <PricingPage />;
     else if (!isLoaded) page = <main className="status-page page-width"><CalendarDays aria-hidden="true" /><h1>Loading account...</h1></main>;
-    else if (path === "/account" && session) page = <AccountPage navigate={navigate} />;
     else if (path === "/app" && session) page = <YearView navigate={navigate} />;
-    else if (["/account", "/app"].includes(path)) page = <LoginPage />;
+    else if (path === "/app") page = <LoginPage />;
     else if (path === "/privacy") page = <PrivacyPage />;
     else if (path === "/terms") page = <TermsPage />;
     else if (path === "/imprint") page = <ImprintPage />;
@@ -71,7 +77,7 @@ function App() {
     const isAppRoute = path === "/app";
     const isAuthenticatedApp = isAppRoute && !!session;
     return <div className={isAuthenticatedApp ? "app-shell" : undefined}>
-        {!isAuthenticatedApp && !isEmbeddedDemo && (!isAppRoute || isLoaded) && <SiteHeader navigate={navigate} path={path} session={session} />}
+        {!isAuthenticatedApp && path !== "/demo" && !isEmbeddedDemo && (!isAppRoute || isLoaded) && <SiteHeader navigate={navigate} path={path} />}
         {page}
         {!isEmbeddedDemo && (!isAppRoute || isLoaded) && <SiteFooter navigate={navigate} />}
     </div>;

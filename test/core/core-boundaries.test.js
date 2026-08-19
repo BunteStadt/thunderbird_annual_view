@@ -8,6 +8,7 @@ const coreRoot = path.resolve(__dirname, '..', '..', 'src', 'core');
 function listJsFiles(dir) {
     const out = [];
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.isDirectory() && entry.name === 'dist') continue;
         const fullPath = path.join(dir, entry.name);
         if (entry.isDirectory()) {
             out.push(...listJsFiles(fullPath));

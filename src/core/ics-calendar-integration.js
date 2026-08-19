@@ -1,5 +1,6 @@
 import { setIcsCalendars } from "./providers/calendar-service.js";
 import { getStorageAdapter } from "./storage-port.js";
+import { buttonVariants } from "./ui/lib/control-classes.js";
 
 const ICS_STORAGE_KEY = "icsCalendars";
 
@@ -86,14 +87,10 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initial
         fileInput.multiple = true;
         fileInput.hidden = true;
 
-        uploadButton.className = "btn";
-        uploadButton.dataset.size = "compact";
+        uploadButton.className = buttonVariants({ variant: "secondary" });
         uploadButton.type = "button";
         uploadButton.textContent = "Upload ICS";
         uploadButton.dataset.tour = "upload-ics";
-
-        const separator = globalThis.document.createElement("div");
-        separator.className = "separator";
 
         const buttonRow = globalThis.document.createElement("div");
         buttonRow.className = "select-buttons";
@@ -101,8 +98,7 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initial
 
         if (demoMode) {
             const restoreButton = globalThis.document.createElement("button");
-            restoreButton.className = "btn";
-            restoreButton.dataset.size = "compact";
+            restoreButton.className = buttonVariants({ variant: "secondary" });
             restoreButton.type = "button";
             restoreButton.textContent = "Restore demo calendars";
             restoreButton.addEventListener("click", () => {
@@ -111,7 +107,7 @@ export function setupIcsCalendarIntegration({ mount, onCalendarsChanged, initial
             buttonRow.appendChild(restoreButton);
         }
 
-        mount.replaceChildren(separator, fileInput, buttonRow);
+        mount.replaceChildren(fileInput, buttonRow);
     }
 
     uploadButton?.addEventListener("click", () => fileInput?.click());

@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const repositoryRoot = import.meta.dirname;
+const coreUiRoot = resolve(repositoryRoot, "src/core/ui");
 
 export default defineConfig({
     root: resolve(repositoryRoot, "src/hosts/saas"),
@@ -12,6 +13,9 @@ export default defineConfig({
     publicDir: false,
     plugins: [react(), tailwindcss()],
     resolve: {
+        alias: {
+            "@": coreUiRoot
+        },
         dedupe: ["react", "react-dom"]
     },
     build: {

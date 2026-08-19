@@ -6,8 +6,9 @@ const path = require('node:path');
 const repoRoot = path.resolve(__dirname, '..', '..');
 const shellSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'annual-view.tsx'), 'utf8');
 const appSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'app.js'), 'utf8');
+const onboardingComponentSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'onboarding-tour.tsx'), 'utf8');
 const storageSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'storage.js'), 'utf8');
-const onboardingSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'onboarding-tour.js'), 'utf8');
+const onboardingSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ui', 'onboarding-tour.tsx'), 'utf8');
 const icsSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'ics-calendar-integration.js'), 'utf8');
 const demoCalendarsSource = fs.readFileSync(path.join(repoRoot, 'src', 'core', 'demo-calendars.js'), 'utf8');
 const coreHostSource = fs.readFileSync(path.join(repoRoot, 'src', 'hosts', 'core', 'main.js'), 'utf8');
@@ -22,7 +23,7 @@ test('view shell contains every element id initApp reads from the DOM', () => {
     assert.ok(ids.length > 0, 'expected scoped element ids in app.js');
     for (const id of ids) {
         assert.ok(
-            shellSource.includes(`id="${id}"`),
+            shellSource.includes(`id="${id}"`) || shellSource.includes(`id: "${id}"`),
             `view shell is missing #${id} required by app.js`
         );
     }
@@ -67,9 +68,9 @@ test('view shell exposes the core onboarding targets and expanded options by def
     assert.match(onboardingSource, /waitingForCalendar/);
     assert.match(onboardingSource, /target: "upload-ics"/);
     assert.match(onboardingSource, /step\.target === "display-options" \|\| step\.target === "view-mode"/);
-    assert.match(onboardingSource, /menu\.hidden = false/);
-    assert.match(appSource, /hasCalendars: \(\) => availableCalendars\.length > 0/);
-    assert.match(appSource, /notifyCalendarStateChanged/);
+    assert.match(onboardingSource, /aria-expanded/);
+    assert.match(onboardingComponentSource, /hasCalendars/);
+    assert.match(onboardingComponentSource, /waitingForCalendar/);
     assert.match(appSource, /restartOnboardingTour\(rootDocument\)/);
     assert.doesNotMatch(icsSource, /textContent = "Redo tour"/);
 });

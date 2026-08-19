@@ -1,21 +1,61 @@
-@import "tailwindcss";
-@import "../../../core/ui/design-tokens.css";
-
-@theme {
-    --font-sans: "Manrope Variable", "Segoe UI", sans-serif;
-    --font-display: "Newsreader Variable", Georgia, serif;
-    --color-ink: #0f1d35;
-    --color-paper: #ffffff;
-    --color-signal: #0a84ff;
-    --color-moss: #075ecb;
-}
+@import "../../../core/ui/year-view.css";
+@source "../../../core/ui";
 
 :root {
+    --av-font: var(--font-sans);
+    --av-bg: var(--background);
+    --av-panel: var(--card);
+    --av-panel-strong: var(--sidebar);
+    --av-header-bg: var(--sidebar);
+    --av-grid-line: var(--border);
+    --av-text: var(--foreground);
+    --av-muted: var(--muted-foreground);
+    --av-accent: var(--primary);
+    --av-accent-strong: var(--sidebar-primary);
+    --av-chip-hover: color-mix(in srgb, var(--primary) 8%, transparent);
+    --av-chip-selected: color-mix(in srgb, var(--primary) 16%, transparent);
+    --av-weekday-bg: var(--card);
+    --av-weekday-text: var(--muted-foreground);
+    --av-weekend-bg: var(--muted);
+    --av-weekend-text: var(--foreground);
+    --av-disabled-day-bg: var(--muted);
+    --av-month-col: var(--card);
+    --av-shadow: 0 18px 36px color-mix(in srgb, var(--foreground) 16%, transparent);
+    --av-btn-surface: var(--secondary);
+    --av-btn-hover: var(--muted);
+    --av-input-shadow: inset 0 1px 0 color-mix(in srgb, var(--card) 35%, transparent);
+    --av-input-shadow-compact: var(--av-input-shadow);
+    --av-event-bg1: color-mix(in srgb, var(--primary) 16%, transparent);
+    --av-event-bg2: color-mix(in srgb, var(--primary) 32%, transparent);
+    --av-event-border: color-mix(in srgb, var(--primary) 50%, transparent);
+    --av-event-text: var(--foreground);
+    --av-event-shadow: 0 8px 16px color-mix(in srgb, var(--foreground) 16%, transparent);
+    --av-btn-shadow: none;
+    --av-btn-shadow-compact: none;
+    --av-btn-active-shadow: none;
     font-family: var(--av-font);
     color: var(--av-text);
     background: var(--av-bg);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
+}
+
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.bg-primary {
+    background-color: var(--primary);
+}
+
+.text-primary-foreground {
+    color: var(--primary-foreground);
+}
+
+.bg-primary:hover {
+    background-color: color-mix(in srgb, var(--primary) 80%, transparent);
 }
 
 * {
@@ -30,6 +70,7 @@ body {
     margin: 0;
     min-width: 320px;
     background: var(--av-bg);
+    font-family: "Manrope Variable", "Segoe UI", sans-serif;
 }
 
 html.embedded-demo-document,
@@ -52,12 +93,27 @@ a {
     -webkit-tap-highlight-color: transparent;
 }
 
-button {
+.site-header button,
+.site-footer button,
+.landing-page button,
+.inner-page button,
+.legal-page button,
+.auth-page button {
     font: inherit;
 }
 
-button:focus-visible,
-a:focus-visible {
+.site-header button:focus-visible,
+.site-header a:focus-visible,
+.site-footer button:focus-visible,
+.site-footer a:focus-visible,
+.landing-page button:focus-visible,
+.landing-page a:focus-visible,
+.inner-page button:focus-visible,
+.inner-page a:focus-visible,
+.legal-page button:focus-visible,
+.legal-page a:focus-visible,
+.auth-page button:focus-visible,
+.auth-page a:focus-visible {
     outline: 3px solid #0a84ff;
     outline-offset: 3px;
 }
@@ -79,11 +135,16 @@ a:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 20px;
 }
 
 .nav-demo-link {
     order: 4;
-    margin-left: 12px;
+}
+
+.nav-pricing-link {
+    margin-left: 0;
+    cursor: pointer;
 }
 
 .brand {
@@ -107,7 +168,7 @@ a:focus-visible {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 20px;
 }
 
 .nav-links>button {
@@ -115,6 +176,30 @@ a:focus-visible {
     background: transparent;
     color: var(--av-weekday-text);
     cursor: pointer;
+}
+
+.site-header [data-clerk-component="UserButton"] .cl-userButtonTrigger,
+.site-header [data-clerk-component="UserButton"] .cl-userButtonAvatarBox {
+    width: 40px;
+    height: 40px;
+}
+
+.auth-control-placeholder {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--av-grid-line) 55%, transparent);
+}
+
+.nav-demo-placeholder {
+    order: 4;
+    width: 144px;
+}
+
+.user-button-placeholder {
+    border-radius: 999px;
 }
 
 .icon-button {
@@ -190,6 +275,14 @@ a:focus-visible {
 
 .button-wide {
     width: 100%;
+}
+
+.hero-demo-placeholder {
+    display: inline-block;
+    width: 184px;
+    height: 52px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--av-grid-line) 55%, transparent);
 }
 
 .button:disabled {
@@ -1814,22 +1907,57 @@ a:focus-visible {
 }
 
 .year-view-page {
+    --font-sans: "Geist Variable", sans-serif;
     height: calc(100vh - 72px);
     min-height: 0;
     overflow: hidden;
+    position: relative;
     background: var(--av-bg);
 }
 
 .year-view-page.app-page {
-    flex: 1;
-    height: auto;
+    flex: 1 1 0;
+    height: 0;
 }
 
 .app-shell {
-    height: 100vh;
+    width: 100%;
+    flex: 1 1 auto;
+    height: 100dvh;
+    max-height: 100dvh;
     min-height: 0;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
+}
+
+.app-shell .year-view-page.app-page {
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.app-shell .year-view-page.app-page .av-toolbar [data-clerk-component="UserButton"] .cl-userButtonTrigger,
+.app-shell .year-view-page.app-page .av-toolbar [data-clerk-component="UserButton"] .cl-userButtonAvatarBox {
+    width: 25px;
+    height: 25px;
+}
+
+.app-shell .year-view-page.app-page .av-toolbar [data-ui-slot="header-actions"] {
+    order: 11;
+}
+
+.app-shell>.site-footer {
+    flex: 0 0 auto;
+}
+
+@media (min-width: 768px) {
+    .year-view-page [data-slot="sidebar-container"].calendar-filters {
+        position: absolute;
+        top: var(--av-toolbar-height, 0px);
+        bottom: 0;
+        height: auto;
+    }
 }
 
 .year-view-page>.av-root {
@@ -2005,7 +2133,6 @@ a:focus-visible {
 .auth-panel {
     width: min(440px, 100%);
     padding: clamp(28px, 5vw, 40px);
-    border: 2px solid var(--av-grid-line);
     background: var(--av-panel);
     border-radius: 6px;
 }

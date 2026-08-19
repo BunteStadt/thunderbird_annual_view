@@ -41,7 +41,7 @@ const WEEK_EPOCH_DAY = dayNumber(new Date(2001, 0, 1)); // A Monday.
 
 const DAY_ALIGNED_COLS = 37; // 6 max weekday offset + 31 days.
 const WEEKDAYS_SUNDAY_FIRST = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-const WEEKDAYS_MONDAY_FIRST = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEKDAYS_MONDAY_FIRST = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
 function yearOfDay(dayNum) {
     return dateFromDayNumber(dayNum).getFullYear();
@@ -73,16 +73,20 @@ function createDayCell(date, ctx) {
     cell.appendChild(label);
 
     const dayNum = dayNumber(date);
+    cell.dataset.dayNumber = String(dayNum);
     if (ctx.highlightCurrentDay && dayNum === ctx.todayDayNum) {
         cell.classList.add("current-day");
     }
     if (ctx.grayPastDays && dayNum < ctx.todayDayNum) {
         cell.classList.add("past-day");
     }
-    if (ctx.showWeekNumbers && weekday === 1) {
+    if (ctx.showWeekNumber ?? weekday === 1) {
+        cell.dataset.weekNumber = String(getISOWeekNumber(new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))));
+    }
+    if (ctx.showWeekNumbers && cell.dataset.weekNumber) {
         const weekLabel = document.createElement("span");
         weekLabel.className = "week-number";
-        weekLabel.textContent = String(getISOWeekNumber(new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))));
+        weekLabel.textContent = cell.dataset.weekNumber;
         cell.appendChild(weekLabel);
     }
 
@@ -176,7 +180,7 @@ function createWeekRowsMode(className, daysPerRow) {
             row.appendChild(createMonthLabelCell(meta));
             for (let i = 0; i < daysPerRow; i += 1) {
                 const date = dateFromDayNumber(meta.startDayNum + i);
-                row.appendChild(createDayCell(date, ctx));
+                row.appendChild(createDayCell(date, { ...ctx, showWeekNumber: i % 7 === 0 }));
             }
         }
     };
@@ -254,8 +258,9 @@ function alphaFromHex(color, alpha) {
 }
 
 function applyEventColor(el, color) {
-    const bg = alphaFromHex(color, 0.25) || color;
-    const border = alphaFromHex(color, 0.6) || color;
+    const darkMode = el.closest(".theme-dark") !== null;
+    const bg = alphaFromHex(color, darkMode ? 0.45 : 0.25) || color;
+    const border = alphaFromHex(color, darkMode ? 0.6 : 0.4) || color;
     el.style.background = `linear-gradient(135deg, ${bg}, ${bg})`;
     el.style.borderColor = border;
 }
@@ -315,7 +320,9 @@ function layoutRowEvents(overlay, meta, events, impl) {
         bar.className = "event";
         if (evStartDay < meta.startDayNum) bar.classList.add("continues-prev");
         if (evEndDay > meta.endDayNum) bar.classList.add("continues-next");
-        applyEventColor(bar, event.calendarColor || event.color || "#38bdf8");
+        const eventColor = event.calendarColor || event.color || "#38bdf8";
+        bar.dataset.eventColor = eventColor;
+        applyEventColor(bar, eventColor);
         bar.style.setProperty("--lane", lane);
         bar.style.gridRow = "1";
         bar.style.gridColumn = `${impl.columnStart(meta, segStart)} / ${impl.columnStart(meta, segEnd) + 1}`;
@@ -356,6 +363,7 @@ export class GridView {
         this.renderGen = 0;
         this._reportedYear = null;
         this._scrollPending = false;
+        this._scrollDeferEvents = false;
 
         this._onScroll = () => this._scheduleScrollWork();
         this._onResize = () => {
@@ -388,7 +396,7 @@ export class GridView {
 
     /** Scrolls (jumps) so the given year starts at the top of the viewport. */
     showYear(year) {
-        this._rebuild(this._impl.keyForYearStart(year));
+        this._rebuild(this._impl.keyForYearStart(year), 0, { deferFill: true });
     }
 
     /** Scrolls (jumps) so the row containing today is at the top. */
@@ -409,27 +417,58 @@ export class GridView {
         }
     }
 
-    _rebuild(anchorKey, scrollTop = 0) {
+    /** Updates display-only settings without rebuilding rows or event overlays. */
+    updateDisplayOptions() {
+        const options = this.getOptions();
+        const todayDayNum = dayNumber(new Date());
+        for (const row of this.rows) {
+            row.el.querySelectorAll(".cell[data-day-number]").forEach((cell) => {
+                const cellDayNum = Number(cell.dataset.dayNumber);
+                cell.classList.toggle("past-day", options.grayPastDays && cellDayNum < todayDayNum);
+                cell.classList.toggle("current-day", options.highlightCurrentDay && cellDayNum === todayDayNum);
+
+                const weekNumber = cell.dataset.weekNumber;
+                const label = cell.querySelector(".week-number");
+                if (options.showWeekNumbers && weekNumber && !label) {
+                    const weekLabel = document.createElement("span");
+                    weekLabel.className = "week-number";
+                    weekLabel.textContent = weekNumber;
+                    cell.appendChild(weekLabel);
+                } else if (!options.showWeekNumbers) {
+                    label?.remove();
+                }
+            });
+        }
+    }
+
+    _rebuild(anchorKey, scrollTop = 0, { deferFill = false } = {}) {
         this.renderGen += 1;
         this.rows = [];
         this.viewport.style.removeProperty("--month-column-width");
         this.rowsContainer.textContent = "";
         this._renderHeader();
-        this._appendRow(anchorKey);
+        this._appendRow(anchorKey, false, !deferFill);
 
-        // Grow content downward until the requested scroll offset exists,
-        // otherwise the browser would clamp scrollTop to the current height.
+        // Mode changes only need enough rows for the first viewport immediately;
+        // the ahead-window fill runs on the next animation frame.
         let guard = 0;
         while (
             guard++ < 60 &&
-            this.viewport.scrollHeight < scrollTop + this.viewport.clientHeight + RENDER_AHEAD_PX
+            (deferFill
+                ? this.rows[this.rows.length - 1].el.offsetTop + this.rows[this.rows.length - 1].el.offsetHeight < this.viewport.clientHeight + ROW_BASE_HEIGHT
+                : this.viewport.scrollHeight < scrollTop + this.viewport.clientHeight + RENDER_AHEAD_PX)
         ) {
-            this._appendRow(this.rows[this.rows.length - 1].key + 1);
+            this._appendRow(this.rows[this.rows.length - 1].key + 1, false, !deferFill);
         }
 
+        this._syncMonthColumnWidth();
         this.viewport.scrollTop = scrollTop;
-        this._fill();
         this._updateVisibleYear(true);
+        if (deferFill) {
+            this._scheduleScrollWork({ deferEvents: true });
+        } else {
+            this._fill();
+        }
     }
 
     _renderHeader() {
@@ -448,7 +487,7 @@ export class GridView {
         }
     }
 
-    _createRow(key) {
+    _createRow(key, applyEvents = true) {
         const impl = this._impl;
         const meta = impl.meta(key);
         const el = document.createElement("div");
@@ -461,7 +500,7 @@ export class GridView {
         el.appendChild(overlay);
 
         const row = { key, meta, el, overlay };
-        this._applyEvents(row);
+        if (applyEvents) this._applyEvents(row);
         return row;
     }
 
@@ -488,6 +527,7 @@ export class GridView {
 
         row.overlay.textContent = "";
         const laneCount = layoutRowEvents(row.overlay, row.meta, events, this._impl);
+        this.updateEventColors();
 
         const newHeight = rowHeightForLanes(laneCount);
         const oldHeight = row.el.offsetHeight;
@@ -501,19 +541,25 @@ export class GridView {
         }
     }
 
-    _appendRow(key) {
-        const row = this._createRow(key);
+    updateEventColors() {
+        for (const bar of this.rowsContainer.querySelectorAll(".event")) {
+            if (bar.dataset.eventColor) applyEventColor(bar, bar.dataset.eventColor);
+        }
+    }
+
+    _appendRow(key, syncWidth = true, applyEvents = true) {
+        const row = this._createRow(key, applyEvents);
         this.rowsContainer.appendChild(row.el);
         this.rows.push(row);
-        this._syncMonthColumnWidth();
+        if (syncWidth) this._syncMonthColumnWidth();
         return row;
     }
 
-    _prependRow(key) {
+    _prependRow(key, syncWidth = true) {
         const row = this._createRow(key);
         this.rowsContainer.insertBefore(row.el, this.rowsContainer.firstChild);
         this.rows.unshift(row);
-        this._syncMonthColumnWidth();
+        if (syncWidth) this._syncMonthColumnWidth();
         return row;
     }
 
@@ -526,34 +572,44 @@ export class GridView {
         if (width > 0) this.viewport.style.setProperty("--month-column-width", `${width}px`);
     }
 
-    _scheduleScrollWork() {
+    _scheduleScrollWork({ deferEvents = false } = {}) {
         if (this._scrollPending) return;
         this._scrollPending = true;
+        this._scrollDeferEvents = deferEvents;
         requestAnimationFrame(() => {
             this._scrollPending = false;
-            this._fill();
+            const shouldDeferEvents = this._scrollDeferEvents;
+            this._scrollDeferEvents = false;
             this._updateVisibleYear();
+            if (shouldDeferEvents) {
+                requestAnimationFrame(() => this._fill({ deferEvents: true }));
+                return;
+            }
+            this._fill();
         });
     }
 
     // Extends the rendered window around the viewport and trims distant rows.
-    _fill() {
+    _fill({ deferEvents = false } = {}) {
         const vp = this.viewport;
         if (!this.rows.length) return;
+        let rowsChanged = false;
 
         let guard = 0;
         while (guard++ < 60) {
             const last = this.rows[this.rows.length - 1];
             if (last.el.offsetTop + last.el.offsetHeight > vp.scrollTop + vp.clientHeight + RENDER_AHEAD_PX) break;
-            this._appendRow(last.key + 1);
+            this._appendRow(last.key + 1, false, !deferEvents);
+            rowsChanged = true;
         }
 
         guard = 0;
         while (guard++ < 60) {
             const first = this.rows[0];
             if (first.el.offsetTop <= vp.scrollTop - RENDER_AHEAD_PX) break;
-            const row = this._prependRow(first.key - 1);
+            const row = this._prependRow(first.key - 1, false);
             vp.scrollTop += row.el.offsetHeight + ROW_GAP;
+            rowsChanged = true;
         }
 
         while (this.rows.length > 2) {
@@ -562,6 +618,7 @@ export class GridView {
             vp.scrollTop -= first.el.offsetHeight + ROW_GAP;
             first.el.remove();
             this.rows.shift();
+            rowsChanged = true;
         }
 
         while (this.rows.length > 2) {
@@ -569,7 +626,19 @@ export class GridView {
             if (last.el.offsetTop <= vp.scrollTop + vp.clientHeight + TRIM_DISTANCE_PX) break;
             last.el.remove();
             this.rows.pop();
+            rowsChanged = true;
         }
+
+        if (rowsChanged) this._syncMonthColumnWidth();
+        if (deferEvents) this._scheduleEventHydration();
+    }
+
+    _scheduleEventHydration() {
+        const generation = this.renderGen;
+        requestAnimationFrame(() => {
+            if (generation !== this.renderGen) return;
+            for (const row of this.rows) this._applyEvents(row);
+        });
     }
 
     // Day number at the middle of the row currently centered in the viewport.

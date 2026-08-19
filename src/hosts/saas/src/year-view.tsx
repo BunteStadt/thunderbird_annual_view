@@ -1,44 +1,42 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/react";
-import { ArrowLeft, CircleUserRound } from "lucide-react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { UserButton, useAuth } from "@clerk/react";
+import { createPortal } from "react-dom";
 import { YearView as CoreYearView } from "../../../core/ui/annual-view";
 import { EmptyCalendarProvider, registerProviderFactory, setCalendarProvider } from "../../../core/providers/calendar-service.js";
 import { setStorageAdapter } from "../../../core/storage-port.js";
 import { createSaasStorageAdapter } from "./saas-storage-adapter.js";
 import { createSaasGoogleProvider } from "./saas-google-provider";
 import { demoCalendars } from "../../../core/demo-calendars.js";
+import { Button } from "../../../core/ui/components/ui/button";
 
-function createSaasHeaderAction(slot: "header-leading" | "header-actions", navigate: (path: string) => void) {
+function createSaasHeaderAction(navigate: (path: string) => void) {
     return {
-        slot,
+        slot: "header-leading",
         mount(container: HTMLElement) {
             container.toggleAttribute("hidden", false);
-            const action = document.createElement(slot === "header-leading" ? "a" : "button");
-            action.className = "btn av-header-action";
-            action.dataset.size = "compact";
-            action.setAttribute("aria-label", slot === "header-leading" ? "Back to Year View home" : "Open account");
-            action.title = slot === "header-leading" ? "Back to Year View home" : "Open account";
-            if (slot === "header-leading") {
-                action.setAttribute("href", "/");
-                action.innerHTML = `${renderToStaticMarkup(<ArrowLeft aria-hidden="true" />)}<span>YearView</span>`;
-            } else {
-                action.setAttribute("type", "button");
-                action.innerHTML = `${renderToStaticMarkup(<CircleUserRound aria-hidden="true" />)}<span>Account</span>`;
-            }
-            const onClick = (event: Event) => {
-                if (slot === "header-leading") {
+            const logo = container.querySelector<HTMLElement>(".av-header-logo");
+            if (!logo) return { destroy: () => container.toggleAttribute("hidden", true) };
+            const onClick = () => navigate("/");
+            const onKeyDown = (event: KeyboardEvent) => {
+                if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
+                    navigate("/");
                 }
-                navigate(slot === "header-leading" ? "/" : "/account");
             };
-            action.addEventListener("click", onClick);
-            container.replaceChildren(action);
+            logo.setAttribute("role", "link");
+            logo.setAttribute("tabindex", "0");
+            logo.setAttribute("aria-label", "Year View home");
+            logo.title = "Year View home";
+            logo.addEventListener("click", onClick);
+            logo.addEventListener("keydown", onKeyDown);
             return {
                 destroy: () => {
-                    action.removeEventListener("click", onClick);
-                    container.replaceChildren();
-                    container.toggleAttribute("hidden", true);
+                    logo.removeEventListener("click", onClick);
+                    logo.removeEventListener("keydown", onKeyDown);
+                    logo.removeAttribute("role");
+                    logo.removeAttribute("tabindex");
+                    logo.removeAttribute("aria-label");
+                    logo.removeAttribute("title");
                 }
             };
         }
@@ -47,8 +45,20 @@ function createSaasHeaderAction(slot: "header-leading" | "header-actions", navig
 
 export function YearView({ navigate, demo = false }: { navigate: (path: string) => void; demo?: boolean }) {
     const [ready, setReady] = useState(false);
+    const [headerActionsTarget, setHeaderActionsTarget] = useState<HTMLElement | null>(null);
+    const pageRef = useRef<HTMLElement>(null);
     const { getToken } = useAuth();
     const [googleProvider] = useState(() => createSaasGoogleProvider(getToken));
+    const config = useMemo(() => ({
+        icsCalendars: demo ? demoCalendars : undefined,
+        icsReadOnly: false,
+        demoMode: demo,
+        selectAllCalendars: demo,
+        embeddedDemo: demo && new URLSearchParams(globalThis.location.search).get("embed") === "1",
+        uiModules: demo ? [] : [
+            createSaasHeaderAction(navigate)
+        ]
+    }), [demo, navigate]);
 
     useEffect(() => {
         const provider = demo ? new EmptyCalendarProvider() : googleProvider;
@@ -58,19 +68,32 @@ export function YearView({ navigate, demo = false }: { navigate: (path: string) 
         setReady(true);
     }, [demo, googleProvider]);
 
+    useEffect(() => {
+        if (!ready) return;
+        const page = pageRef.current;
+        if (!page) return;
+        const findTarget = () => {
+            const target = page.querySelector<HTMLElement>('[data-ui-slot="header-actions"]');
+            if (target) {
+                target.toggleAttribute("hidden", false);
+                setHeaderActionsTarget(target);
+            }
+        };
+        findTarget();
+        const observer = new MutationObserver(findTarget);
+        observer.observe(page, { childList: true, subtree: true });
+        return () => observer.disconnect();
+    }, [demo, ready]);
+
     return (
-        <main className={`year-view-page${demo ? "" : " app-page"}`}>
-            {ready && <CoreYearView config={{
-                icsCalendars: demo ? demoCalendars : undefined,
-                icsReadOnly: false,
-                demoMode: demo,
-                selectAllCalendars: demo,
-                embeddedDemo: demo && new URLSearchParams(globalThis.location.search).get("embed") === "1",
-                uiModules: demo ? [] : [
-                    createSaasHeaderAction("header-leading", navigate),
-                    createSaasHeaderAction("header-actions", navigate)
-                ]
-            }} />}
+        <main ref={pageRef} className={`year-view-page${demo ? "" : " app-page"}`}>
+            {ready && <CoreYearView config={config} />}
+            {headerActionsTarget && createPortal(
+                demo
+                    ? <Button type="button" onClick={() => navigate("/login?next=/app")}>Sign up</Button>
+                    : <UserButton />,
+                headerActionsTarget
+            )}
         </main>
     );
 }

@@ -1,5 +1,6 @@
 import { ArrowRight, CalendarDays, Eye, ShieldCheck } from "lucide-react";
 import { SiGithub, SiThunderbird } from "react-icons/si";
+import { Button } from "@/components/ui/button";
 import { Link, type Navigate } from "../components/Link";
 import { ModeCard } from "../components/ModeCard";
 
@@ -30,7 +31,7 @@ function LandingCalendarBackdrop() {
     return <div className="landing-calendar-backdrop" aria-hidden="true"><div className="landing-calendar-grid">{months.map((month) => <div className="landing-calendar-row" key={`${month.name}-${month.year}`}><div className="landing-calendar-month"><span>{month.name}</span><small>{month.year}</small></div>{month.days.map((day, index) => <div className={`landing-calendar-cell${day?.weekend ? " weekend" : ""}${day ? "" : " is-empty"}`} key={`${month.name}-${month.year}-${index}`}>{day?.number}</div>)}<div className="landing-calendar-events">{month.events.map((event, index) => <span className={`landing-calendar-event event-${event.color}`} key={`${month.name}-${month.year}-event-${index}`} style={{ gridColumn: `${event.start + 1} / span ${event.length}`, gridRow: index + 1 }} />)}</div></div>)}</div></div>;
 }
 
-export function LandingPage({ navigate, session }: { navigate: Navigate; session: Session }) {
+export function LandingPage({ navigate, session, authLoaded }: { navigate: Navigate; session: Session; authLoaded: boolean }) {
     return (
         <div className="landing-page">
             <LandingCalendarBackdrop />
@@ -39,7 +40,7 @@ export function LandingPage({ navigate, session }: { navigate: Navigate; session
                     <p className="eyebrow"><CalendarDays aria-hidden="true" /> Your Google Calendar, at year scale</p>
                     <h1>Year View <span>at a glance.</span></h1>
                     <p className="hero-lead">Year View shows your events on a full-year grid, making it easy to spot busy or free periods.</p>
-                    <div className="hero-actions"><button className="button button-primary hero-demo-button" type="button" onClick={() => navigate(session ? "/app" : "/demo")}><Eye aria-hidden="true" /> {session ? "Open Year View" : "Try the demo"}</button></div>
+                    <div className="hero-actions">{authLoaded ? <Button className="hero-demo-button" size="lg" onClick={() => navigate(session ? "/app" : "/demo")}><Eye aria-hidden="true" /> {session ? "Open Year View" : "Try the demo"}</Button> : <span className="hero-demo-placeholder" aria-hidden="true" />}</div>
                     <div className="hero-assurance"><ShieldCheck aria-hidden="true" /><p><strong>How it works.</strong> Year View uses your Google Calendar event and calendar list data to show a full-year overview. Access is read-only: no event edits and no calendar data stored on our server.</p></div>
                 </div><div className="preview-wrap reveal reveal-late"><figure className="product-preview" aria-label="Preview of the annual calendar interface"><div className="product-preview-bar" aria-hidden="true"><span className="product-preview-name"><CalendarDays /> Year View</span><span className="product-preview-status"><i /> Google Calendar connected</span></div><img src="https://github.com/BunteStadt/thunderbird_annual_view/releases/latest/download/linear-light.png" alt="Annual calendar with color-coded events and calendar filters" /><figcaption>Preview of the Year View calendar interface.</figcaption></figure></div></div></section>
 

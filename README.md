@@ -97,6 +97,7 @@ The view mode can be changed directly in the year view header: select between co
 
 ## Development
 
+The shadcn preset: --preset b1D5T6K8 was used.
 For the SaaS development setup, see [docs/saas-setup.md](docs/saas-setup.md) and
 [docs/saas-architecture.md](docs/saas-architecture.md). General contribution and
 testing guidance is in [docs/contributor-workflow.md](docs/contributor-workflow.md).

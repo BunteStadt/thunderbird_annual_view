@@ -13,7 +13,12 @@ export default defineConfig({
     plugins: [react(), tailwindcss()],
     resolve: {
         alias: {
+            "@": uiRoot,
             "@calendar-host": resolve(repositoryRoot, "src/hosts/core/main.js")
         }
+    },
+    build: {
+        emptyOutDir: true,
+        outDir: resolve(repositoryRoot, "dist/core")
     }
 });

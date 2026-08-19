@@ -118,7 +118,7 @@ test('ICS calendar integration loads stored calendars and renders upload control
 
     await integration.initialize();
 
-    assert.equal(mount.children.length, 3);
+    assert.equal(mount.children.length, 2);
     assert.equal(uploadButton.textContent, 'Upload ICS');
     assert.equal(fileInput.hidden, true);
     assert.equal(refreshCount, 0);
@@ -243,7 +243,6 @@ test('ICS calendar integration removeCalendar removes calendar and triggers refr
         listeners: {},
         addEventListener(type, handler) { this.listeners[type] = handler; }
     };
-    const separator = { className: '' };
     const buttonRow = { className: '', appendChild() {} };
     const mount = { replaceChildren() {} };
 
@@ -264,7 +263,7 @@ test('ICS calendar integration removeCalendar removes calendar and triggers refr
             const id = `${tag}-${(createCallCount[tag] = (createCallCount[tag] || 0) + 1)}`;
             if (tag === 'input') return fileInput;
             if (tag === 'button') return uploadButton;
-            if (tag === 'div') return id.endsWith('-1') ? separator : buttonRow;
+            if (tag === 'div') return buttonRow;
             return { className: '', textContent: '', appendChild() {} };
         }
     };

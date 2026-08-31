@@ -15,8 +15,7 @@ function requestOrigin(request: Request): string {
 async function authenticate(request: Request, env: Env) {
     const clerk = createClerkClient({
         secretKey: env.CLERK_SECRET_KEY,
-        publishableKey: env.CLERK_PUBLISHABLE_KEY,
-        jwtKey: env.CLERK_JWT_KEY
+        publishableKey: env.CLERK_PUBLISHABLE_KEY
     });
     return clerk.authenticateRequest(request, {
         authorizedParties: [requestOrigin(request)]
@@ -33,8 +32,7 @@ async function googleAccessToken(request: Request, env: Env): Promise<string> {
     if (!userId) throw new Error("Authenticated request did not contain a Clerk user ID.");
     const clerk = createClerkClient({
         secretKey: env.CLERK_SECRET_KEY,
-        publishableKey: env.CLERK_PUBLISHABLE_KEY,
-        jwtKey: env.CLERK_JWT_KEY
+        publishableKey: env.CLERK_PUBLISHABLE_KEY
     });
     const tokenResponse = await clerk.users.getUserOauthAccessToken(userId, "google");
     const accessToken = tokenResponse.data[0]?.token;

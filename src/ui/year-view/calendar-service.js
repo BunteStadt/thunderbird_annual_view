@@ -257,6 +257,16 @@ function parseICalDate(value) {
     return new Date(iso);
 }
 
+// Unfolds continuation lines, skips property parameters and resolves
+// TEXT escapes (RFC 5545 section 3.3.11).
+function parseICalText(vevent, name) {
+    const unfolded = vevent.replace(/\r?\n[ \t]/g, "");
+    const raw = unfolded.match(new RegExp(`^${name}(?:;[^:\\r\\n]*)?:(.*)$`, "m"))?.[1] ?? "";
+    return raw
+        .replace(/\\([\\;,nN])/g, (_, c) => (c === "n" || c === "N" ? "\n" : c))
+        .trim();
+}
+
 function formatRangeBound(year, month, day) {
     const yyyy = String(year).padStart(4, "0");
     const mm = String(month).padStart(2, "0");
@@ -332,9 +342,9 @@ export async function fetchCalendarEvents(year, options = {}) {
                 const veventMatch = item.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/m);
                 const vevent = veventMatch ? veventMatch[0] : item;
 
-                const summary = vevent.match(/^SUMMARY:(.*)$/m)?.[1]?.trim() ?? "";
-                const description = vevent.match(/^DESCRIPTION:(.*)$/m)?.[1]?.trim() ?? "";
-                const location = vevent.match(/^LOCATION:(.*)$/m)?.[1]?.trim() ?? "";
+                const summary = parseICalText(vevent, "SUMMARY");
+                const description = parseICalText(vevent, "DESCRIPTION");
+                const location = parseICalText(vevent, "LOCATION");
                 const startRaw = vevent.match(/DTSTART(?:;TZID=[^:]+|;VALUE=DATE)?:([^\r\n]+)/m)?.[1];
                 const endRaw = vevent.match(/DTEND(?:;TZID=[^:]+|;VALUE=DATE)?:([^\r\n]+)/m)?.[1];
                 const start = parseICalDate(startRaw);

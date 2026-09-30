@@ -65,6 +65,37 @@ test('fetchCalendarEvents resolves per-calendar all-day modes against the global
     assert.ok(events.every((event) => event.calendarId !== 'dummy-project' || event.allDay === true));
 });
 
+test('fetchCalendarEvents unescapes and unfolds iCal text properties', async (t) => {
+    const calendarService = await loadCalendarServiceModule();
+    globalThis.ENABLE_DUMMY_CALENDARS = false;
+    const ical = [
+        'BEGIN:VEVENT',
+        'SUMMARY:Offsite (Berlin\\, Munich)',
+        'DESCRIPTION;LANGUAGE=en:Line one\\nLine two\\; with a back',
+        ' slash \\\\',
+        'LOCATION:Room 1\\, Floor 2',
+        'DTSTART;VALUE=DATE:20260301',
+        'DTEND;VALUE=DATE:20260322',
+        'END:VEVENT'
+    ].join('\r\n');
+    globalThis.browser = {
+        calendar: {
+            calendars: { query: async () => [{ id: 'cal', name: 'Cal' }] },
+            items: { query: async () => [{ id: 'evt', item: ical }] }
+        }
+    };
+    t.after(() => {
+        delete globalThis.browser;
+        delete globalThis.ENABLE_DUMMY_CALENDARS;
+    });
+
+    const [event] = await calendarService.fetchCalendarEvents(2026, {});
+
+    assert.equal(event.title, 'Offsite (Berlin, Munich)');
+    assert.equal(event.description, 'Line one\nLine two; with a backslash \\');
+    assert.equal(event.location, 'Room 1, Floor 2');
+});
+
 test('calendar service returns empty arrays when calendar API is unavailable', async (t) => {
     const calendarService = await loadCalendarServiceModule();
     globalThis.ENABLE_DUMMY_CALENDARS = false;
